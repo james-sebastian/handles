@@ -10,6 +10,7 @@ class PhoneAuthPage extends StatefulWidget {
 class _PhoneAuthPageState extends State<PhoneAuthPage> {
 
   String countryCode = '+61';
+  bool isError = false;
   TextEditingController phoneInputController = TextEditingController();
 
   @override
@@ -38,7 +39,7 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
                     Font.out(
                       "Handles will send a SMS message to verify\nyour phone number. Please enter your country\ncode and your phone number as well.",
                       textAlign: TextAlign.center,
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.w300,
                       color: Palette.primaryText,
                     ),
@@ -55,7 +56,7 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
                       CountryListPick(
                         appBar: AppBar(
                           backgroundColor: Colors.blue,
-                          title: Text('Choisir un pays'),
+                          title: Text('Choose your country code'),
                         ),
                         
                         pickerBuilder: (context, CountryCode? code){
@@ -139,6 +140,9 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
                               width: MQuery.width(0.9, context),
                               margin: const EdgeInsets.only(left: 0.0, right: 7.5),
                               decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: isError ? Palette.warning : Colors.transparent
+                                ),
                                 borderRadius: BorderRadius.circular(10.0),
                                 color: Palette.formColor,
                               ),
@@ -154,6 +158,10 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
                                     fontSize: 18
                                   ),
                                   decoration: InputDecoration(
+                                    hintStyle: TextStyle(
+                                      fontSize: 18,
+                                      color: isError ? Palette.warning : Colors.black.withOpacity(0.4)
+                                    ),
                                     hintText: "Ex: 2 3456 7890",
                                     contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
                                     border: InputBorder.none
@@ -173,12 +181,32 @@ class _PhoneAuthPageState extends State<PhoneAuthPage> {
                     ],
                   ),
                 ),
+                if (isError)
+                Column(
+                  children: [
+                    SizedBox(height: MQuery.height(0.02, context)),
+                    Font.out(
+                      "Please provide your phone number firstly.",
+                      fontSize: 14,
+                      color: Palette.warning
+                    ),
+                  ],
+                ) else
+                SizedBox(),
                 Spacer(flex: 2),
                 Button(
                   title: "NEXT",
                   color: Palette.primary,
-                  method: (){
-                    FlutterAppBadger.updateBadgeCount(1);
+                  method: () async {
+                    if(phoneInputController.text != ""){
+                      Get.to(() => PhoneVerificationPage(
+                        phoneNumber: countryCode + " " + phoneInputController.text.trim(),
+                      ), transition: Transition.cupertino);
+                    } else {
+                      setState(() {
+                        isError = true;
+                      });
+                    }
                   },
                   textColor: Colors.white,
                 ),
