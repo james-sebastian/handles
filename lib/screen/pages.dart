@@ -20,3 +20,4 @@ part 'auth/phone_input.dart';
 part 'auth/phone_verification.dart';
 part 'auth/account_creation.dart';
 part 'homepage/homepage.dart';
+part 'homepage/archived_handles.dart';

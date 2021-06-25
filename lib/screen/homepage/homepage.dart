@@ -26,11 +26,23 @@ class _HomepageState extends State<Homepage> {
     ];
 
     Map<String, Widget> filterAvatar = {
-      "Photos": Icon(Icons.image, color: Colors.white, size: 20),
-      "Videos": Icon(Icons.videocam, color: Colors.white, size: 20),
+      "Photos": AdaptiveIcon(
+        android: Icons.image,
+        iOS: CupertinoIcons.photo_fill,
+        color: Colors.white, size: 20
+      ),
+      "Videos": AdaptiveIcon(
+        android: Icons.videocam,
+        iOS: CupertinoIcons.video_camera_solid,
+        color: Colors.white, size: 20
+      ),
       "Docs": SvgPicture.asset("assets/mdi_file-document.svg", height: 18, width: 18),
       "Meetings": SvgPicture.asset("assets/mdi_presentation-play.svg", height: 18, width: 18),
-      "Services": Icon(Icons.shopping_cart, color: Colors.white, size: 18)
+      "Services": AdaptiveIcon(
+        android: Icons.shopping_cart,
+        iOS: CupertinoIcons.cart_fill,
+        color: Colors.white, size: 18
+      )
     };
 
     return MaterialApp(
@@ -42,7 +54,11 @@ class _HomepageState extends State<Homepage> {
           floatingActionButton: FloatingActionButton(
             elevation: 0,
             backgroundColor: Palette.secondary,
-            child: Icon(Icons.add, color: Colors.white, size: 28,),
+            child: AdaptiveIcon(
+              android: Icons.add,
+              iOS: CupertinoIcons.add,
+              color: Colors.white, size: 28,
+            ),
             onPressed: (){},
           ),
           appBar: AppBar(
@@ -66,7 +82,10 @@ class _HomepageState extends State<Homepage> {
                       });
                     }
                   },
-                  icon: Icon(Icons.arrow_back),
+                  icon: AdaptiveIcon(
+                    android: Icons.arrow_back,
+                    iOS: CupertinoIcons.back,
+                  ),
                 )
               : SizedBox(width: 0),
             title: isHandlesSelected
@@ -111,14 +130,43 @@ class _HomepageState extends State<Homepage> {
               ? FadeIn(
                   child: Row(
                     children: [
-                    IconButton(
+                      IconButton(
+                        icon: AdaptiveIcon(
+                          android: Icons.delete,
+                          iOS: CupertinoIcons.trash,
+                        ),
+                        onPressed: (){
+                          showDialog(
+                            context: context,
+                            builder: (context){
+                              return AdaptiveDialog(
+                                title: "Delete ${selectedHandles.length} Handles?",
+                                content: "This action will irreversibly get you out from these Handles",
+                                actionMethodNegative: (){},
+                                actionMethodPositive: (){
+                                  Get.back();
+                                },
+                                negativeTitle: "Delete",
+                                positiveTitle: "Cancel",
+                              );
+                            }
+                          );
+                        },
+                      ),
+                      IconButton(
                         tooltip: "Pin Handles",
-                        icon: Icon(Icons.push_pin),
+                        icon: AdaptiveIcon(
+                          android: Icons.push_pin,
+                          iOS: CupertinoIcons.pin_fill,
+                        ),
                         onPressed: (){}
                       ),
                       IconButton(
                         tooltip: "Settings",
-                        icon: Icon(Icons.archive),
+                        icon: AdaptiveIcon(
+                          android: Icons.archive,
+                          iOS: CupertinoIcons.archivebox_fill,
+                        ),
                         onPressed: (){}
                       ),
                     ],
@@ -130,7 +178,10 @@ class _HomepageState extends State<Homepage> {
                       children: [
                         IconButton(
                           tooltip: "Search",
-                          icon: Icon(Icons.search),
+                          icon: AdaptiveIcon(
+                            android: Icons.search,
+                            iOS: CupertinoIcons.search,
+                          ),
                           onPressed: (){}
                         ),
                       ]
@@ -141,7 +192,10 @@ class _HomepageState extends State<Homepage> {
                       children: [
                       IconButton(
                           tooltip: "Search",
-                          icon: Icon(Icons.search),
+                          icon: AdaptiveIcon(
+                            android: Icons.search,
+                            iOS: CupertinoIcons.search,
+                          ),
                           onPressed: (){
                             setState(() {
                               isSearchActive = true;
@@ -150,7 +204,10 @@ class _HomepageState extends State<Homepage> {
                         ),
                         IconButton(
                           tooltip: "Settings",
-                          icon: Icon(Icons.more_vert_rounded),
+                          icon: AdaptiveIcon(
+                            android: Icons.more_vert_rounded,
+                            iOS: CupertinoIcons.ellipsis,
+                          ),
                           onPressed: (){}
                         ),
                       ],
@@ -178,173 +235,183 @@ class _HomepageState extends State<Homepage> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  isSearchActive
-                  ? Container(
-                      color: Palette.primary,
-                      width: MQuery.width(1, context),
-                      height: MQuery.height(0.075, context),
-                      padding: EdgeInsets.symmetric(
-                        vertical: MQuery.height(0.01 ,context),
-                        horizontal: MQuery.width(0.0225, context)
-                      ),
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        children: filterList.map((e){
-                          return Padding(
-                            padding: EdgeInsets.only(
-                              left: 8.0
-                            ),
-                            child: FilterChip(
-                              padding: EdgeInsets.only(
-                                left: 10,
-                                right: 10,
-                                top: 5,
-                                bottom: 5
-                              ),
-                              shape: StadiumBorder(side: BorderSide(
-                                color: filterList.indexOf(e) == isFilterChipSelected
-                                ? Palette.filterSelected
-                                : Palette.filterSelected.withOpacity(0.25)
-                              )),
-                              shadowColor: Colors.transparent,
-                              backgroundColor: Palette.primary,
-                              selectedColor: Palette.filterSelected,
-                              elevation: 0,
-                              showCheckmark: false,
-                              avatar: filterAvatar[e],
-                              label: Text(e),
-                              labelStyle: TextStyle(
-                                color: Colors.white
-                              ),
-                              selected: filterList.indexOf(e) == isFilterChipSelected,
-                              onSelected: (bool selected) {
-                                filterList.indexOf(e) != isFilterChipSelected
-                                ? setState((){
-                                    isFilterChipSelected = filterList.indexOf(e);
-                                  })
-                                : setState((){
-                                    isFilterChipSelected = -1;
-                                  });
-                              },
-                            ),
-                          );
-                        }).toList().cast<Widget>()        
-                      ),
-                  )
-                  : SizedBox(),
+                  if (isSearchActive)
                   Container(
-                    height: isSearchActive ? MQuery.height(0.725, context) : MQuery.height(0.75, context),
-                    child: ListView.builder(
-                      itemCount: 3,
-                      itemBuilder: (context, index){
-                        return ListTile(
-                          onLongPress: (){
-                            setState(() {
-                              isHandlesSelected = true;
-                              selectedHandles.add(index);
-                            });
-                          },
-                          onTap: (){
-                            if(isHandlesSelected){
-                              print(selectedHandles.toList().indexOf(index));
-                              if(selectedHandles.toList().indexOf(index) < 0){
-                                setState(() {
-                                  selectedHandles.add(index);
+                    color: Palette.primary,
+                    width: MQuery.width(1, context),
+                    height: MQuery.height(0.075, context),
+                    padding: EdgeInsets.symmetric(
+                      vertical: MQuery.height(0.01 ,context),
+                      horizontal: MQuery.width(0.0225, context)
+                    ),
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: filterList.map((e){
+                        return Padding(
+                          padding: EdgeInsets.only(
+                            left: 8.0
+                          ),
+                          child: FilterChip(
+                            padding: EdgeInsets.only(
+                              left: 10,
+                              right: 10,
+                              top: 5,
+                              bottom: 5
+                            ),
+                            shape: StadiumBorder(side: BorderSide(
+                              color: filterList.indexOf(e) == isFilterChipSelected
+                              ? Palette.filterSelected
+                              : Palette.filterSelected.withOpacity(0.25)
+                            )),
+                            shadowColor: Colors.transparent,
+                            backgroundColor: Palette.primary,
+                            selectedColor: Palette.filterSelected,
+                            elevation: 0,
+                            showCheckmark: false,
+                            avatar: filterAvatar[e],
+                            label: Text(e),
+                            labelStyle: TextStyle(
+                              color: Colors.white
+                            ),
+                            selected: filterList.indexOf(e) == isFilterChipSelected,
+                            onSelected: (bool selected) {
+                              filterList.indexOf(e) != isFilterChipSelected
+                              ? setState((){
+                                  isFilterChipSelected = filterList.indexOf(e);
+                                })
+                              : setState((){
+                                  isFilterChipSelected = -1;
                                 });
-                              } else {
-                                setState(() {
-                                  selectedHandles.remove(index);
-                                });
+                            },
+                          ),
+                        );
+                      }).toList().cast<Widget>()        
+                    ),
+                  ) else
+                  SizedBox(),
+                  //TODO: PRO USER DETECTION
+                  SubscriptionBanner(),
+                  Expanded(
+                    flex: 7,
+                    child: Container(
+                      // height: isSearchActive ? MQuery.height(0.725, context) : MQuery.height(0.7, context),
+                      child: ListView.builder(
+                        itemCount: 3,
+                        itemBuilder: (context, index){
+                          return ListTile(
+                            onLongPress: (){
+                              setState(() {
+                                isHandlesSelected = true;
+                                selectedHandles.add(index);
+                              });
+                            },
+                            onTap: (){
+                              if(isHandlesSelected){
+                                print(selectedHandles.toList().indexOf(index));
+                                if(selectedHandles.toList().indexOf(index) < 0){
+                                  setState(() {
+                                    selectedHandles.add(index);
+                                  });
+                                } else {
+                                  setState(() {
+                                    selectedHandles.remove(index);
+                                  });
+                                }
                               }
-                            }
-                          },
-                          contentPadding: EdgeInsets.fromLTRB(
-                            MQuery.width(0.02, context),
-                            index >= 1 ? MQuery.height(0.005, context) : MQuery.height(0.01, context),
-                            MQuery.width(0.02, context),
-                            MQuery.height(0.005, context),
-                          ),
-                          leading: Stack(
-                            alignment: Alignment.bottomRight,
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: Palette.primary,
-                                radius: MQuery.height(0.025, context),
-                              ),
-                              selectedHandles.toList().indexOf(index) >= 0
-                              ? ZoomIn(
-                                  duration: Duration(milliseconds: 100),
-                                  child: Positioned(
-                                    child: CircleAvatar(
-                                      backgroundColor: Palette.secondary,
-                                      radius: 10,
-                                      child: Icon(Icons.check, size: 12, color: Colors.white),
-                                    ),
-                                  ),
-                                )
-                              : SizedBox()
-                            ],
-                          ),
-                          title: Font.out(
-                            "Handles DevTeam",
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            textAlign: TextAlign.start
-                          ),
-                          subtitle: Font.out(
-                            "Steve: Great! no problem. Good luck!",
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            textAlign: TextAlign.start,
-                            color: //TODO: IF MESSAGE IS NEW, OPACITY 100% 
-                              Colors.black.withOpacity(0.75)
-                          ),
-                          trailing: Container(
-                            width: MQuery.width(0.07, context),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              crossAxisAlignment: CrossAxisAlignment.end,
+                            },
+                            contentPadding: EdgeInsets.fromLTRB(
+                              MQuery.width(0.02, context),
+                              index >= 1 ? MQuery.height(0.005, context) : MQuery.height(0.01, context),
+                              MQuery.width(0.02, context),
+                              MQuery.height(0.005, context),
+                            ),
+                            leading: Stack(
+                              alignment: Alignment.bottomRight,
                               children: [
-                                Font.out(
-                                  "1:13 PM",
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  textAlign: TextAlign.start,
-                                  color: Colors.black.withOpacity(0.75)
+                                CircleAvatar(
+                                  backgroundColor: Palette.primary,
+                                  radius: MQuery.height(0.025, context),
                                 ),
-                                //TODO: IF MESSAGE IS NEW // PINNED, DISPLAY INDICATOR / PINNED ICON
-                                if (index >= 1)
-                                  SizedBox()
-                                else Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    // CircleAvatar(
-                                    //   backgroundColor: Palette.primary,
-                                    //   radius: 10,
-                                    //   child: Center(
-                                    //     child: Font.out(
-                                    //       "1",
-                                    //       fontSize: 12
-                                    //     ),
-                                    //   ),
-                                    // ),
-                                    Icon(Icons.push_pin, size: 20)
-                                  ],
-                                )
+                                selectedHandles.toList().indexOf(index) >= 0
+                                ? ZoomIn(
+                                    duration: Duration(milliseconds: 100),
+                                    child: Positioned(
+                                      child: CircleAvatar(
+                                        backgroundColor: Palette.secondary,
+                                        radius: 10,
+                                        child: Icon(Icons.check, size: 12, color: Colors.white),
+                                      ),
+                                    ),
+                                  )
+                                : SizedBox()
                               ],
                             ),
-                          )
-                        );
-                      }
-                    )
+                            title: Font.out(
+                              "Handles DevTeam",
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              textAlign: TextAlign.start
+                            ),
+                            subtitle: Font.out(
+                              "Steve: Great! no problem. Good luck!",
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              textAlign: TextAlign.start,
+                              color: //TODO: IF MESSAGE IS NEW, OPACITY 100% 
+                                Colors.black.withOpacity(0.75)
+                            ),
+                            trailing: Container(
+                              width: MQuery.width(0.06, context),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Font.out(
+                                    "1:13 PM",
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                    textAlign: TextAlign.start,
+                                    color: Colors.black.withOpacity(0.75)
+                                  ),
+                                  //TODO: IF MESSAGE IS NEW // PINNED, DISPLAY INDICATOR / PINNED ICON
+                                  if (index >= 1)
+                                    SizedBox()
+                                  else Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      // CircleAvatar(
+                                      //   backgroundColor: Palette.primary,
+                                      //   radius: 10,
+                                      //   child: Center(
+                                      //     child: Font.out(
+                                      //       "1",
+                                      //       fontSize: 12
+                                      //     ),
+                                      //   ),
+                                      // ),
+                                      AdaptiveIcon(
+                                        android: Icons.push_pin,
+                                        iOS: CupertinoIcons.pin_fill,
+                                        size: 20
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ),
+                            )
+                          );
+                        }
+                      )
+                    ),
                   ),
-                  Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        top: 10,
-                      ),
+                  Expanded(
+                    flex: 1,
+                    child: Center(
                       child: GestureDetector(
+                        onTap: (){
+                          Get.to(() => ArchivedHandles(), transition: Transition.cupertino);
+                        },
                         child: Text(
                           "Archived Handles",
                           style: TextStyle(
