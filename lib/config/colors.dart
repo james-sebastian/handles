@@ -20,6 +20,7 @@ class Palette{
   static Color primary = HexColor("007BFF");
   static Color secondary = HexColor("47E5BC");
   static Color tertiary = HexColor("FFD60A");
+  static Color filterSelected = HexColor("1E599D");
   static Color primaryText = HexColor("000000");
   static Color secondaryText = HexColor("355366");
   static Color warning = HexColor("CF1B2B");
