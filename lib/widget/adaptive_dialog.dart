@@ -21,47 +21,31 @@ class AdaptiveDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Platform.isAndroid
-    ? AlertDialog(
-        title: Text(this.title),
-        content: Text(this.content),
-        actions: [
-          TextButton(
-            child: Text(negativeTitle),
-            style: TextButton.styleFrom(
-              textStyle: TextStyle(
-                color: Palette.warning,
-                fontWeight: FontWeight.w500
-              )
-            ),
-            onPressed: actionMethodNegative(),
+    return AlertDialog(
+      title: Text(this.title),
+      content: Text(this.content),
+      actions: [
+        TextButton(
+          child: Text(negativeTitle),
+          style: TextButton.styleFrom(
+            textStyle: TextStyle(
+              color: Palette.warning,
+              fontWeight: FontWeight.w500
+            )
           ),
-          TextButton(
-            child: Text(positiveTitle),
-            style: TextButton.styleFrom(
-              textStyle: TextStyle(
-                color: Palette.primary,
-                fontWeight: FontWeight.w500
-              )
-            ),
-            onPressed: actionMethodPositive(),
-          )
-        ],
-      )
-    : CupertinoAlertDialog(
-        title: Text(this.title),
-        content: Text(this.content),
-        actions: [
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            onPressed: actionMethodPositive(),
-            child: Text(positiveTitle),
+          onPressed: actionMethodNegative(),
+        ),
+        TextButton(
+          child: Text(positiveTitle),
+          style: TextButton.styleFrom(
+            textStyle: TextStyle(
+              color: Palette.primary,
+              fontWeight: FontWeight.w500
+            )
           ),
-          CupertinoDialogAction(
-            onPressed: actionMethodNegative(),
-            child: Text(negativeTitle),
-          )
-        ],
+          onPressed: actionMethodPositive(),
+        )
+      ],
     );
   }
 }
