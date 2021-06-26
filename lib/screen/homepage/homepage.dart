@@ -7,43 +7,33 @@ class Homepage extends StatefulWidget {
   _HomepageState createState() => _HomepageState();
 }
 
-class _HomepageState extends State<Homepage> {
+class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin {
   
   bool isHandlesSelected = false;
   bool isSearchActive = false;
   int isFilterChipSelected = -1;
+  int activePage = 0;
+  bool sampleIsEmptyPage = false;
   Set<int> selectedHandles = Set();
+  late TabController _tabController;
+
+  @override
+  void initState() { 
+    super.initState();
+    _tabController = TabController(vsync: this, length: 2);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
 
     print(isHandlesSelected);
     print(selectedHandles);
-
-    List<String> filterList = [
-      "Photos", "Videos",
-      "Docs", "Meetings", "Services"
-    ];
-
-    Map<String, Widget> filterAvatar = {
-      "Photos": AdaptiveIcon(
-        android: Icons.image,
-        iOS: CupertinoIcons.photo_fill,
-        color: Colors.white, size: 20
-      ),
-      "Videos": AdaptiveIcon(
-        android: Icons.videocam,
-        iOS: CupertinoIcons.video_camera_solid,
-        color: Colors.white, size: 20
-      ),
-      "Docs": SvgPicture.asset("assets/mdi_file-document.svg", height: 18, width: 18),
-      "Meetings": SvgPicture.asset("assets/mdi_presentation-play.svg", height: 18, width: 18),
-      "Services": AdaptiveIcon(
-        android: Icons.shopping_cart,
-        iOS: CupertinoIcons.cart_fill,
-        color: Colors.white, size: 18
-      )
-    };
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -127,51 +117,81 @@ class _HomepageState extends State<Homepage> {
                   ),
             actions: [
               isHandlesSelected
-              ? FadeIn(
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: AdaptiveIcon(
-                          android: Icons.delete,
-                          iOS: CupertinoIcons.trash,
+              ? _tabController.index == 0
+                ? FadeIn(
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: AdaptiveIcon(
+                            android: Icons.delete,
+                            iOS: CupertinoIcons.trash,
+                          ),
+                          onPressed: (){
+                            showDialog(
+                              context: context,
+                              builder: (context){
+                                return AdaptiveDialog(
+                                  title: "Delete ${selectedHandles.length} Handles?",
+                                  content: "This action will irreversibly get you out from these Handles",
+                                  actionMethodNegative: (){},
+                                  actionMethodPositive: (){
+                                    Get.back();
+                                  },
+                                  negativeTitle: "Delete",
+                                  positiveTitle: "Cancel",
+                                );
+                              }
+                            );
+                          },
                         ),
-                        onPressed: (){
-                          showDialog(
-                            context: context,
-                            builder: (context){
-                              return AdaptiveDialog(
-                                title: "Delete ${selectedHandles.length} Handles?",
-                                content: "This action will irreversibly get you out from these Handles",
-                                actionMethodNegative: (){},
-                                actionMethodPositive: (){
-                                  Get.back();
-                                },
-                                negativeTitle: "Delete",
-                                positiveTitle: "Cancel",
-                              );
-                            }
-                          );
-                        },
-                      ),
-                      IconButton(
-                        tooltip: "Pin Handles",
-                        icon: AdaptiveIcon(
-                          android: Icons.push_pin,
-                          iOS: CupertinoIcons.pin_fill,
+                        IconButton(
+                          tooltip: "Pin Handles",
+                          icon: AdaptiveIcon(
+                            android: Icons.push_pin,
+                            iOS: CupertinoIcons.pin_fill,
+                          ),
+                          onPressed: (){}
                         ),
-                        onPressed: (){}
-                      ),
-                      IconButton(
-                        tooltip: "Settings",
-                        icon: AdaptiveIcon(
-                          android: Icons.archive,
-                          iOS: CupertinoIcons.archivebox_fill,
+                        IconButton(
+                          tooltip: "Settings",
+                          icon: AdaptiveIcon(
+                            android: Icons.archive,
+                            iOS: CupertinoIcons.archivebox_fill,
+                          ),
+                          onPressed: (){}
                         ),
-                        onPressed: (){}
-                      ),
-                    ],
-                  ),
-                )
+                      ],
+                    ),
+                  )
+                : FadeIn(
+                    child: Row(
+                      children: [
+                        IconButton(
+                          icon: AdaptiveIcon(
+                            android: Icons.delete,
+                            iOS: CupertinoIcons.trash,
+                          ),
+                          onPressed: (){
+                            showDialog(
+                              context: context,
+                              builder: (context){
+                                return AdaptiveDialog(
+                                  title: "Delete ${selectedHandles.length} call logs?",
+                                  content: "This action is irreversible.",
+                                  actionMethodNegative: (){},
+                                  actionMethodPositive: (){
+                                    Get.back();
+                                  },
+                                  negativeTitle: "Delete",
+                                  positiveTitle: "Cancel",
+                                );
+                              }
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  )
               : isSearchActive
                 ? FadeIn(
                     child: Row(
@@ -217,22 +237,28 @@ class _HomepageState extends State<Homepage> {
             bottom: isSearchActive
             ? PreferredSize(child: SizedBox(), preferredSize: Size.fromHeight(0))
             : TabBar(
-              indicatorSize: TabBarIndicatorSize.tab,
-              labelStyle: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Colors.white
-              ),
-              indicatorColor: Colors.white,
-              tabs: [
-                Tab(text: "CHATS"),
-                Tab(text: "CALLS"),
-              ],
-            )
+                controller: _tabController,
+                indicatorSize: TabBarIndicatorSize.tab,
+                labelStyle: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white
+                ),
+                indicatorColor: Colors.white,
+                tabs: [
+                  Tab(text: "CHATS"),
+                  Tab(text: "CALLS"),
+                ],
+              )
           ),
           body: TabBarView(
+            controller: _tabController,
             children: [
-              Column(
+              sampleIsEmptyPage
+              ? EmptyHandles(
+                  isHandlesPage: true
+                )
+              : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (isSearchActive)
@@ -246,7 +272,7 @@ class _HomepageState extends State<Homepage> {
                     ),
                     child: ListView(
                       scrollDirection: Axis.horizontal,
-                      children: filterList.map((e){
+                      children: Constants.filterList.map((e){
                         return Padding(
                           padding: EdgeInsets.only(
                             left: 8.0
@@ -259,7 +285,7 @@ class _HomepageState extends State<Homepage> {
                               bottom: 5
                             ),
                             shape: StadiumBorder(side: BorderSide(
-                              color: filterList.indexOf(e) == isFilterChipSelected
+                              color: Constants.filterList.indexOf(e) == isFilterChipSelected
                               ? Palette.filterSelected
                               : Palette.filterSelected.withOpacity(0.25)
                             )),
@@ -268,16 +294,16 @@ class _HomepageState extends State<Homepage> {
                             selectedColor: Palette.filterSelected,
                             elevation: 0,
                             showCheckmark: false,
-                            avatar: filterAvatar[e],
+                            avatar: Constants.filterAvatar[e],
                             label: Text(e),
                             labelStyle: TextStyle(
                               color: Colors.white
                             ),
-                            selected: filterList.indexOf(e) == isFilterChipSelected,
+                            selected: Constants.filterList.indexOf(e) == isFilterChipSelected,
                             onSelected: (bool selected) {
-                              filterList.indexOf(e) != isFilterChipSelected
+                              Constants.filterList.indexOf(e) != isFilterChipSelected
                               ? setState((){
-                                  isFilterChipSelected = filterList.indexOf(e);
+                                  isFilterChipSelected = Constants.filterList.indexOf(e);
                                 })
                               : setState((){
                                   isFilterChipSelected = -1;
@@ -292,13 +318,37 @@ class _HomepageState extends State<Homepage> {
                   //TODO: PRO USER DETECTION
                   SubscriptionBanner(),
                   Expanded(
-                    flex: 7,
+                    flex: 8,
                     child: Container(
-                      // height: isSearchActive ? MQuery.height(0.725, context) : MQuery.height(0.7, context),
                       child: ListView.builder(
-                        itemCount: 3,
+                        itemCount: 3 + 1, //REAL LENGTH + 1 (FOR ARCHIVED)
                         itemBuilder: (context, index){
-                          return ListTile(
+                          return index == 3 //REAL LENGTH
+                          ? Padding(
+                              padding: EdgeInsets.only(
+                                top: 3 >= 8 //IF REAL LENGTH > 8 => ARCHIVED HANDLES PADDING == MINIMUM
+                                ? MQuery.height(0.01, context)
+                                : MQuery.height(0.41, context),
+                                bottom: MQuery.height(0.03, context)
+                              ),
+                              child: Center(
+                                child: GestureDetector(
+                                  onTap: (){
+                                    Get.to(() => ArchivedHandles(), transition: Transition.cupertino);
+                                  },
+                                  child: Text(
+                                    "Archived Handles",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      decoration: TextDecoration.underline,
+                                      fontSize: 16,
+                                      color: Palette.primary
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : ListTile(
                             onLongPress: (){
                               setState(() {
                                 isHandlesSelected = true;
@@ -317,6 +367,8 @@ class _HomepageState extends State<Homepage> {
                                     selectedHandles.remove(index);
                                   });
                                 }
+                              } else {
+                                Get.to(() => HandlesPage(), transition: Transition.cupertino);
                               }
                             },
                             contentPadding: EdgeInsets.fromLTRB(
@@ -405,28 +457,104 @@ class _HomepageState extends State<Homepage> {
                       )
                     ),
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: Center(
-                      child: GestureDetector(
-                        onTap: (){
-                          Get.to(() => ArchivedHandles(), transition: Transition.cupertino);
-                        },
-                        child: Text(
-                          "Archived Handles",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w400,
-                            decoration: TextDecoration.underline,
-                            fontSize: 16,
-                            color: Palette.primary
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
                 ],
               ),
-              Icon(Icons.directions_transit),
+              sampleIsEmptyPage
+              ? EmptyHandles(isHandlesPage: false)
+              : ListView.builder(
+                itemCount: 3,
+                itemBuilder: (context, index){
+                  return Column(
+                    children: [
+                      ListTile(
+                        onLongPress: (){
+                          setState(() {
+                            isHandlesSelected = true;
+                            selectedHandles.add(index);
+                          });
+                        },
+                        onTap: (){
+                          if(isHandlesSelected){
+                            print(selectedHandles.toList().indexOf(index));
+                            if(selectedHandles.toList().indexOf(index) < 0){
+                              setState(() {
+                                selectedHandles.add(index);
+                              });
+                            } else {
+                              setState(() {
+                                selectedHandles.remove(index);
+                              });
+                            }
+                          } else {
+                            Get.to(() => DetailedCallPage(), transition: Transition.cupertino);
+                          }
+                        },
+                        contentPadding: EdgeInsets.fromLTRB(
+                          MQuery.width(0.02, context),
+                          index >= 1 ? 0 : MQuery.height(0.01, context),
+                          MQuery.width(0.01, context),
+                          0,
+                        ),
+                        leading: Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            CircleAvatar(
+                              backgroundColor: Palette.primary,
+                              radius: MQuery.height(0.025, context),
+                            ),
+                            selectedHandles.toList().indexOf(index) >= 0
+                            ? ZoomIn(
+                                duration: Duration(milliseconds: 100),
+                                child: Positioned(
+                                  child: CircleAvatar(
+                                    backgroundColor: Palette.secondary,
+                                    radius: 10,
+                                    child: Icon(Icons.check, size: 12, color: Colors.white),
+                                  ),
+                                ),
+                              )
+                            : SizedBox()
+                          ],
+                        ),
+                        title: Font.out(
+                          "Handles DevTeam",
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          textAlign: TextAlign.start
+                        ),
+                        subtitle: Row(
+                          children: [
+                            //TODO: PHONE STATUS LOGIC
+                            AdaptiveIcon(
+                              android: Icons.call_made,
+                              iOS: CupertinoIcons.phone_fill_arrow_down_left,
+                              size: 14,
+                              color: Palette.secondary,
+                            ),
+                            SizedBox(width: MQuery.width(0.0075, context)),
+                            Font.out(
+                              "June 16, 7:43 AM",
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              textAlign: TextAlign.start,
+                              color: Colors.black.withOpacity(0.75)
+                            ),
+                          ],
+                        ),
+                        trailing: IconButton(
+                          onPressed: (){},
+                          icon: AdaptiveIcon(
+                            android: Icons.call,
+                            iOS: CupertinoIcons.phone_fill,
+                            color: Palette.primary,
+                          ),
+                        )
+                      ),
+                      Divider(),
+                    ],
+                  );
+                }
+              ),
             ],
           ),
         ),

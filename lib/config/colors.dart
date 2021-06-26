@@ -5,16 +5,16 @@ class Palette{
   static int primaryIntForm = 0xFF007BFF;
 
   static Map<int, Color> materialColorMap = {
-    50:Color.fromRGBO(136,14,79, .1),
-    100:Color.fromRGBO(136,14,79, .2),
-    200:Color.fromRGBO(136,14,79, .3),
-    300:Color.fromRGBO(136,14,79, .4),
-    400:Color.fromRGBO(136,14,79, .5),
-    500:Color.fromRGBO(136,14,79, .6),
-    600:Color.fromRGBO(136,14,79, .7),
-    700:Color.fromRGBO(136,14,79, .8),
-    800:Color.fromRGBO(136,14,79, .9),
-    900:Color.fromRGBO(136,14,79, 1),
+    50:HexColor("007BFF"),
+    100:HexColor("007BFF"),
+    200:HexColor("007BFF"),
+    300:HexColor("007BFF"),
+    400:HexColor("007BFF"),
+    500:HexColor("007BFF"),
+    600:HexColor("007BFF"),
+    700:HexColor("007BFF"),
+    800:HexColor("007BFF"),
+    900:HexColor("007BFF"),
   };
 
   static Color primary = HexColor("007BFF");
@@ -25,4 +25,5 @@ class Palette{
   static Color secondaryText = HexColor("355366");
   static Color warning = HexColor("CF1B2B");
   static Color formColor = HexColor("F0F0F0");
+  static Color handlesBackground = HexColor("D8E4F4");
 }
