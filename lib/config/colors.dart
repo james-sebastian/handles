@@ -26,4 +26,5 @@ class Palette{
   static Color warning = HexColor("CF1B2B");
   static Color formColor = HexColor("F0F0F0");
   static Color handlesBackground = HexColor("D8E4F4");
+  static Color handlesChat = HexColor("84ADE3");
 }

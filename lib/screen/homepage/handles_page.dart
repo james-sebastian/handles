@@ -45,9 +45,6 @@ class _HandlesPageState extends State<HandlesPage> {
       "Meetings",
       "Services"
     ];
-    List<String> test = List.generate(100, (index){
-      return index.toString();
-    });
 
     return Scaffold(
       backgroundColor: Palette.handlesBackground,
@@ -58,7 +55,7 @@ class _HandlesPageState extends State<HandlesPage> {
       : SizedBox(),
       appBar: AppBar(
         toolbarHeight: MQuery.height(0.075, context),
-        leadingWidth: MQuery.width(0.02, context),
+        leadingWidth: MQuery.width(0.04, context),
         leading: Padding(
           padding: EdgeInsets.only(left: 8.0),
           child: GestureDetector(
@@ -72,6 +69,8 @@ class _HandlesPageState extends State<HandlesPage> {
           ),
         ),
         title: ListTile(
+          onTap: (){},
+          horizontalTitleGap: MQuery.width(0.0075, context),
           contentPadding: EdgeInsets.fromLTRB(
             MQuery.width(0, context),
             MQuery.height(0.01, context),
@@ -91,7 +90,7 @@ class _HandlesPageState extends State<HandlesPage> {
           ),
           subtitle: Font.out(
             "Andy, Grant, Steve, Mark, Luke, ...",
-            fontSize: 13,
+            fontSize: 12,
             fontWeight: FontWeight.w400,
             textAlign: TextAlign.start,
             color: Colors.white.withOpacity(0.75)
@@ -99,6 +98,7 @@ class _HandlesPageState extends State<HandlesPage> {
         ),
         actions: [
           IconButton(
+            padding: EdgeInsets.zero,
             tooltip: "Make a Group Call",
             icon: AdaptiveIcon(
               android: Icons.add_call,
@@ -118,32 +118,96 @@ class _HandlesPageState extends State<HandlesPage> {
       ),
       body: Column(
         children: [
+          isKeyboardOpen
+          ? SizedBox()
+          : Expanded(
+              flex: 4,
+              child: InkWell(
+                onTap: (){
+                  //TODO: LOGIC: CALCULATE TARGET POSITION BY LIST'S INDEX
+                },
+                child: Container(
+                  padding: EdgeInsets.only(
+                    left: MQuery.width(0.01, context),
+                    right: MQuery.width(0.01, context)
+                  ),
+                  width: MQuery.width(1, context),
+                  color: Colors.white,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Pinned Message #5",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              color: Palette.primary,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            "Andy: Hello everyone, welcome to the Handles DevTeam! ...",
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                              color: Colors.black.withOpacity(0.5),
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12
+                            ),
+                          ),
+                        ] 
+                      ),
+                      AdaptiveIcon(
+                        android: Icons.push_pin,
+                        iOS: CupertinoIcons.pin_fill,
+                        size: 16
+                      ),
+                    ],
+                  )
+                ),
+              )
+            ),
           Expanded(
-            flex: isKeyboardOpen ? 10 : 11,
+            flex: isKeyboardOpen ? 23 : 50,
             child: ListView.builder(
               controller: _scrollController,
               reverse: false,
               itemCount: 100,
               itemBuilder: (context, index){
-                return Padding(
-                  padding: EdgeInsets.only(
-                    bottom: index == test.length - 1
-                    ? MQuery.height(0.01, context)
-                    : 0,
-                    top: index == 0
-                    ? MQuery.height(0.01, context)
-                    : 0
-                  ),
-                  child: Font.out(
-                    test[index],
-                    fontSize: 16
-                  ),
-                );
+                if (index == 0) {
+                  return HandlesStatusBlock(
+                    content: "Andy created “Handles DevTeam”"
+                  );
+                } else {
+                  return index == 1
+                  ? PlainChat(
+                      timestamp: DateTime.now(),
+                      sender: "Andy",
+                      senderRole: "Admin",
+                      isRecurring: false,
+                      content: "Hello everyone, welcome to the Handles DevTeam! \nBefore we add our client’s representatives into this group, I would like to hold a meeting and discuss a proper workflow in the future. ",
+                      isPinned: true,
+                    )
+                  : index == 2
+                    ? PlainChat(
+                        timestamp: DateTime.now(),
+                        sender: "a",
+                        senderRole: "",
+                        isRecurring: false,
+                        content: "Sure let's do it!aaaaaaaaa",
+                        isPinned: false
+                      ) 
+                    : SizedBox();
+                }
               }
             ),
           ),
           Expanded(
-            flex: isKeyboardOpen ? 2 : 1,
+            flex: isKeyboardOpen ? 4 : 5,
             child: Container(
               padding: EdgeInsets.only(
                 left: MQuery.height(0.015, context),
@@ -166,7 +230,7 @@ class _HandlesPageState extends State<HandlesPage> {
                           hintText: "Type a message",
                           contentPadding: EdgeInsets.fromLTRB(
                             MQuery.width(0.02, context),
-                            isKeyboardOpen ? MQuery.height(0.0225, context) : MQuery.height(0.0175, context),
+                            MQuery.height(0.0175, context),
                             MQuery.width(0.02, context),
                             MQuery.height(0, context)
                           ),

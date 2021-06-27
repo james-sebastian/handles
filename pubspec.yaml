@@ -38,6 +38,7 @@ dependencies:
   flutter_svg: ^0.22.0
   get: ^4.1.4
   image_picker: ^0.8.0+4
+  intl: ^0.17.0
   pinput: ^1.2.0
 
 dev_dependencies:
