@@ -27,32 +27,28 @@ class VideoChat extends StatefulWidget {
 }
 
 class _VideoChatState extends State<VideoChat> {
-  late VideoPlayerController _controller;
-
-  void initState() {
-    super.initState();
-    _controller = VideoPlayerController.network(
-        widget.videoURL)
-      ..initialize().then((_) {
-        setState(() {});
-      });
-  }
-  
-  @override
-  void dispose() {
-    super.dispose();
-    _controller.dispose();
-  }
+  bool isLoading = true;
 
   @override
   Widget build(BuildContext context) {
+
+    Future<String?> getThumbnail(String videoURL) async {
+      final String? fileName = await VideoThumbnail.thumbnailFile(
+        video: this.widget.videoURL,
+        thumbnailPath: (await getTemporaryDirectory()).path,
+        imageFormat: ImageFormat.JPEG,
+        maxHeight: 180, // specify the height of the thumbnail, let the width auto-scaled to keep the source aspect ratio
+        quality: 50,
+      );
+
+      return fileName;
+    }
+
     return widget.sender == "a" //TODO: CHECK IF SENDER == USER ID
       ? Container(
           width: MQuery.width(1, context),
           margin: EdgeInsets.only(
-            bottom: widget.isRecurring
-            ? MQuery.width(0, context)
-            : MQuery.width(0.01, context)
+            bottom: MQuery.width(0.01, context),
           ),
           padding: EdgeInsets.symmetric(horizontal: MQuery.width(0.01, context)),
           child: Row(
@@ -106,25 +102,81 @@ class _VideoChatState extends State<VideoChat> {
                                 children: [
                                   AspectRatio(
                                     aspectRatio: 1/1,
-                                    child: Container(
-                                      width: MQuery.width(0.35, context),
-                                      clipBehavior: Clip.antiAlias,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(Radius.circular(5))
-                                      ),
-                                      child: VideoPlayer(_controller)
-                                    ),
+                                    child: FutureBuilder<String?>(
+                                      future: getThumbnail(this.widget.videoURL),
+                                      builder: (context, snapshot){
+                                        return snapshot.hasData
+                                        ? Container(
+                                            width: MQuery.width(0.35, context),
+                                            clipBehavior: Clip.antiAlias,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(Radius.circular(5))
+                                            ),
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                Positioned.fill(
+                                                  child: Image.file(
+                                                    File(snapshot.data ?? ""),
+                                                    fit: BoxFit.fill
+                                                  ),
+                                                ),
+                                                Container(
+                                                  width: MQuery.width(0.35, context),
+                                                  clipBehavior: Clip.antiAlias,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.black.withOpacity(0.4),
+                                                    borderRadius: BorderRadius.all(Radius.circular(5))
+                                                  )
+                                                ),
+                                                AdaptiveIcon(
+                                                  android: Icons.play_arrow_rounded,
+                                                  iOS: CupertinoIcons.play_arrow_solid,
+                                                  size: 32,
+                                                  color: Colors.white
+                                                )
+                                              ],
+                                            )
+                                          )
+                                        : Container(
+                                            width: MQuery.width(0.35, context),
+                                            clipBehavior: Clip.antiAlias,
+                                            decoration: BoxDecoration(
+                                              color: Colors.black.withOpacity(0.5),
+                                              borderRadius: BorderRadius.all(Radius.circular(5))
+                                            ),
+                                            child: Center(
+                                              child: CircularProgressIndicator(
+                                                color: Palette.primary,
+                                              ),
+                                            )
+                                          );
+                                      },
+                                    )
                                   ),
                                   Padding(
                                     padding: EdgeInsets.all(8.0),
-                                    child: Text(
-                                      DateFormat.jm().format(widget.timestamp),
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(
-                                        color: Colors.white.withOpacity(1),
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 12
-                                      ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        widget.isPinned
+                                        ? AdaptiveIcon(
+                                            android: Icons.push_pin,
+                                            iOS: CupertinoIcons.pin_fill,
+                                            size: 12,
+                                            color: Palette.handlesBackground,
+                                          )
+                                        : SizedBox(),
+                                        Text(
+                                          DateFormat.jm().format(widget.timestamp),
+                                          textAlign: TextAlign.start,
+                                          style: TextStyle(
+                                            color: Colors.white.withOpacity(1),
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 12
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
@@ -163,7 +215,7 @@ class _VideoChatState extends State<VideoChat> {
                 transform: Matrix4.rotationY(math.pi),
                 child: SvgPicture.asset(
                   "assets/tool_tip.svg",
-                  color: Palette.primary,
+                  color: widget.isRecurring ? Palette.handlesBackground : Palette.primary,
                   height: MQuery.height(0.02, context),
                   width: MQuery.height(0.02, context),
                 ),
@@ -173,20 +225,18 @@ class _VideoChatState extends State<VideoChat> {
       : Container(
           width: MQuery.width(1, context),
           margin: EdgeInsets.only(
-            bottom: widget.isRecurring
-            ? MQuery.width(0, context)
-            : MQuery.width(0.01, context)),
+            bottom: MQuery.width(0.01, context)
+          ),
           padding: EdgeInsets.symmetric(horizontal: MQuery.width(0.01, context)),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              widget.isRecurring
-              ? SizedBox()
-              : SvgPicture.asset(
-                  "assets/tool_tip.svg",
-                  height: MQuery.height(0.02, context),
-                  width: MQuery.height(0.02, context),
-                ),
+              SvgPicture.asset(
+                "assets/tool_tip.svg",
+                height: MQuery.height(0.02, context),
+                width: MQuery.height(0.02, context),
+                color: widget.isRecurring ? Palette.handlesBackground : Colors.white
+              ),
               ConstrainedBox(
                 constraints: BoxConstraints(
                   maxWidth: MQuery.width(
@@ -218,27 +268,29 @@ class _VideoChatState extends State<VideoChat> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          RichText(
-                            text: TextSpan(
-                              text: "${this.widget.sender} ",
-                              style: TextStyle(
-                                //TODO: DYNAMIC COLOR CREATION
-                                color: Palette.primary,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 15
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: "(${this.widget.senderRole})",
-                                  style: TextStyle(
-                                    color: Palette.primary,
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 15
-                                  )
+                          widget.isRecurring && widget.isPinned == false
+                          ? SizedBox()
+                          : RichText(
+                              text: TextSpan(
+                                text: "${this.widget.sender} ",
+                                style: TextStyle(
+                                  //TODO: DYNAMIC COLOR CREATION
+                                  color: Palette.primary,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 15
                                 ),
-                              ],
+                                children: [
+                                  TextSpan(
+                                    text: "(${this.widget.senderRole})",
+                                    style: TextStyle(
+                                      color: Palette.primary,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 15
+                                    )
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
                           widget.isPinned
                           ? AdaptiveIcon(
                               android: Icons.push_pin,
@@ -266,14 +318,57 @@ class _VideoChatState extends State<VideoChat> {
                             children: [
                               AspectRatio(
                                 aspectRatio: 1/1,
-                                child: Container(
-                                  width: MQuery.width(0.35, context),
-                                  clipBehavior: Clip.antiAlias,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.all(Radius.circular(5))
-                                  ),
-                                  child: VideoPlayer(_controller)
-                                ),
+                                child: FutureBuilder<String?>(
+                                  future: getThumbnail(this.widget.videoURL),
+                                  builder: (context, snapshot){
+                                    return snapshot.hasData
+                                    ? Container(
+                                        width: MQuery.width(0.35, context),
+                                        clipBehavior: Clip.antiAlias,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(Radius.circular(5))
+                                        ),
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Positioned.fill(
+                                              child: Image.file(
+                                                File(snapshot.data ?? ""),
+                                                fit: BoxFit.fill
+                                              ),
+                                            ),
+                                            Container(
+                                              width: MQuery.width(0.35, context),
+                                              clipBehavior: Clip.antiAlias,
+                                              decoration: BoxDecoration(
+                                                color: Colors.black.withOpacity(0.25),
+                                                borderRadius: BorderRadius.all(Radius.circular(5))
+                                              )
+                                            ),
+                                            AdaptiveIcon(
+                                              android: Icons.play_arrow_rounded,
+                                              iOS: CupertinoIcons.play_arrow_solid,
+                                              size: 32,
+                                              color: Colors.white
+                                            )
+                                          ],
+                                        )
+                                      )
+                                    : Container(
+                                        width: MQuery.width(0.35, context),
+                                        clipBehavior: Clip.antiAlias,
+                                        decoration: BoxDecoration(
+                                          color: Colors.black.withOpacity(0.5),
+                                          borderRadius: BorderRadius.all(Radius.circular(5))
+                                        ),
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            color: Palette.primary,
+                                          ),
+                                        )
+                                      );
+                                  },
+                                )
                               ),
                               Padding(
                                 padding: EdgeInsets.all(8.0),

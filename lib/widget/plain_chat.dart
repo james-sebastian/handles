@@ -24,9 +24,7 @@ class PlainChat extends StatelessWidget {
         ? Container(
             width: MQuery.width(1, context),
             margin: EdgeInsets.only(
-              bottom: isRecurring
-              ? MQuery.width(0, context)
-              : MQuery.width(0.01, context)
+              bottom: MQuery.width(0.01, context)
             ),
             padding: EdgeInsets.symmetric(horizontal: MQuery.width(0.01, context)),
             child: Row(
@@ -58,22 +56,32 @@ class PlainChat extends StatelessWidget {
                         alignment: Alignment.bottomRight,
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                DateFormat.jm().format(timestamp),
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    color: Colors.white.withOpacity(0.5),
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 12),
-                              ),
-                              SizedBox(width: 5),
                               AdaptiveIcon(
-                                android: Icons.check,
-                                iOS: CupertinoIcons.checkmark_alt,
-                                size: 16,
+                                android: Icons.push_pin,
+                                iOS: CupertinoIcons.pin_fill,
+                                size: 12,
                                 color: Palette.handlesBackground,
+                              ),
+                              Row(
+                                children: [
+                                  Text(
+                                    DateFormat.jm().format(timestamp),
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(
+                                        color: Colors.white.withOpacity(0.5),
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 12),
+                                  ),
+                                  SizedBox(width: 5),
+                                  AdaptiveIcon(
+                                    android: Icons.check,
+                                    iOS: CupertinoIcons.checkmark_alt,
+                                    size: 16,
+                                    color: Palette.handlesBackground,
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -113,9 +121,9 @@ class PlainChat extends StatelessWidget {
                   transform: Matrix4.rotationY(math.pi),
                   child: SvgPicture.asset(
                     "assets/tool_tip.svg",
-                    color: Palette.primary,
                     height: MQuery.height(0.02, context),
                     width: MQuery.height(0.02, context),
+                    color: this.isRecurring ? Palette.handlesBackground : Palette.primary
                   ),
                 ),
               ],
@@ -123,21 +131,17 @@ class PlainChat extends StatelessWidget {
         : Container(
             width: MQuery.width(1, context),
             margin: EdgeInsets.only(
-              bottom: isRecurring
-              ? MQuery.width(0, context)
-              : MQuery.width(0.01, context)),
-            padding:
-                EdgeInsets.symmetric(horizontal: MQuery.width(0.01, context)),
+              bottom: MQuery.width(0.01, context)),
+            padding: EdgeInsets.symmetric(horizontal: MQuery.width(0.01, context)),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                isRecurring
-                ? SizedBox()
-                : SvgPicture.asset(
-                    "assets/tool_tip.svg",
-                    height: MQuery.height(0.02, context),
-                    width: MQuery.height(0.02, context),
-                  ),
+                SvgPicture.asset(
+                  "assets/tool_tip.svg",
+                  height: MQuery.height(0.02, context),
+                  width: MQuery.height(0.02, context),
+                  color: this.isRecurring ? Palette.handlesBackground : Colors.white
+                ),
                 ConstrainedBox(
                   constraints: BoxConstraints(
                       maxWidth: MQuery.width(
@@ -177,24 +181,29 @@ class PlainChat extends StatelessWidget {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  RichText(
-                                    text: TextSpan(
-                                      text: "${this.sender} ",
-                                      style: TextStyle(
+                                  isRecurring && isPinned == false
+                                  ? SizedBox()
+                                  : RichText(
+                                      text: TextSpan(
+                                        text: "${this.sender} ",
+                                        style: TextStyle(
                                           //TODO: DYNAMIC COLOR CREATION
                                           color: Palette.primary,
                                           fontWeight: FontWeight.w500,
-                                          fontSize: 15),
-                                      children: [
-                                        TextSpan(
+                                          fontSize: 15
+                                        ),
+                                        children: [
+                                          TextSpan(
                                             text: "(${this.senderRole})",
                                             style: TextStyle(
-                                                color: Palette.primary,
-                                                fontWeight: FontWeight.w400,
-                                                fontSize: 15)),
-                                      ],
+                                              color: Palette.primary,
+                                              fontWeight: FontWeight.w400,
+                                              fontSize: 15
+                                            )
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
                                   isPinned
                                   ? AdaptiveIcon(
                                       android: Icons.push_pin,
