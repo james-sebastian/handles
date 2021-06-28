@@ -193,37 +193,57 @@ class _HandlesPageState extends State<HandlesPage> {
                       isPinned: true,
                     )
                   : index == 2
-                    ? PlainChat(
-                        timestamp: DateTime.now(),
-                        sender: "a",
-                        senderRole: "",
-                        isRecurring: false,
-                        content: "Sure let's do it!",
-                        isPinned: false
-                      ) 
-                    : index == 3
-                      ? ImageChat(
-                          index: index,
-                          timestamp: DateTime.now(),
-                          isRecurring: false,
-                          isPinned: false,
-                          sender: "a",
-                          senderRole: "Admin",
-                          imageURL: "https://images.pexels.com/photos/1054289/pexels-photo-1054289.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-                          content: "aaaaaaaaaaaaaaaaaa"
-                        )
-                      : index == 4
-                        ? VideoChat(
-                            index: index,
-                            timestamp: DateTime.now(),
-                            isRecurring: false,
-                            isPinned: false,
-                            sender: "a",
-                            senderRole: "Admin",
-                            videoURL: "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
-                            content: "aaaaaaaaaaaaaaaaaa"
-                          )
-                        : SizedBox();
+                  ? PlainChat(
+                      timestamp: DateTime.now(),
+                      sender: "a",
+                      senderRole: "",
+                      isRecurring: false,
+                      content: "Sure let's do it!",
+                      isPinned: false
+                    ) 
+                  : index == 3
+                  ? ImageChat(
+                      index: index,
+                      timestamp: DateTime.now(),
+                      isRecurring: true,
+                      isPinned: false,
+                      sender: "a",
+                      senderRole: "Admin",
+                      imageURL: "https://images.pexels.com/photos/1054289/pexels-photo-1054289.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+                      content: "aaaaaaaaaaaaaaaaaa"
+                    )
+                  : index == 4
+                  ? VideoChat(
+                      index: index,
+                      timestamp: DateTime.now(),
+                      isRecurring: false,
+                      isPinned: true,
+                      sender: "Maya",
+                      senderRole: "Admin",
+                      videoURL: "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
+                      content: "aaaaaaaaaaaaaaaaaa"
+                    )
+                  : index == 5
+                  ? AudioChat(
+                      index: index,
+                      timestamp: DateTime.now(),
+                      isRecurring: false,
+                      isPinned: true,
+                      sender: "b",
+                      senderRole: "Admin",
+                      audioURL: "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
+                    )
+                  : index == 6
+                  ? DocumentChat(
+                      index: index,
+                      timestamp: DateTime.now(),
+                      isRecurring: true,
+                      isPinned: true,
+                      sender: "b",
+                      senderRole: "Admin",
+                      documentURL: "http://www.africau.edu/images/default/sample.pdf",
+                    )
+                  : SizedBox();
                 }
               }
             ),

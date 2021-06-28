@@ -11,7 +11,7 @@ class AdaptiveIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Icon(
-      Platform.isAndroid
+      !Platform.isAndroid
       ? android
       : iOS,
       size: size,

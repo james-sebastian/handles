@@ -1,15 +1,18 @@
+import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:handles/config/config.dart';
+import 'package:handles/providers/providers.dart';
 import 'package:handles/screen/pages.dart';
-import 'dart:io' show Platform;
+import 'dart:io' show File, Platform;
 import 'dart:math' as math;
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:video_player/video_player.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 part 'plain_chat.dart';
 part 'button.dart';
@@ -20,3 +23,5 @@ part 'adaptive_dialog.dart';
 part 'handles_status_block.dart';
 part 'image_chat.dart';
 part 'video_chat.dart';
+part 'audio_chat.dart';
+part 'document_chat.dart';
