@@ -38,9 +38,9 @@ class PlainChat extends StatelessWidget {
                       maxWidth: MQuery.width(
                         this.content.length >= 30
                         ? 0.35
-                        : this.content.length >= 20
-                          ? 0.25
-                          : 0.15
+                        : this.content.length <= 12
+                          ? 0.15
+                          : this.content.length * 0.009
                         , context
                       ),
                       minWidth: MQuery.width(0.1, context),
@@ -83,14 +83,18 @@ class PlainChat extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Text(
-                                  this.content,
+                                SelectableLinkify(
+                                  onOpen: (link) async {
+                                    print(link.url);
+                                    await launch(link.url);
+                                  },
+                                  text: this.content,
                                   textAlign: TextAlign.start,
                                   style: TextStyle(
                                       height: 1.25,
                                       color: Colors.white,
                                       fontWeight: FontWeight.w400,
-                                      fontSize: 14),
+                                      fontSize: 15),
                                 ),
                                 SizedBox(
                                     height: MQuery.height(
@@ -128,16 +132,23 @@ class PlainChat extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 isRecurring
-                ? SvgPicture.asset(
+                ? SizedBox()
+                : SvgPicture.asset(
                     "assets/tool_tip.svg",
                     height: MQuery.height(0.02, context),
                     width: MQuery.height(0.02, context),
-                  )
-                : SizedBox(),
+                  ),
                 ConstrainedBox(
                   constraints: BoxConstraints(
-                      maxWidth: MQuery.width(0.35, context),
-                      minWidth: MQuery.width(0.2, context),
+                      maxWidth: MQuery.width(
+                        this.content.length >= 30
+                        ? 0.35
+                        : this.content.length <= 12
+                          ? 0.15
+                          : this.content.length * 0.0145
+                        , context
+                      ),
+                      minWidth: MQuery.width(0.14, context),
                       minHeight: MQuery.height(0.045, context)),
                   child: Container(
                       padding: EdgeInsets.all(MQuery.height(0.01, context)),
@@ -194,16 +205,20 @@ class PlainChat extends StatelessWidget {
                                 ],
                               ),
                               SizedBox(height: MQuery.height(0.005, context)),
-                              Text(
-                                this.content,
+                              SelectableLinkify(
+                                onOpen: (link) async {
+                                  print(link.url);
+                                  await launch(link.url);
+                                },
+                                text: this.content,
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     height: 1.25,
                                     color: Colors.black,
                                     fontWeight: FontWeight.w400,
-                                    fontSize: 14),
+                                    fontSize: 15),
                               ),
-                              SizedBox(height: MQuery.height(0.0075, context)),
+                              SizedBox(height: MQuery.height(0.02, context)),
                             ],
                           ),
                         ],

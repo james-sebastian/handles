@@ -1,10 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:handles/config/config.dart';
+import 'package:handles/screen/pages.dart';
 import 'dart:io' show Platform;
 import 'dart:math' as math;
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:video_player/video_player.dart';
 
 part 'plain_chat.dart';
 part 'button.dart';
@@ -13,3 +18,5 @@ part 'subscription_banner.dart';
 part 'adaptive_icon.dart';
 part 'adaptive_dialog.dart';
 part 'handles_status_block.dart';
+part 'image_chat.dart';
+part 'video_chat.dart';
