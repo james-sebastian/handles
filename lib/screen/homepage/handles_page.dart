@@ -189,7 +189,7 @@ class _HandlesPageState extends State<HandlesPage> {
                       sender: "Andy",
                       senderRole: "Admin",
                       isRecurring: false,
-                      content: "Hello everyone, welcome to the Handles DevTeam! \nBefore we add our client’s representatives into this group, I would like to hold a meeting and discuss a proper workflow in the future. ",
+                      content: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                       isPinned: true,
                     )
                   : index == 2
@@ -198,10 +198,32 @@ class _HandlesPageState extends State<HandlesPage> {
                         sender: "a",
                         senderRole: "",
                         isRecurring: false,
-                        content: "Sure let's do it!aaaaaaaaa",
+                        content: "Sure let's do it!",
                         isPinned: false
                       ) 
-                    : SizedBox();
+                    : index == 3
+                      ? ImageChat(
+                          index: index,
+                          timestamp: DateTime.now(),
+                          isRecurring: false,
+                          isPinned: false,
+                          sender: "a",
+                          senderRole: "Admin",
+                          imageURL: "https://images.pexels.com/photos/1054289/pexels-photo-1054289.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+                          content: "aaaaaaaaaaaaaaaaaa"
+                        )
+                      : index == 4
+                        ? VideoChat(
+                            index: index,
+                            timestamp: DateTime.now(),
+                            isRecurring: false,
+                            isPinned: false,
+                            sender: "a",
+                            senderRole: "Admin",
+                            videoURL: "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
+                            content: "aaaaaaaaaaaaaaaaaa"
+                          )
+                        : SizedBox();
                 }
               }
             ),
