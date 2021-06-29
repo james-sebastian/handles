@@ -243,6 +243,50 @@ class _HandlesPageState extends State<HandlesPage> {
                       senderRole: "Admin",
                       documentURL: "http://www.africau.edu/images/default/sample.pdf",
                     )
+                  : index == 7
+                  ? MeetingChat(
+                      index: index,
+                      timestamp: DateTime.now(),
+                      isRecurring: false,
+                      isPinned: true,
+                      sender: "a",
+                      senderRole: "Admin",
+                      meetingModel: MeetingModel(
+                        meetingName: "Handles DevTeam Opening Meeting",
+                        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non dapibus eros. Duis facilisis faucibus accumsan. Sed sit amet convallis felis. Suspendisse non faucibus neque. Praesent sed enim ex. Pellentesque tempor sollicitudin dui vitae ultricies.",
+                        meetingStartTime: DateTime.now(),
+                        meetingURL: "https://meet.google.com/wyd-ytsf-kwi",
+                        meetingEndTime: DateTime.now().add(Duration(hours: 2)),
+                        attendees: //TODO: FILL ATTENDEES UID HERE
+                        [
+                          "Clark Kent",
+                          "Bruce Wayne",
+                          "Diana Prince"
+                        ]
+                      ),
+                    )
+                  : index == 8
+                  ? ServiceChat(
+                      index: index,
+                      timestamp: DateTime.now(),
+                      isRecurring: false,
+                      isPinned: true,
+                      sender: "Axxel",
+                      senderRole: "Admin",
+                      serviceModel: ServiceModel(
+                        serviceName: "WebSocket: Upgrade",
+                        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non dapibus eros. Duis facilisis faucibus accumsan. Sed sit amet convallis felis. Suspendisse non faucibus neque. Praesent sed enim ex. Pellentesque tempor sollicitudin dui vitae ultricies.",
+                        serviceFee: 1200,
+                        status: ServiceStatus.paid,
+                        milestones: [
+                          MilestoneModel(
+                            milestoneName: "Schematics Planning",
+                            isCompleted: false,
+                            description: "Planning for the project's schematics"
+                          )
+                        ]
+                      ),
+                    )
                   : SizedBox();
                 }
               }
