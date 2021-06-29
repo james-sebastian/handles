@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:chewie/chewie.dart';
 import 'package:country_list_pick/country_list_pick.dart';
@@ -10,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:handles/config/config.dart';
 import 'package:handles/model/models.dart';
@@ -20,6 +22,7 @@ import 'package:intl/intl.dart';
 import 'package:pinch_zoom/pinch_zoom.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:timeline_tile/timeline_tile.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
 
@@ -36,3 +39,4 @@ part 'homepage/image_previewer.dart';
 part 'homepage/video_previewer.dart';
 part 'homepage/meeting_detailed_page.dart';
 part 'homepage/service_detailed_page.dart';
+part 'homepage/meeting_creator.dart';

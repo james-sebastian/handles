@@ -239,7 +239,7 @@ class _HandlesPageState extends State<HandlesPage> {
                       timestamp: DateTime.now(),
                       isRecurring: true,
                       isPinned: true,
-                      sender: "b",
+                      sender: "a",
                       senderRole: "Admin",
                       documentURL: "http://www.africau.edu/images/default/sample.pdf",
                     )
@@ -279,6 +279,16 @@ class _HandlesPageState extends State<HandlesPage> {
                         serviceFee: 1200,
                         status: ServiceStatus.paid,
                         milestones: [
+                          MilestoneModel(
+                            milestoneName: "Schematics Planning",
+                            isCompleted: true,
+                            description: "Planning for the project's schematics"
+                          ),
+                          MilestoneModel(
+                            milestoneName: "Schematics Planning",
+                            isCompleted: false,
+                            description: "Planning for the project's schematics"
+                          ),
                           MilestoneModel(
                             milestoneName: "Schematics Planning",
                             isCompleted: false,
@@ -354,7 +364,9 @@ class _HandlesPageState extends State<HandlesPage> {
                                         Container(
                                           height: MQuery.height(0.1, context),
                                           child: ElevatedButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              
+                                            },
                                             child: Constants.mediaAvatar[keys[0]],
                                             style: ElevatedButton.styleFrom(
                                               shape: CircleBorder(),
@@ -399,7 +411,10 @@ class _HandlesPageState extends State<HandlesPage> {
                                         Container(
                                           height: MQuery.height(0.1, context),
                                           child: ElevatedButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              Get.back();
+                                              Get.to(() => MeetingCreator(), transition: Transition.cupertino);
+                                            },
                                             child: Constants.mediaAvatar[keys[3]],
                                             style: ElevatedButton.styleFrom(
                                               shape: CircleBorder(),
@@ -412,7 +427,9 @@ class _HandlesPageState extends State<HandlesPage> {
                                         Container(
                                           height: MQuery.height(0.1, context),
                                           child: ElevatedButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              
+                                            },
                                             child: Constants.mediaAvatar[keys[4]],
                                             style: ElevatedButton.styleFrom(
                                               shape: CircleBorder(),

@@ -27,6 +27,21 @@ class DocumentChat extends StatefulWidget {
 class _DocumentChatState extends State<DocumentChat> {
   @override
   Widget build(BuildContext context) {
+
+    final String _filename = basename(widget.documentURL);
+    final String _extension = extension(widget.documentURL);
+
+    Future<String> getFileSize(String filepath, int decimals) async {
+      http.Response r = await http.get(Uri.parse(filepath));
+      final bytes = int.parse(r.headers["content-length"] ?? "0");      
+      if (bytes <= 0){
+        return "0 B";
+      } 
+      const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+      var i = (log(bytes) / log(1024)).floor();
+      return ((bytes / pow(1024, i)).toStringAsFixed(decimals)) + ' ' + suffixes[i];
+    }
+
     return widget.sender == "a" //TODO: CHECK IF SENDER == USER ID
       ? Container(
           width: MQuery.width(1, context),
@@ -70,14 +85,19 @@ class _DocumentChatState extends State<DocumentChat> {
                         children: [
                           Row(
                             children: [
-                              Text(
-                                "1.4 MB",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.5),
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 12
-                                ),
+                              FutureBuilder<String>(
+                                future: getFileSize(widget.documentURL, 2),
+                                builder: (context, snapshot){
+                                  return Text(
+                                    snapshot.data ?? "",
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.5),
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 12
+                                    ),
+                                  );
+                                }
                               ),
                               SizedBox(width: 5),
                               Container(
@@ -90,7 +110,7 @@ class _DocumentChatState extends State<DocumentChat> {
                               ),
                               SizedBox(width: 5),
                               Text(
-                                "PDF",
+                                _extension.substring(1, _extension.length).toUpperCase(),
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                   color: Colors.white.withOpacity(0.5),
@@ -137,7 +157,7 @@ class _DocumentChatState extends State<DocumentChat> {
                                         SvgPicture.asset("assets/mdi_file-document.svg", height: 18, width: 18, color: Palette.primary),
                                         SizedBox(width: MQuery.width(0.01, context)),
                                         Text(
-                                          "asn.pdf",
+                                          _filename,
                                           style: TextStyle(
                                             color: Colors.black,
                                             fontWeight: FontWeight.w400,
@@ -225,14 +245,19 @@ class _DocumentChatState extends State<DocumentChat> {
                         children: [
                           Row(
                             children: [
-                              Text(
-                                "1.4 MB",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                  color: Colors.black.withOpacity(0.5),
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 12
-                                ),
+                              FutureBuilder<String>(
+                                future: getFileSize(widget.documentURL, 2),
+                                builder: (context, snapshot){
+                                  return Text(
+                                    snapshot.data ?? "",
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(
+                                      color: Colors.black.withOpacity(0.5),
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 12
+                                    ),
+                                  );
+                                }
                               ),
                               SizedBox(width: 5),
                               Container(
@@ -245,7 +270,7 @@ class _DocumentChatState extends State<DocumentChat> {
                               ),
                               SizedBox(width: 5),
                               Text(
-                                "PDF",
+                                _extension.substring(1, _extension.length).toUpperCase(),
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                   color: Colors.black.withOpacity(0.5),
@@ -327,7 +352,9 @@ class _DocumentChatState extends State<DocumentChat> {
                                         SvgPicture.asset("assets/mdi_file-document.svg", height: 18, width: 18, color: Palette.primary),
                                         SizedBox(width: MQuery.width(0.01, context)),
                                         Text(
-                                          "asn.pdf",
+                                          _filename.length >= 20
+                                          ? _filename.substring(0, 20) + "..."
+                                          : _filename,
                                           style: TextStyle(
                                             color: Colors.black,
                                             fontWeight: FontWeight.w400,
