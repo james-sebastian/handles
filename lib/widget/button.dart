@@ -6,12 +6,15 @@ class Button extends StatelessWidget {
   final String title;
   final Color color;
   final Color textColor;
+  final Color? borderColor;
   final double? height;
   final double? width;
+
   const Button({
     Key? key,
     this.height,
     this.width,
+    this.borderColor,
     required this.title,
     required this.method,
     required this.color,
@@ -31,16 +34,24 @@ class Button extends StatelessWidget {
     ? Container(
         height: height ?? MQuery.width(0.0575, context),
         width: width ?? MQuery.width(0.25, context),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: borderColor ?? Colors.transparent
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(5)
+          )
+        ),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            elevation: 1,
+            elevation: borderColor != null ? 0 : 1,
             primary: color
           ),
           onPressed: method,
           child: Font.out(
             title,
             height: 1,
-            fontSize: 18,
+            fontSize: height == MQuery.width(0.045, context) ? 14 : 18,
             fontWeight: FontWeight.w600,
             color: textColor
           ) 
@@ -56,7 +67,7 @@ class Button extends StatelessWidget {
           child: Font.out(
             title,
             height: 1,
-            fontSize: 18,
+            fontSize: height! == MQuery.width(0.045, context) ? 14 : 18,
             fontWeight: FontWeight.w600,
             color: textColor
           ) 
