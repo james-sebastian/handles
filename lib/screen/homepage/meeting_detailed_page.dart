@@ -44,7 +44,7 @@ class _MeetingDetailedPageState extends State<MeetingDetailedPage> {
           "Meeting Details",
           textAlign: TextAlign.start,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
             color: Colors.white
           )

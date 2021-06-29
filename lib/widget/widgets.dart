@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:favicon/favicon.dart' as Favicon;
 import 'package:flutter/cupertino.dart';
@@ -12,9 +14,11 @@ import 'package:handles/screen/pages.dart';
 import 'dart:io' show File, Platform;
 import 'dart:math' as math;
 import 'package:intl/intl.dart';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
+import 'package:http/http.dart' as http;
 
 part 'plain_chat.dart';
 part 'button.dart';
