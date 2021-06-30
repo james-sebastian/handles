@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:chewie/chewie.dart';
@@ -11,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:handles/config/config.dart';
 import 'package:handles/model/models.dart';
@@ -25,6 +25,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 part 'auth/onboarding.dart';
 part 'auth/phone_input.dart';
@@ -40,3 +41,7 @@ part 'homepage/video_previewer.dart';
 part 'homepage/meeting_detailed_page.dart';
 part 'homepage/service_detailed_page.dart';
 part 'homepage/meeting_creator.dart';
+part 'homepage/pick_images_page.dart';
+part 'homepage/preview_images_page.dart';
+part 'homepage/pick_videos_page.dart';
+part 'homepage/preview_videos_page.dart';

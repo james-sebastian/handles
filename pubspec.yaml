@@ -52,6 +52,7 @@ dependencies:
   url_launcher: ^6.0.7
   video_player: ^2.1.6
   video_thumbnail: ^0.3.3
+  wechat_assets_picker: ^5.5.7
 
 dev_dependencies:
   flutter_test:
