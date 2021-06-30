@@ -23,13 +23,6 @@ class Button extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    if(Platform.isAndroid){
-      print("Android");
-    } else {
-      print ("iOS Scope or Others");
-    }
-
     return Platform.isAndroid
     ? Container(
         height: height ?? MQuery.width(0.0575, context),

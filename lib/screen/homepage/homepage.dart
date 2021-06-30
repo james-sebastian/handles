@@ -31,10 +31,6 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-
-    print(isHandlesSelected);
-    print(selectedHandles);
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: DefaultTabController(

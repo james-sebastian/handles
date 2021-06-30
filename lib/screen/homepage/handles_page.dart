@@ -11,6 +11,8 @@ class _HandlesPageState extends State<HandlesPage> {
 
   late ScrollController _scrollController;
   bool isScrolling = false;
+  bool isSearchActive = false;
+  int isFilterChipSelected = -1;
 
   void scrollToBottom() {
     final bottomOffset = _scrollController.position.maxScrollExtent;
@@ -54,6 +56,7 @@ class _HandlesPageState extends State<HandlesPage> {
         )
       : SizedBox(),
       appBar: AppBar(
+        elevation: isSearchActive ? 0 : 1,
         toolbarHeight: MQuery.height(0.075, context),
         leadingWidth: MQuery.width(0.04, context),
         leading: Padding(
@@ -64,40 +67,68 @@ class _HandlesPageState extends State<HandlesPage> {
               iOS: CupertinoIcons.back,
             ),
             onTap: (){
-              Get.back();
+              if(isSearchActive){
+                setState(() {
+                  isSearchActive = false;
+                }); 
+              } else {
+                Get.back();
+              }
             },
           ),
         ),
-        title: ListTile(
-          onTap: (){},
-          horizontalTitleGap: MQuery.width(0.0075, context),
-          contentPadding: EdgeInsets.fromLTRB(
-            MQuery.width(0, context),
-            MQuery.height(0.01, context),
-            MQuery.width(0, context),
-            MQuery.height(0.0075, context),
+        title: isSearchActive
+        ? FadeIn(
+            child: Container(
+              width: MQuery.width(0.35, context),
+              child: TextField(
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                ),
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: "Search anything...",
+                  hintStyle: TextStyle(
+                    color: Colors.white.withOpacity(0.5),
+                    fontSize: 18,
+                  )
+                ),
+              )
+            )
+          )
+        : ListTile(
+            onTap: (){},
+            horizontalTitleGap: MQuery.width(0.0075, context),
+            contentPadding: EdgeInsets.fromLTRB(
+              MQuery.width(0, context),
+              MQuery.height(0.01, context),
+              MQuery.width(0, context),
+              MQuery.height(0.0075, context),
+            ),
+            leading: CircleAvatar(
+              backgroundColor: Colors.white,
+              radius: MQuery.height(0.0215, context),
+            ),
+            title: Font.out(
+              "Handles DevTeam",
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              textAlign: TextAlign.start,
+              color: Colors.white
+            ),
+            subtitle: Font.out(
+              "Andy, Grant, Steve, Mark, Luke, ...",
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+              textAlign: TextAlign.start,
+              color: Colors.white.withOpacity(0.75)
+            ),
           ),
-          leading: CircleAvatar(
-            backgroundColor: Colors.white,
-            radius: MQuery.height(0.0215, context),
-          ),
-          title: Font.out(
-            "Handles DevTeam",
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            textAlign: TextAlign.start,
-             color: Colors.white
-          ),
-          subtitle: Font.out(
-            "Andy, Grant, Steve, Mark, Luke, ...",
-            fontSize: 12,
-            fontWeight: FontWeight.w400,
-            textAlign: TextAlign.start,
-            color: Colors.white.withOpacity(0.75)
-          ),
-        ),
         actions: [
-          IconButton(
+          isSearchActive
+          ? SizedBox()
+          : IconButton(
             padding: EdgeInsets.zero,
             tooltip: "Make a Group Call",
             icon: AdaptiveIcon(
@@ -112,12 +143,74 @@ class _HandlesPageState extends State<HandlesPage> {
               android: Icons.search,
               iOS: CupertinoIcons.search
             ),
-            onPressed: (){}
+            onPressed: (){
+              if(!isSearchActive){
+                setState(() {
+                  isSearchActive = true;
+                });
+              } else {
+                //TODO: SEARCH MECHANISM HERE
+              }
+            }
           ),
         ],
       ),
       body: Column(
         children: [
+          if (isSearchActive)
+          Container(
+            color: Palette.primary,
+            width: MQuery.width(1, context),
+            height: MQuery.height(0.075, context),
+            padding: EdgeInsets.symmetric(
+              vertical: MQuery.height(0.01 ,context),
+              horizontal: MQuery.width(0.0225, context)
+            ),
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: Constants.filterList.map((e){
+                return Padding(
+                  padding: EdgeInsets.only(
+                    left: 8.0
+                  ),
+                  child: FilterChip(
+                    padding: EdgeInsets.only(
+                      left: 10,
+                      right: 10,
+                      top: 5,
+                      bottom: 5
+                    ),
+                    shape: StadiumBorder(side: BorderSide(
+                      color: Constants.filterList.indexOf(e) == isFilterChipSelected
+                      ? Palette.filterSelected
+                      : Palette.filterSelected.withOpacity(0.25)
+                    )),
+                    shadowColor: Colors.transparent,
+                    backgroundColor: Palette.primary,
+                    selectedColor: Palette.filterSelected,
+                    elevation: 0,
+                    showCheckmark: false,
+                    avatar: Constants.filterAvatar[e],
+                    label: Text(e),
+                    labelStyle: TextStyle(
+                      color: Colors.white
+                    ),
+                    selected: Constants.filterList.indexOf(e) == isFilterChipSelected,
+                    onSelected: (bool selected) {
+                      Constants.filterList.indexOf(e) != isFilterChipSelected
+                      ? setState((){
+                          isFilterChipSelected = Constants.filterList.indexOf(e);
+                        })
+                      : setState((){
+                          isFilterChipSelected = -1;
+                        });
+                    },
+                  ),
+                );
+              }).toList().cast<Widget>()        
+            ),
+          ) else
+          SizedBox(),
           isKeyboardOpen
           ? SizedBox()
           : Expanded(
@@ -172,7 +265,11 @@ class _HandlesPageState extends State<HandlesPage> {
               )
             ),
           Expanded(
-            flex: isKeyboardOpen ? 23 : 50,
+            flex: isKeyboardOpen
+              ? 23
+              : isSearchActive
+                ? 45
+                : 50,
             child: ListView.builder(
               controller: _scrollController,
               reverse: false,
@@ -239,7 +336,7 @@ class _HandlesPageState extends State<HandlesPage> {
                       timestamp: DateTime.now(),
                       isRecurring: true,
                       isPinned: true,
-                      sender: "a",
+                      sender: "b",
                       senderRole: "Admin",
                       documentURL: "http://www.africau.edu/images/default/sample.pdf",
                     )
@@ -365,7 +462,8 @@ class _HandlesPageState extends State<HandlesPage> {
                                           height: MQuery.height(0.1, context),
                                           child: ElevatedButton(
                                             onPressed: () {
-                                              
+                                              Get.back();
+                                              Get.to(() => PickImagesPage(), transition: Transition.cupertino);
                                             },
                                             child: Constants.mediaAvatar[keys[0]],
                                             style: ElevatedButton.styleFrom(
@@ -379,7 +477,10 @@ class _HandlesPageState extends State<HandlesPage> {
                                         Container(
                                           height: MQuery.height(0.1, context),
                                           child: ElevatedButton(
-                                            onPressed: () {},
+                                            onPressed: () {
+                                              Get.back();
+                                              Get.to(() => PickVideosPage(), transition: Transition.cupertino);
+                                            },
                                             child: Constants.mediaAvatar[keys[1]],
                                             style: ElevatedButton.styleFrom(
                                               shape: CircleBorder(),
