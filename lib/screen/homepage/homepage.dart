@@ -31,6 +31,13 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+
+    if(selectedHandles.length == 0){
+      setState(() {
+        isHandlesSelected = false;
+      });
+    }
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: DefaultTabController(
@@ -126,16 +133,76 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                             showDialog(
                               context: context,
                               builder: (context){
-                                return AdaptiveDialog(
-                                  title: "Delete ${selectedHandles.length} Handles?",
-                                  content: "This action will irreversibly get you out from these Handles",
-                                  actionMethodNegative: (){},
-                                  actionMethodPositive: (){
-                                    Get.back();
-                                  },
-                                  negativeTitle: "Delete",
-                                  positiveTitle: "Cancel",
-                                );
+                                return Platform.isAndroid
+                                ? AlertDialog(
+                                    title: Text(
+                                      "Are you sure you want to delete Handles DevTeam?",
+                                    ),
+                                    content: Text(
+                                      "This action is irreversible and will make you leave this Handles without deleting the actual one"
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        child: Text("CANCEL"),
+                                        style: TextButton.styleFrom(
+                                          textStyle: TextStyle(
+                                            color: Palette.warning,
+                                            fontWeight: FontWeight.w500
+                                          )
+                                        ),
+                                        onPressed: (){
+                                          Get.back();
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: Text("DELETE"),
+                                        style: TextButton.styleFrom(
+                                          textStyle: TextStyle(
+                                            color: Palette.primary,
+                                            fontWeight: FontWeight.w500
+                                          )
+                                        ),
+                                        onPressed: (){
+                                          Get.back();
+                                        },
+                                      )
+                                    ],
+                                  )
+                                : CupertinoAlertDialog(
+                                    //TODO: ASSIGN HANDLES NAME HERE...
+                                    title: Text(
+                                      "Are you sure you want to delete Handles DevTeam?",
+                                    ),
+                                    content: Text(
+                                      "This action is irreversible and will make you leave this Handles without deleting the actual one"
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        child: Text("CANCEL"),
+                                        style: TextButton.styleFrom(
+                                          textStyle: TextStyle(
+                                            color: Palette.warning,
+                                            fontWeight: FontWeight.w500
+                                          )
+                                        ),
+                                        onPressed: (){
+                                          Get.back();
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: Text("DELETE"),
+                                        style: TextButton.styleFrom(
+                                          textStyle: TextStyle(
+                                            color: Palette.primary,
+                                            fontWeight: FontWeight.w500
+                                          )
+                                        ),
+                                        onPressed: (){
+                                          Get.back();
+                                        },
+                                      )
+                                    ],
+                                  );
                               }
                             );
                           },
@@ -171,16 +238,77 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                             showDialog(
                               context: context,
                               builder: (context){
-                                return AdaptiveDialog(
-                                  title: "Delete ${selectedHandles.length} call logs?",
-                                  content: "This action is irreversible.",
-                                  actionMethodNegative: (){},
-                                  actionMethodPositive: (){
-                                    Get.back();
-                                  },
-                                  negativeTitle: "Delete",
-                                  positiveTitle: "Cancel",
-                                );
+                                return Platform.isAndroid
+                                ? AlertDialog(
+                                    title: Text(
+                                      "Are you want to delete your call logs?",
+                                    ),
+                                    content: Text(
+                                      "This action is irreversible"
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        child: Text("CANCEL"),
+                                        style: TextButton.styleFrom(
+                                          textStyle: TextStyle(
+                                            color: Palette.warning,
+                                            fontWeight: FontWeight.w500
+                                          )
+                                        ),
+                                        onPressed: (){
+                                          Get.back();
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: Text("DELETE"),
+                                        style: TextButton.styleFrom(
+                                          textStyle: TextStyle(
+                                            color: Palette.primary,
+                                            fontWeight: FontWeight.w500
+                                          )
+                                        ),
+                                        onPressed: (){
+                                          //TODO: DELETION LOGIC...
+                                          Get.back();
+                                        },
+                                      )
+                                    ],
+                                  )
+                                : CupertinoAlertDialog(
+                                    //TODO: ASSIGN HANDLES NAME HERE...
+                                    title: Text(
+                                      "Are you want to delete your call logs?",
+                                    ),
+                                    content: Text(
+                                      "This action is irreversible"
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        child: Text("CANCEL"),
+                                        style: TextButton.styleFrom(
+                                          textStyle: TextStyle(
+                                            color: Palette.warning,
+                                            fontWeight: FontWeight.w500
+                                          )
+                                        ),
+                                        onPressed: (){
+                                          Get.back();
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: Text("DELETE"),
+                                        style: TextButton.styleFrom(
+                                          textStyle: TextStyle(
+                                            color: Palette.primary,
+                                            fontWeight: FontWeight.w500
+                                          )
+                                        ),
+                                        onPressed: (){
+                                          Get.back();
+                                        },
+                                      )
+                                    ],
+                                  );
                               }
                             );
                           },

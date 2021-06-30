@@ -493,7 +493,86 @@ class _HandlesPageState extends State<HandlesPage> {
                                         Container(
                                           height: MQuery.height(0.1, context),
                                           child: ElevatedButton(
-                                            onPressed: () {},
+                                            onPressed: () async {
+                                              FilePickerResult? result = await FilePicker.platform.pickFiles();
+                                              if(result != null) {
+                                                PlatformFile file = result.files.first;
+                                                showDialog(
+                                                  context: context,
+                                                  builder: (context){
+                                                    return Platform.isAndroid
+                                                    ? AlertDialog(
+                                                        content: Text(
+                                                          //TODO: ASSIGN HANDLES NAME HERE...
+                                                          'Send file: "${file.name}" to Handles DevTeam?'
+                                                        ),
+                                                        actions: [
+                                                          TextButton(
+                                                            child: Text("CANCEL"),
+                                                            style: TextButton.styleFrom(
+                                                              textStyle: TextStyle(
+                                                                color: Palette.warning,
+                                                                fontWeight: FontWeight.w500
+                                                              )
+                                                            ),
+                                                            onPressed: (){
+                                                              Get.back();
+                                                            },
+                                                          ),
+                                                          TextButton(
+                                                            child: Text("SEND"),
+                                                            style: TextButton.styleFrom(
+                                                              textStyle: TextStyle(
+                                                                color: Palette.primary,
+                                                                fontWeight: FontWeight.w500
+                                                              )
+                                                            ),
+                                                            onPressed: (){
+                                                              Get.back();
+                                                              //TODO: FILE SEND LOGIC...
+                                                            },
+                                                          )
+                                                        ],
+                                                      )
+                                                    : CupertinoAlertDialog(
+                                                        content: Text(
+                                                          //TODO: ASSIGN HANDLES NAME HERE...
+                                                          'Send file: "${file.name}" to Handles DevTeam?'
+                                                        ),
+                                                        actions: [
+                                                          TextButton(
+                                                            child: Text("CANCEL"),
+                                                            style: TextButton.styleFrom(
+                                                              textStyle: TextStyle(
+                                                                color: Palette.warning,
+                                                                fontWeight: FontWeight.w500
+                                                              )
+                                                            ),
+                                                            onPressed: (){
+                                                              Get.back();
+                                                            },
+                                                          ),
+                                                          TextButton(
+                                                            child: Text("SEND"),
+                                                            style: TextButton.styleFrom(
+                                                              textStyle: TextStyle(
+                                                                color: Palette.primary,
+                                                                fontWeight: FontWeight.w500
+                                                              )
+                                                            ),
+                                                            onPressed: (){
+                                                              Get.back();
+                                                              //TODO: FILE SEND LOGIC...
+                                                            },
+                                                          )
+                                                        ],
+                                                      );
+                                                  }
+                                                );
+                                              } else {
+                                                // User canceled the picker
+                                              }
+                                            },
                                             child: Constants.mediaAvatar[keys[2]],
                                             style: ElevatedButton.styleFrom(
                                               shape: CircleBorder(),
