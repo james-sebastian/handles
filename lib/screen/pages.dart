@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:chewie/chewie.dart';
 import 'package:country_list_pick/country_list_pick.dart';
 import 'package:favicon/favicon.dart' as Favicon;
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';

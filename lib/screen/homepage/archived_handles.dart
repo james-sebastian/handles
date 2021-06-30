@@ -42,14 +42,168 @@ class _ArchivedHandlesState extends State<ArchivedHandles> {
                     android: Icons.restore,
                     iOS: CupertinoIcons.restart,
                   ),
-                  onPressed: (){},
+                  onPressed: (){
+                    showDialog(
+                      context: context,
+                      builder: (context){
+                        return Platform.isAndroid
+                        ? AlertDialog(
+                            title: Text(
+                              "Are you sure you want to restore these archived Handles?",
+                            ),
+                            content: Text(
+                              "This action will make all of the selected Handles displayed in your homepage"
+                            ),
+                            actions: [
+                              TextButton(
+                                child: Text("CANCEL"),
+                                style: TextButton.styleFrom(
+                                  textStyle: TextStyle(
+                                    color: Palette.warning,
+                                    fontWeight: FontWeight.w500
+                                  )
+                                ),
+                                onPressed: (){
+                                  Get.back();
+                                },
+                              ),
+                              TextButton(
+                                child: Text("DELETE"),
+                                style: TextButton.styleFrom(
+                                  textStyle: TextStyle(
+                                    color: Palette.primary,
+                                    fontWeight: FontWeight.w500
+                                  )
+                                ),
+                                onPressed: (){
+                                  //TODO: DELETION LOGIC...
+                                  Get.back();
+                                },
+                              )
+                            ],
+                          )
+                        : CupertinoAlertDialog(
+                            //TODO: ASSIGN HANDLES NAME HERE...
+                            title: Text(
+                              "Are you sure you want to restore these archived Handles?",
+                            ),
+                            content: Text(
+                              "This action will make all of the selected Handles displayed in your homepage"
+                            ),
+                            actions: [
+                              TextButton(
+                                child: Text("CANCEL"),
+                                style: TextButton.styleFrom(
+                                  textStyle: TextStyle(
+                                    color: Palette.warning,
+                                    fontWeight: FontWeight.w500
+                                  )
+                                ),
+                                onPressed: (){
+                                  Get.back();
+                                },
+                              ),
+                              TextButton(
+                                child: Text("DELETE"),
+                                style: TextButton.styleFrom(
+                                  textStyle: TextStyle(
+                                    color: Palette.primary,
+                                    fontWeight: FontWeight.w500
+                                  )
+                                ),
+                                onPressed: (){
+                                  Get.back();
+                                },
+                              )
+                            ],
+                          );
+                      },
+                    );
+                  }
                 ),
                 IconButton(
                   icon: AdaptiveIcon(
                     android: Icons.delete,
                     iOS: CupertinoIcons.trash,
                   ),
-                  onPressed: (){},
+                  onPressed: (){
+                    showDialog(
+                      context: context,
+                      builder: (context){
+                        return Platform.isAndroid
+                        ? AlertDialog(
+                            title: Text(
+                              "Are you sure you want to delete these archived Handles?",
+                            ),
+                            content: Text(
+                              "This action is irreversible and will make you leave the Handles"
+                            ),
+                            actions: [
+                              TextButton(
+                                child: Text("CANCEL"),
+                                style: TextButton.styleFrom(
+                                  textStyle: TextStyle(
+                                    color: Palette.warning,
+                                    fontWeight: FontWeight.w500
+                                  )
+                                ),
+                                onPressed: (){
+                                  Get.back();
+                                },
+                              ),
+                              TextButton(
+                                child: Text("DELETE"),
+                                style: TextButton.styleFrom(
+                                  textStyle: TextStyle(
+                                    color: Palette.primary,
+                                    fontWeight: FontWeight.w500
+                                  )
+                                ),
+                                onPressed: (){
+                                  //TODO: DELETION LOGIC...
+                                  Get.back();
+                                },
+                              )
+                            ],
+                          )
+                        : CupertinoAlertDialog(
+                            //TODO: ASSIGN HANDLES NAME HERE...
+                            title: Text(
+                              "Are you sure you want to delete these archived Handles?",
+                            ),
+                            content: Text(
+                              "This action is irreversible and will make you leave the Handles"
+                            ),
+                            actions: [
+                              TextButton(
+                                child: Text("CANCEL"),
+                                style: TextButton.styleFrom(
+                                  textStyle: TextStyle(
+                                    color: Palette.warning,
+                                    fontWeight: FontWeight.w500
+                                  )
+                                ),
+                                onPressed: (){
+                                  Get.back();
+                                },
+                              ),
+                              TextButton(
+                                child: Text("DELETE"),
+                                style: TextButton.styleFrom(
+                                  textStyle: TextStyle(
+                                    color: Palette.primary,
+                                    fontWeight: FontWeight.w500
+                                  )
+                                ),
+                                onPressed: (){
+                                  Get.back();
+                                },
+                              )
+                            ],
+                          );
+                      }
+                    );
+                  },
                 )
               ],
             )
