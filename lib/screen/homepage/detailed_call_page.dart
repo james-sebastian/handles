@@ -31,18 +31,80 @@ class DetailedCallPage extends StatelessWidget {
               iOS: CupertinoIcons.trash,
             ),
             onPressed: (){
-              Get.dialog(
-                AdaptiveDialog(
-                  title: "Delete this call log?",
-                  content: "This action is irreversible.",
-                  actionMethodNegative: (){},
-                  actionMethodPositive: (){
-                    Get.back();
-                  },
-                  negativeTitle: "Delete",
-                  positiveTitle: "Cancel",
-                )
-              );
+              showDialog(
+                context: context,
+                builder: (context){
+                  return Platform.isAndroid
+                  ? AlertDialog(
+                      title: Text(
+                        "Are you sure you want to delete this call log?",
+                      ),
+                      content: Text(
+                        "This action is irreversible"
+                      ),
+                      actions: [
+                        TextButton(
+                          child: Text("CANCEL"),
+                          style: TextButton.styleFrom(
+                            textStyle: TextStyle(
+                              color: Palette.warning,
+                              fontWeight: FontWeight.w500
+                            )
+                          ),
+                          onPressed: (){
+                            Get.back();
+                          },
+                        ),
+                        TextButton(
+                          child: Text("DELETE"),
+                          style: TextButton.styleFrom(
+                            textStyle: TextStyle(
+                              color: Palette.primary,
+                              fontWeight: FontWeight.w500
+                            )
+                          ),
+                          onPressed: (){
+                            Get.back();
+                          },
+                        )
+                      ],
+                    )
+                  : CupertinoAlertDialog(
+                      title: Text(
+                        "Are you sure you want to delete this call log?",
+                      ),
+                      content: Text(
+                        "This action is irreversible"
+                      ),
+                      actions: [
+                        TextButton(
+                          child: Text("CANCEL"),
+                          style: TextButton.styleFrom(
+                            textStyle: TextStyle(
+                              color: Palette.warning,
+                              fontWeight: FontWeight.w500
+                            )
+                          ),
+                          onPressed: (){
+                            Get.back();
+                          },
+                        ),
+                        TextButton(
+                          child: Text("DELETE"),
+                          style: TextButton.styleFrom(
+                            textStyle: TextStyle(
+                              color: Palette.primary,
+                              fontWeight: FontWeight.w500
+                            )
+                          ),
+                          onPressed: (){
+                            Get.back();
+                          },
+                        )
+                      ],
+                    );
+                  }
+                );
             },
           ),
         ],

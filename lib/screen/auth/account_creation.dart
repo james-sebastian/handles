@@ -35,34 +35,56 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
     }
 
     void _showPicker(context) {
-      showModalBottomSheet(
-        context: context,
-        builder: (BuildContext bc) {
-          return SafeArea(
-            child: Container(
-              child: new Wrap(
-                children: <Widget>[
-                  new ListTile(
-                      leading: new Icon(Icons.photo_library),
-                      title: new Text('Photo Library'),
+      Platform.isAndroid
+      ? showModalBottomSheet(
+          context: context,
+          builder: (BuildContext bc) {
+            return SafeArea(
+              child: Container(
+                child: new Wrap(
+                  children: <Widget>[
+                    new ListTile(
+                        leading: new Icon(Icons.photo_library),
+                        title: new Text('Photo Library'),
+                        onTap: () {
+                          _imgFromGallery();
+                          Navigator.of(context).pop();
+                        }),
+                    new ListTile(
+                      leading: new Icon(Icons.photo_camera),
+                      title: new Text('Camera'),
                       onTap: () {
-                        _imgFromGallery();
+                        _imgFromCamera();
                         Navigator.of(context).pop();
-                      }),
-                  new ListTile(
-                    leading: new Icon(Icons.photo_camera),
-                    title: new Text('Camera'),
-                    onTap: () {
-                      _imgFromCamera();
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        }
-      );
+            );
+          }
+        )
+      : showCupertinoModalPopup<void>(
+          context: context,
+          builder: (BuildContext context) => CupertinoActionSheet(
+            actions: <CupertinoActionSheetAction>[
+              CupertinoActionSheetAction(
+                child: const Text('Pick from Camera'),
+                onPressed: () {
+                  _imgFromGallery();
+                  Navigator.of(context).pop();
+                },
+              ),
+              CupertinoActionSheetAction(
+                child: const Text('Pick from Gallery'),
+                onPressed: () {
+                  _imgFromCamera();
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          ),
+        );
     }
 
     return SafeArea(

@@ -216,12 +216,13 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                           onPressed: (){}
                         ),
                         IconButton(
-                          tooltip: "Settings",
+                          tooltip: "Archive",
                           icon: AdaptiveIcon(
                             android: Icons.archive,
                             iOS: CupertinoIcons.archivebox_fill,
                           ),
-                          onPressed: (){}
+                          onPressed: (){
+                          }
                         ),
                       ],
                     ),
@@ -352,7 +353,9 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                             android: Icons.more_vert_rounded,
                             iOS: CupertinoIcons.ellipsis,
                           ),
-                          onPressed: (){}
+                          onPressed: (){
+                            Get.to(() => SettingsPage(), transition: Transition.cupertino);
+                          }
                         ),
                       ],
                     ),
