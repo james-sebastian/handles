@@ -186,6 +186,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         fontSize: 16,
                       )
                     ),
+                    onTap: (){Get.to(() => SubscriptionPage(), transition: Transition.cupertino);}
                   ),
                   Divider(height: 1,),
                   ListTile(
