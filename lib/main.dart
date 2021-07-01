@@ -20,6 +20,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: MaterialColor(Palette.primaryIntForm, Palette.materialColorMap),
         primaryColor: Palette.primary,
         accentColor: Palette.primary,
+        switchTheme: SwitchThemeData(
+          thumbColor: MaterialStateProperty.all(Palette.secondary),
+          trackColor: MaterialStateProperty.all(Palette.secondary.withOpacity(0.5)),
+        )
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
     );

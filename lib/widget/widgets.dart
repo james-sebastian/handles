@@ -25,7 +25,6 @@ part 'button.dart';
 part 'pro_tag.dart';
 part 'subscription_banner.dart';
 part 'adaptive_icon.dart';
-part 'adaptive_dialog.dart';
 part 'handles_status_block.dart';
 part 'general_status_tag.dart';
 part 'image_chat.dart';
