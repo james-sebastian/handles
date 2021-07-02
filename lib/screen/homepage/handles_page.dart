@@ -373,20 +373,31 @@ class _HandlesPageState extends State<HandlesPage> {
                       serviceModel: ServiceModel(
                         serviceName: "WebSocket: Upgrade",
                         description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non dapibus eros. Duis facilisis faucibus accumsan. Sed sit amet convallis felis. Suspendisse non faucibus neque. Praesent sed enim ex. Pellentesque tempor sollicitudin dui vitae ultricies.",
-                        serviceFee: 1200,
-                        status: ServiceStatus.paid,
+                        paymentStatus: ProjectPaymentStatus.unpaid,
+                        status: ProjectStatus.in_progress,
                         milestones: [
                           MilestoneModel(
+                            fee: 20,
+                            paymentStatus: ProjectPaymentStatus.unpaid,
+                            status: ProjectStatus.completed,
                             milestoneName: "Schematics Planning",
                             isCompleted: true,
-                            description: "Planning for the project's schematics"
+                            description: "Planning for the project's schematics",
+                            dueDate: DateTime.now().subtract(Duration(days: 2))
                           ),
                           MilestoneModel(
+                            fee: 200,
+                            paymentStatus: ProjectPaymentStatus.unpaid,
+                            status: ProjectStatus.pending,
                             milestoneName: "Schematics Planning",
                             isCompleted: false,
-                            description: "Planning for the project's schematics"
+                            description: "Planning for the project's schematics of lorem ipsum color si damet esquis sita gamma color si damet",
+                            dueDate: DateTime.now().add(Duration(days: 2))
                           ),
                           MilestoneModel(
+                            fee: 150,
+                            paymentStatus: ProjectPaymentStatus.unpaid,
+                            status: ProjectStatus.pending,
                             milestoneName: "Schematics Planning",
                             isCompleted: false,
                             description: "Planning for the project's schematics"
@@ -608,7 +619,8 @@ class _HandlesPageState extends State<HandlesPage> {
                                           height: MQuery.height(0.1, context),
                                           child: ElevatedButton(
                                             onPressed: () {
-                                              
+                                              Get.back();
+                                              Get.to(() => ProjectCreator(), transition: Transition.cupertino);
                                             },
                                             child: Constants.mediaAvatar[keys[4]],
                                             style: ElevatedButton.styleFrom(

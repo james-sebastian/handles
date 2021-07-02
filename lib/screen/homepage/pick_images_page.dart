@@ -75,6 +75,10 @@ class _PickImagesPageState extends State<PickImagesPage> {
     double midBar = 55;
     print(selectedEntities);
 
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Palette.primary
+    ));
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
