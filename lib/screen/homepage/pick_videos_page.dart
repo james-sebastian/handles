@@ -92,6 +92,9 @@ class _PickVideosPageState extends State<PickVideosPage> {
 
     Size size = MediaQuery.of(context).size;
     double midBar = 55;
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Palette.primary
+    ));
 
     return SafeArea(
       child: Scaffold(

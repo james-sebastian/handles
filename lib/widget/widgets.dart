@@ -32,4 +32,5 @@ part 'video_chat.dart';
 part 'audio_chat.dart';
 part 'document_chat.dart';
 part 'meeting_chat.dart';
-part 'service_chat.dart';
+part 'project_chat.dart';
+part 'milestone_dialog.dart';

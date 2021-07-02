@@ -28,6 +28,15 @@ class ServiceChat extends StatefulWidget {
 class _ServiceChatState extends State<ServiceChat> {
   @override
   Widget build(BuildContext context) {
+
+    int calculateTotalFee(){
+      int output = 0;
+      widget.serviceModel.milestones!.forEach((element) {
+        output += (element.fee ?? 0);
+      });
+      return output;
+    }
+
     return widget.sender == "a" //TODO: CHECK IF SENDER == USER ID
       ? Container(
           width: MQuery.width(1, context),
@@ -63,7 +72,7 @@ class _ServiceChatState extends State<ServiceChat> {
                     children: [
                       GestureDetector(
                         onTap: (){
-                          Get.to(() => ServiceDetailedPage(
+                          Get.to(() => ProjectDetailedPage(
                             serviceModel: this.widget.serviceModel,
                             senderUID: this.widget.sender
                           ), transition: Transition.cupertino);
@@ -107,7 +116,7 @@ class _ServiceChatState extends State<ServiceChat> {
                                     ),
                                     Text(
                                       //TODO: GET SHAREDPREF CURRENCY HERE
-                                      NumberFormat.simpleCurrency(locale: 'en_AU').format(widget.serviceModel.serviceFee),
+                                      NumberFormat.simpleCurrency(locale: 'en_AU').format(calculateTotalFee()),
                                       textAlign: TextAlign.start,
                                       style: TextStyle(
                                         fontSize: 12,
@@ -134,7 +143,7 @@ class _ServiceChatState extends State<ServiceChat> {
                         ),
                       ),
                       SizedBox(height: MQuery.height(0.01, context)),
-                      widget.serviceModel.status == ServiceStatus.paid
+                      widget.serviceModel.paymentStatus == ProjectPaymentStatus.paid
                       ? Button(
                           height: MQuery.height(0.045, context),
                           width: double.infinity,
@@ -143,7 +152,7 @@ class _ServiceChatState extends State<ServiceChat> {
                           textColor: Colors.white,
                           title: "Service Has Been Paid",
                         )
-                      : widget.serviceModel.status == ServiceStatus.unpaid
+                      : widget.serviceModel.paymentStatus == ProjectPaymentStatus.unpaid
                       ? Button(
                           height: MQuery.height(0.045, context),
                           width: double.infinity,
@@ -275,7 +284,7 @@ class _ServiceChatState extends State<ServiceChat> {
                       SizedBox(height: MQuery.height(0.005, context)),
                       GestureDetector(
                         onTap: (){
-                          Get.to(() => ServiceDetailedPage(
+                          Get.to(() => ProjectDetailedPage(
                             serviceModel: this.widget.serviceModel,
                             senderUID: this.widget.sender
                           ), transition: Transition.cupertino);
@@ -318,7 +327,7 @@ class _ServiceChatState extends State<ServiceChat> {
                                       )
                                     ),
                                     Text(
-                                      NumberFormat.simpleCurrency(locale: 'en_AU').format(widget.serviceModel.serviceFee),
+                                      NumberFormat.simpleCurrency(locale: 'en_AU').format(calculateTotalFee()),
                                       textAlign: TextAlign.start,
                                       style: TextStyle(
                                         fontSize: 12,
@@ -344,7 +353,7 @@ class _ServiceChatState extends State<ServiceChat> {
                       ),
                       SizedBox(height: MQuery.height(0.01, context)),
                       //TODO: CHECK IF CURRENT USER ROLE == CLIENT =x DISPLAY DETAIL
-                      widget.serviceModel.status == ServiceStatus.paid
+                      widget.serviceModel.paymentStatus == ProjectPaymentStatus.paid
                       ? Button(
                           height: MQuery.height(0.045, context),
                           width: double.infinity,
@@ -353,7 +362,7 @@ class _ServiceChatState extends State<ServiceChat> {
                           textColor: Colors.white,
                           title: "SERVICE HAS BEEN PAID",
                         )
-                      : widget.serviceModel.status == ServiceStatus.unpaid
+                      : widget.serviceModel.paymentStatus == ProjectPaymentStatus.unpaid
                       ? Button(
                           height: MQuery.height(0.045, context),
                           width: double.infinity,
