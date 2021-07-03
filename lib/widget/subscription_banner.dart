@@ -6,6 +6,7 @@ class SubscriptionBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      onTap: (){Get.to(() => SubscriptionPage(), transition: Transition.cupertino);},
       tileColor: Palette.tertiary,
       leading: CircleAvatar(
         backgroundColor: Palette.tertiary,

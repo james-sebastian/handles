@@ -13,6 +13,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   bool isNotificationActive = true;
   FontSize fontSize = FontSize.medium;
+  TextEditingController paymentAddressController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -252,6 +253,108 @@ class _SettingsPageState extends State<SettingsPage> {
                         });
                       },
                     )
+                  ),
+                  Divider(height: 1,),
+                  ListTile(
+                    onTap: (){
+                      Get.dialog(
+                        Dialog(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxHeight: MQuery.height(0.75, context)
+                            ),
+                            child: Container(
+                              width: MQuery.width(0.9, context),
+                              padding: EdgeInsets.all(MQuery.height(0.02, context)),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Your Payment Address",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        color: Palette.primaryText,
+                                        fontWeight: FontWeight.w500
+                                      ),
+                                    ),
+                                    SizedBox(height: MQuery.height(0.02, context)),
+                                    Container(
+                                      padding: EdgeInsets.only(
+                                        bottom: MQuery.height(0.02, context)
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Palette.formColor,
+                                        borderRadius: BorderRadius.all(Radius.circular(5))
+                                      ),
+                                      child: TextFormField(
+                                        maxLength: 12,
+                                        readOnly: false,
+                                        keyboardType: TextInputType.number,
+                                        controller: paymentAddressController,
+                                        cursorColor: Palette.primary,
+                                        style: TextStyle(
+                                          fontSize: 16
+                                        ),
+                                        decoration: InputDecoration(
+                                          isDense: true,
+                                          suffixIconConstraints: BoxConstraints(
+                                            minWidth: 2,
+                                            minHeight: 2,
+                                          ),
+                                          suffixIcon: IconButton(
+                                            onPressed: (){
+                                              // Clipboard.setData(ClipboardData(text: widget.meetingModel.meetingURL));
+                                            },
+                                            icon: AdaptiveIcon(
+                                              android: Icons.copy,
+                                              iOS: CupertinoIcons.doc_on_clipboard_fill,
+                                              color: Palette.primary,
+                                              size: 20
+                                            )
+                                          ),
+                                          fillColor: Palette.primary,
+                                          hintStyle: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black.withOpacity(0.4)
+                                          ),
+                                          hintText: "Credit card hasn't provided yet",
+                                          contentPadding: EdgeInsets.all(15),
+                                          border: InputBorder.none
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: MQuery.height(0.02, context)),
+                                    Text(
+                                      "Your payment address (Credit Card) is official and will be used for any form of transaction related to a Handles Group that you've created or currently admining",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Palette.primaryText,
+                                        fontWeight: FontWeight.w400
+                                      ),
+                                    ),
+                                  ]
+                                )
+                              )
+                            )
+                          )
+                        )
+                      );
+                    },
+                    shape: Border.symmetric(
+                      vertical: BorderSide(color: Colors.grey.withOpacity(0.5))
+                    ),
+                    title: Text(
+                      "Project payment address",
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 16,
+                      )
+                    ),
                   ),
                   Divider(height: 1,),
                   ListTile(

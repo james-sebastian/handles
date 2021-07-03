@@ -52,3 +52,5 @@ part 'homepage/settings_page.dart';
 part 'homepage/profile_page.dart';
 part 'homepage/subscription_page.dart';
 part 'homepage/project_creator.dart';
+part 'homepage/handles_detailed_page.dart';
+part 'homepage/handles_medias_page.dart';

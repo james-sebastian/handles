@@ -98,17 +98,23 @@ class _HandlesPageState extends State<HandlesPage> {
             )
           )
         : ListTile(
-            onTap: (){},
-            horizontalTitleGap: MQuery.width(0.0075, context),
+            onTap: (){
+              Get.to(() => HandlesDetailedPage());
+            },
+            horizontalTitleGap: MQuery.width(0.0125, context),
             contentPadding: EdgeInsets.fromLTRB(
               MQuery.width(0, context),
               MQuery.height(0.01, context),
               MQuery.width(0, context),
               MQuery.height(0.0075, context),
             ),
-            leading: CircleAvatar(
-              backgroundColor: Colors.white,
-              radius: MQuery.height(0.0215, context),
+            leading: Hero(
+              tag: "handles_picture",
+              child: CircleAvatar(
+                backgroundColor: Colors.white,
+                backgroundImage: AssetImage("assets/handles_logo.png"),
+                radius: MQuery.height(0.0215, context),
+              ),
             ),
             title: Font.out(
               "Handles DevTeam",
