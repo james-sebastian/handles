@@ -52,7 +52,9 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
               iOS: CupertinoIcons.add,
               color: Colors.white, size: 28,
             ),
-            onPressed: (){},
+            onPressed: (){
+              Get.to(() => HandlesCreatorPage(), transition: Transition.cupertino);
+            },
           ),
           appBar: AppBar(
             elevation: isSearchActive ? 0 : 2.5,
