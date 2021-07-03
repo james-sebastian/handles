@@ -12,9 +12,9 @@ class OnboardingPage extends StatelessWidget {
       }
     });
 
-    return SafeArea(
-      child: Scaffold(
-        body: Padding(
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
           padding: EdgeInsets.only(
             left: MQuery.width(0.015, context),
             right: MQuery.width(0.015, context)
@@ -59,8 +59,8 @@ class OnboardingPage extends StatelessWidget {
               ],
             ),
           ),
-        )
-      ),
+        ),
+      )
     );
   }
 }
