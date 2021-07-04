@@ -11,8 +11,26 @@ class _HandlesMediasPageState extends State<HandlesMediasPage> with SingleTicker
 
   late TabController _tabController;
 
+  Future<String> createFolder(String folderName) async {
+    final path = Directory("storage/emulated/0/$folderName");
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      await Permission.storage.request();
+    } else {
+      print("a");
+    }
+    if ((await path.exists())) {
+      print("existed");
+      return path.path;
+    } else {
+      print("created");
+      path.create();
+      return path.path;
+    }
+  }
+
   @override
-  void initState() { 
+  void initState(){ 
     super.initState();
     _tabController = TabController(vsync: this, length: 5);
   }
@@ -31,8 +49,8 @@ class _HandlesMediasPageState extends State<HandlesMediasPage> with SingleTicker
                 android: Icons.arrow_back,
                 iOS: CupertinoIcons.back,
               ),
-              onPressed: (){
-                Get.back();
+              onPressed: () async {
+                createFolder("handles");
               },
             ),
             bottom: TabBar(
