@@ -349,18 +349,20 @@ class _AddMemberViaNumberDialogState extends State<AddMemberViaNumberDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      insetPadding: EdgeInsets.all(20),
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxHeight: MQuery.height(0.75, context)
+          maxHeight: MQuery.height(0.75, context),
+          minWidth: MQuery.width(0.8, context)
         ),
         child: Container(
-          width: MQuery.width(0.9, context),
-          padding: EdgeInsets.all(MQuery.height(0.02, context)),
+          padding: EdgeInsets.all(MQuery.height(0.01, context)),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                SizedBox(height: MQuery.height(0.02, context)),
                 Text(
                   "Add Member",
                   textAlign: TextAlign.center,
@@ -378,7 +380,7 @@ class _AddMemberViaNumberDialogState extends State<AddMemberViaNumberDialog> {
                         flex: 2,
                         child: Container(
                           height: MQuery.height(0.065, context),
-                          margin: const EdgeInsets.only(left: 8.0, right: 0.0),
+                          margin: const EdgeInsets.only(left: 8.0),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10.0),
                             color: Palette.formColor,
@@ -393,11 +395,11 @@ class _AddMemberViaNumberDialogState extends State<AddMemberViaNumberDialog> {
                               ),
                               decoration: InputDecoration(
                                 hintStyle: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 16,
                                   color: isError ? Palette.warning : Colors.black.withOpacity(0.4)
                                 ),
                                 hintText: "+61",
-                                contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                                contentPadding: EdgeInsets.fromLTRB(5, 10, 20, 10),
                                 border: InputBorder.none
                               ),
                               onEditingComplete: (){
@@ -407,7 +409,7 @@ class _AddMemberViaNumberDialogState extends State<AddMemberViaNumberDialog> {
                           ),
                         )
                       ),
-                      SizedBox(width: MQuery.width(0.02, context)),
+                      SizedBox(width: MQuery.width(0.01, context)),
                       Expanded(
                         flex: 8,
                         child: Container(
@@ -469,7 +471,8 @@ class _AddMemberViaNumberDialogState extends State<AddMemberViaNumberDialog> {
                     }
                   },
                   color: Palette.primary
-                )
+                ),
+                SizedBox(height: MQuery.height(0.02, context)),
               ]
             )
           )
