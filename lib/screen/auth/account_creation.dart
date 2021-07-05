@@ -167,38 +167,44 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
                 ) else
                 SizedBox(),
                 Spacer(flex: 2),
-                Button(
-                  title: "NEXT",
-                  color: Palette.primary,
-                  method: (){
-                    if(nameController.text != ""){
-                      if(_image != null){
-                        Future<void> uploadFile(String filePath) async {
-                          File file = File(filePath);
-                          try {
-                            await FirebaseStorage.instance
-                            .ref('user_profile/${FirebaseAuth.instance.currentUser!.uid}.png')
-                            .putFile(file);
-                          } on FirebaseException catch (e) {
-                            print(e.toString());
+                Consumer(
+                  builder: (context, watch, _){
+
+                    final _authenticationProvider = watch(authenticationProvider);
+
+                    return Button(
+                      title: "NEXT",
+                      color: Palette.primary,
+                      method: (){
+                        if(nameController.text != ""){
+                          if(_image != null){
+                            _authenticationProvider.uploadUserProfilePicture(_image!.path).whenComplete((){
+                              final String _downloadURL = watch(authenticationProvider).profilePictureDownloadURL;
+                              if(_downloadURL != ""){
+                                if(_authenticationProvider.auth.currentUser != null){
+                                  print(_authenticationProvider.auth.currentUser);
+                                  _authenticationProvider.createUserRecord(
+                                    UserModel(
+                                      id: _authenticationProvider.auth.currentUser!.uid,
+                                      name: nameController.text,
+                                      profilePicture: _downloadURL,
+                                      phoneNumber: _authenticationProvider.auth.currentUser!.phoneNumber ?? "",
+                                      countryCode: _authenticationProvider.auth.currentUser!.phoneNumber!.substring(0,2)
+                                    )
+                                  );
+                                }
+                              }
+                            });
                           }
+                        } else {
+                          setState(() {
+                            isError = true;
+                          });
                         }
-
-                        uploadFile(_image!.path).whenComplete(() async {
-                          String downloadURL = await FirebaseStorage.instance
-                            .ref('user_profile/${FirebaseAuth.instance.currentUser!.uid}.png')
-                            .getDownloadURL();
-
-                          print(downloadURL);
-                        });
-                      }
-                    } else {
-                      setState(() {
-                        isError = true;
-                      });
-                    }
-                  },
-                  textColor: Colors.white,
+                      },
+                      textColor: Colors.white,
+                    );
+                  }
                 ),
                 Spacer()
               ],

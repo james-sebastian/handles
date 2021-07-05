@@ -310,7 +310,7 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
                   SizedBox(height: MQuery.height(0.05, context)),
                   Button(
                     width: double.infinity,
-                    title: "Send Meeting Message",
+                    title: "Create Handles",
                     textColor: Colors.white,
                     color: Palette.primary,
                     method: (){

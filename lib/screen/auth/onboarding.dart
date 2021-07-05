@@ -51,7 +51,7 @@ class OnboardingPage extends StatelessWidget {
                   title: "GET STARTED",
                   color: Palette.primary,
                   method: (){
-                    Get.offAll(() => Homepage(), transition: Transition.cupertino);
+                    Get.offAll(() => PhoneAuthPage(), transition: Transition.cupertino);
                   },
                   textColor: Colors.white,
                 ),

@@ -1,13 +1,19 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
 import 'package:handles/config/config.dart';
+import 'package:handles/provider/providers.dart';
 import 'package:handles/screen/pages.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  Firebase.initializeApp();
-  runApp(MyApp());
+  await Firebase.initializeApp();
+  runApp(
+    ProviderScope(
+      child: MyApp()
+    )
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -25,26 +31,36 @@ class MyApp extends StatelessWidget {
           trackColor: MaterialStateProperty.all(Palette.secondary.withOpacity(0.5)),
         )
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: Authenticator(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
+class Authenticator extends ConsumerWidget {
+  Widget build(BuildContext context, ScopedReader watch) {
 
-  final String title;
+    final authStateChanges = watch(authStateChangesProvider);
 
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
+    print(authStateChanges);
 
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-
-    //Auth Check Here...
-
-    return OnboardingPage();
+    return authStateChanges.when(
+      data: (user){
+        return user != null
+          ? user.displayName == "" || user.displayName == null
+            ? AccountCreationPage()
+            : Homepage()
+          : OnboardingPage();
+      },
+      loading: () => const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (_, __) => const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+    );
   }
 }
