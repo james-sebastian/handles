@@ -43,7 +43,7 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
 
         final _authenticationProvider = watch(authenticationProvider);
 
-        print(_authenticationProvider.auth.currentUser!.displayName);
+        print(_authenticationProvider.auth.currentUser);
 
         return MaterialApp(
           debugShowCheckedModeBanner: false,

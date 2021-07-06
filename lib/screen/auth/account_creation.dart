@@ -189,7 +189,13 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
                                       name: nameController.text,
                                       profilePicture: _downloadURL,
                                       phoneNumber: _authenticationProvider.auth.currentUser!.phoneNumber ?? "",
-                                      countryCode: _authenticationProvider.auth.currentUser!.phoneNumber!.substring(0,2)
+                                      countryCode: _authenticationProvider.auth.currentUser!.phoneNumber!.substring(0,3),
+                                      role: "",
+                                      company: "",
+                                      companyAddress: "",
+                                      creditCard: "",
+                                      handlesList: [""],
+                                      archivedHandlesList: [""]
                                     )
                                   );
                                 }
