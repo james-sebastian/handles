@@ -41,8 +41,6 @@ class Authenticator extends ConsumerWidget {
 
     final authStateChanges = watch(authStateChangesProvider);
 
-    print(authStateChanges);
-
     return authStateChanges.when(
       data: (user){
         return user != null

@@ -10,3 +10,4 @@ part "audio_chat_provider.dart";
 part "authentication_provider.dart";
 part "firestore_provider.dart";
 part 'storage_provider.dart';
+part 'user_provider.dart';

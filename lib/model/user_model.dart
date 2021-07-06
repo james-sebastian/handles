@@ -9,6 +9,7 @@ class UserModel{
   String? role;
   String? company;
   String? companyAddress;
+  String? companyLogo;
   String? creditCard;
   List<String>? handlesList;
   List<String>? archivedHandlesList;
@@ -19,6 +20,7 @@ class UserModel{
     required this.countryCode,
     required this.phoneNumber,
     required this.profilePicture,
+    this.companyLogo,
     this.role,
     this.company,
     this.companyAddress,

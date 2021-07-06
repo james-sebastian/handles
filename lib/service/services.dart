@@ -7,5 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:handles/model/models.dart';
 import 'package:handles/screen/pages.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part "authentication_services.dart";
+part 'user_services.dart';
