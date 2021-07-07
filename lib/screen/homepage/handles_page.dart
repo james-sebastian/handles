@@ -10,9 +10,12 @@ class HandlesPage extends StatefulWidget {
 class _HandlesPageState extends State<HandlesPage> {
 
   late ScrollController _scrollController;
-  bool isScrolling = false;
+  TextEditingController chatController = TextEditingController();
   bool isSearchActive = false;
+  bool isChatSelected = false;
   int isFilterChipSelected = -1;
+  int lineCount = 4;
+  Set<int> selectedChats = Set();
 
   void scrollToBottom() {
     final bottomOffset = _scrollController.position.maxScrollExtent;
@@ -48,23 +51,64 @@ class _HandlesPageState extends State<HandlesPage> {
       "Services"
     ];
 
+    void selectChat(int index){
+      setState(() {
+        isChatSelected = true;
+        selectedChats.add(index);
+      });
+    }
+
+    void chatOnTap(int index){
+      if(isChatSelected){
+        if(selectedChats.toList().indexOf(index) >= 0){
+          setState(() {
+            selectedChats.remove(index);
+          });
+        } else {
+          setState(() {
+            selectedChats.add(index);
+          });
+        }
+      }
+    }
+
+    if(selectedChats.isEmpty){
+      setState(() {
+        isChatSelected = false;
+      });
+    }
+
     return Scaffold(
       backgroundColor: Palette.handlesBackground,
-      floatingActionButton: isScrolling
-      ? FloatingActionButton(
-          onPressed: (){},
-        )
-      : SizedBox(),
       appBar: AppBar(
         elevation: isSearchActive ? 0 : 1,
         toolbarHeight: MQuery.height(0.075, context),
-        leadingWidth: MQuery.width(0.04, context),
-        leading: Padding(
+        leadingWidth: !isChatSelected 
+        ? MQuery.width(0.085, context)
+        : 0,
+        leading: !isChatSelected
+        ? Container(
           padding: EdgeInsets.only(left: 8.0),
-          child: GestureDetector(
-            child: AdaptiveIcon(
-              android: Icons.arrow_back,
-              iOS: CupertinoIcons.back,
+          child: InkWell(
+            customBorder: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+            child: Row(
+              children: [
+                AdaptiveIcon(
+                  android: Icons.arrow_back,
+                  iOS: CupertinoIcons.back,
+                ),
+                SizedBox(width: MQuery.width(0.005, context)),
+                Hero(
+                  tag: "handles_picture",
+                  child: CircleAvatar(
+                    backgroundColor: Colors.white,
+                    backgroundImage: AssetImage("assets/handles_logo.png"),
+                    radius: MQuery.height(0.0215, context),
+                  ),
+                )
+              ],
             ),
             onTap: (){
               if(isSearchActive){
@@ -76,7 +120,8 @@ class _HandlesPageState extends State<HandlesPage> {
               }
             },
           ),
-        ),
+        )
+        : SizedBox(),
         title: isSearchActive
         ? FadeIn(
             child: Container(
@@ -97,24 +142,28 @@ class _HandlesPageState extends State<HandlesPage> {
               )
             )
           )
+        : isChatSelected
+        ? ListTile(
+            contentPadding: EdgeInsets.only(
+              right: MQuery.width(0.1, context)
+            ),
+            title: Font.out(
+              "${selectedChats.length} chat(s) selected",
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              textAlign: TextAlign.start,
+              color: Colors.white
+            )
+          )
         : ListTile(
             onTap: (){
               Get.to(() => HandlesDetailedPage());
             },
-            horizontalTitleGap: MQuery.width(0.0125, context),
             contentPadding: EdgeInsets.fromLTRB(
               MQuery.width(0, context),
               MQuery.height(0.01, context),
               MQuery.width(0, context),
               MQuery.height(0.0075, context),
-            ),
-            leading: Hero(
-              tag: "handles_picture",
-              child: CircleAvatar(
-                backgroundColor: Colors.white,
-                backgroundImage: AssetImage("assets/handles_logo.png"),
-                radius: MQuery.height(0.0215, context),
-              ),
             ),
             title: Font.out(
               "Handles DevTeam",
@@ -132,33 +181,79 @@ class _HandlesPageState extends State<HandlesPage> {
             ),
           ),
         actions: [
-          isSearchActive
-          ? SizedBox()
-          : IconButton(
-            padding: EdgeInsets.zero,
-            tooltip: "Make a Group Call",
-            icon: AdaptiveIcon(
-              android: Icons.add_call,
-              iOS: CupertinoIcons.phone_solid,
-            ),
-            onPressed: (){}
-          ),
-          IconButton(
-            tooltip: "Search",
-            icon: AdaptiveIcon(
-              android: Icons.search,
-              iOS: CupertinoIcons.search
-            ),
-            onPressed: (){
-              if(!isSearchActive){
-                setState(() {
-                  isSearchActive = true;
-                });
-              } else {
-                //TODO: SEARCH MECHANISM HERE
+          if (isSearchActive)
+            IconButton(
+              tooltip: "Search",
+              icon: AdaptiveIcon(
+                android: Icons.search,
+                iOS: CupertinoIcons.search
+              ),
+              onPressed: (){
+                if(!isSearchActive){
+                  setState(() {
+                    isSearchActive = true;
+                  });
+                } else {
+                  //TODO: SEARCH MECHANISM HERE
+                }
               }
-            }
-          ),
+            )
+          else
+            if(isChatSelected)
+              Row(
+                children: [
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    tooltip: "Forward Message",
+                    icon: AdaptiveIcon(
+                      android: Icons.subdirectory_arrow_right_sharp,
+                      iOS: CupertinoIcons.forward,
+                    ),
+                    onPressed: (){}
+                  ),
+                  selectedChats.length == 1 //TODO: && CURRENT USER == SENDER
+                  ? IconButton(
+                      tooltip: "Message Info",
+                      icon: AdaptiveIcon(
+                        android: Icons.info_outline_rounded,
+                        iOS: CupertinoIcons.info_circle
+                      ),
+                      onPressed: (){
+                        Get.bottomSheet(
+                          MessageInfoBottomSheet(index: selectedChats.first)
+                        );
+                      }
+                    )
+                  : SizedBox()
+                  //TODO: IF CURRENT USER == SENDER => DELETE ICON
+                ]
+              )
+            else
+              Row(
+                children: [
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    tooltip: "Make a Group Call",
+                    icon: AdaptiveIcon(
+                      android: Icons.add_call,
+                      iOS: CupertinoIcons.phone_solid,
+                    ),
+                    onPressed: (){}
+                  ),
+                  IconButton(
+                    tooltip: "Search",
+                    icon: AdaptiveIcon(
+                      android: Icons.search,
+                      iOS: CupertinoIcons.search
+                    ),
+                    onPressed: (){
+                      setState(() {
+                        isSearchActive = true;
+                      });
+                    }
+                  ),
+                ]
+              )
         ],
       ),
       body: Column(
@@ -288,21 +383,29 @@ class _HandlesPageState extends State<HandlesPage> {
                 } else {
                   return index == 1
                   ? PlainChat(
+                      index: index,
                       timestamp: DateTime.now(),
                       sender: "Andy",
                       senderRole: "Admin",
                       isRecurring: false,
                       content: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                       isPinned: true,
+                      selectChatMethod: selectChat,
+                      chatOnTap: chatOnTap,
+                      selectedChats: selectedChats
                     )
                   : index == 2
                   ? PlainChat(
+                      index: index,
                       timestamp: DateTime.now(),
                       sender: "a",
                       senderRole: "",
                       isRecurring: false,
                       content: "Sure let's do it!",
-                      isPinned: false
+                      isPinned: false,
+                      selectChatMethod: selectChat,
+                      chatOnTap: chatOnTap,
+                      selectedChats: selectedChats
                     ) 
                   : index == 3
                   ? ImageChat(
@@ -313,7 +416,10 @@ class _HandlesPageState extends State<HandlesPage> {
                       sender: "a",
                       senderRole: "Admin",
                       imageURL: "https://images.pexels.com/photos/1054289/pexels-photo-1054289.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
-                      content: "aaaaaaaaaaaaaaaaaa"
+                      content: "aaaaaaaaaaaaaaaaaa",
+                      selectChatMethod: selectChat,
+                      chatOnTap: chatOnTap,
+                      selectedChats: selectedChats
                     )
                   : index == 4
                   ? VideoChat(
@@ -324,7 +430,10 @@ class _HandlesPageState extends State<HandlesPage> {
                       sender: "Maya",
                       senderRole: "Admin",
                       videoURL: "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
-                      content: "aaaaaaaaaaaaaaaaaa"
+                      content: "aaaaaaaaaaaaaaaaaa",
+                      selectChatMethod: selectChat,
+                      chatOnTap: chatOnTap,
+                      selectedChats: selectedChats
                     )
                   : index == 5
                   ? AudioChat(
@@ -335,6 +444,9 @@ class _HandlesPageState extends State<HandlesPage> {
                       sender: "b",
                       senderRole: "Admin",
                       audioURL: "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
+                      selectChatMethod: selectChat,
+                      chatOnTap: chatOnTap,
+                      selectedChats: selectedChats
                     )
                   : index == 6
                   ? DocumentChat(
@@ -345,6 +457,9 @@ class _HandlesPageState extends State<HandlesPage> {
                       sender: "b",
                       senderRole: "Admin",
                       documentURL: "http://www.africau.edu/images/default/sample.pdf",
+                      selectChatMethod: selectChat,
+                      chatOnTap: chatOnTap,
+                      selectedChats: selectedChats
                     )
                   : index == 7
                   ? MeetingChat(
@@ -417,34 +532,50 @@ class _HandlesPageState extends State<HandlesPage> {
             ),
           ),
           Expanded(
-            flex: isKeyboardOpen ? 4 : 5,
+            flex: isKeyboardOpen ? lineCount : 5,
             child: Container(
               padding: EdgeInsets.only(
                 left: MQuery.height(0.015, context),
                 right: MQuery.height(0.015, context),
-                bottom: MQuery.height(0.015, context)
+                bottom: MQuery.height(0.015, context),
               ),
               color: Palette.handlesBackground,
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(
                     flex: 6,
                     child: Container(
+                      height: 200,
+                      padding: EdgeInsets.only(
+                        left: MQuery.width(0.02, context),
+                        right: MQuery.width(0.02, context),
+                        top:  MQuery.width(0.004, context)
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(50))
+                        borderRadius: BorderRadius.all(Radius.circular(50 - (lineCount * 4)))
                       ),
-                      child: TextFormField(
-                        maxLines: 6,
-                        decoration: InputDecoration(
-                          hintText: "Type a message",
-                          contentPadding: EdgeInsets.fromLTRB(
-                            MQuery.width(0.02, context),
-                            MQuery.height(0.0175, context),
-                            MQuery.width(0.02, context),
-                            MQuery.height(0, context)
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextFormField(
+                          keyboardType: TextInputType.multiline,
+                          controller: chatController,
+                          maxLines: 6,
+                          decoration: InputDecoration(
+                            hintText: "Type a message",
+                            border: InputBorder.none
                           ),
-                          border: InputBorder.none
+                          onChanged: (String value){
+                            if(value.indexOf("\n") >= 0){
+                              if(lineCount <= 8){
+                                setState(() {
+                                  lineCount++;
+                                });
+                              }
+                            }
+                          }
                         ),
                       )
                     ),

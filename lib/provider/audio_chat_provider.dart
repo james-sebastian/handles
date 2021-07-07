@@ -20,7 +20,11 @@ class AudioChatProvider{
   void _init() async {
     // initialize the song
     _audioPlayer = AudioPlayer();
-    await _audioPlayer.setUrl(url);
+    try{
+      await _audioPlayer.setUrl(url);
+    } catch (e){
+      print(e);
+    }
 
     // listen for changes in player state
     _audioPlayer.playerStateStream.listen((playerState) {

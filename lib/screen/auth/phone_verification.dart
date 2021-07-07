@@ -1,9 +1,11 @@
 part of "../pages.dart";
+enum PhoneVerificationType{creation, update, deletion}
 
 class PhoneVerificationPage extends StatefulWidget {
 
+  final PhoneVerificationType verificationStatus;
   final String phoneNumber;
-  const PhoneVerificationPage({ Key? key, required this.phoneNumber }) : super(key: key);
+  const PhoneVerificationPage({ Key? key, required this.phoneNumber, required this.verificationStatus}) : super(key: key);
 
   @override
   _PhoneVerificationPageState createState() => _PhoneVerificationPageState();
@@ -22,16 +24,20 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
         final _authenticationProvider = watch(authenticationProvider);
         final _verificationCode = watch(authenticationProvider).verificationCode;
 
-        _authenticationProvider.verifyPhone(
-          phoneNumber: widget.phoneNumber,
-        );
+        if(widget.verificationStatus == PhoneVerificationType.update){
+          _authenticationProvider.updateUserPhoneVerification(widget.phoneNumber);
+        } else if (widget.verificationStatus == PhoneVerificationType.creation){
+          _authenticationProvider.verifyPhone(
+            phoneNumber: widget.phoneNumber,
+          );
+        } else {
+          _authenticationProvider.deleteUserVerification(widget.phoneNumber);
+        }
 
         if(watch(authenticationProvider).isError){
           FocusScope.of(context).unfocus();
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Invalid OTP')));
         }
-
-        print(watch(authenticationProvider).isLoading);
 
         return SafeArea(
           child: Scaffold(
@@ -95,7 +101,13 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
                         ),
                         fieldsCount: 6,
                         onSubmit: (pin) async {
-                          _authenticationProvider.signInWithVerificationCode(_verificationCode, pin);
+                          if(widget.verificationStatus == PhoneVerificationType.update){
+                            _authenticationProvider.updateUserPhoneCredential(widget.phoneNumber, pin);
+                          } else if(widget.verificationStatus == PhoneVerificationType.creation) {
+                             _authenticationProvider.signInWithVerificationCode(_verificationCode, pin);
+                          } else {
+                            _authenticationProvider.deleteUserPhoneCredential(_verificationCode, _pinPutController.text);
+                          }
                         },
                       ),
                     ),
@@ -105,7 +117,13 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
                       color: Palette.primary,
                       method: () async {
                         if(_pinPutController.text != ""){
-                          _authenticationProvider.signInWithVerificationCode(_verificationCode, _pinPutController.text);
+                          if(widget.verificationStatus == PhoneVerificationType.update){
+                            _authenticationProvider.updateUserPhoneCredential(_verificationCode, _pinPutController.text);
+                          } else if(widget.verificationStatus == PhoneVerificationType.creation){
+                            _authenticationProvider.signInWithVerificationCode(_verificationCode, _pinPutController.text);
+                          } else {
+                            _authenticationProvider.deleteUserPhoneCredential(_verificationCode, _pinPutController.text);
+                          }
                         }
                       },
                       textColor: Colors.white,

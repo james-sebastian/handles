@@ -29,7 +29,8 @@ class MyApp extends StatelessWidget {
         switchTheme: SwitchThemeData(
           thumbColor: MaterialStateProperty.all(Palette.secondary),
           trackColor: MaterialStateProperty.all(Palette.secondary.withOpacity(0.5)),
-        )
+        ),
+        splashColor: Palette.primary.withOpacity(0.25)
       ),
       home: Authenticator(),
     );
