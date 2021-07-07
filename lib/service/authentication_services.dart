@@ -134,7 +134,7 @@ class AuthenticationService with ChangeNotifier{
     }
   }
 
-  Future<void> updateUserPhoneCredential(String phoneNumber) async {
+  Future<void> updateUserPhoneVerification(String phoneNumber) async {
     await FirebaseAuth.instance.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       timeout: const Duration(minutes: 2),
@@ -148,14 +148,50 @@ class AuthenticationService with ChangeNotifier{
       codeSent: (verificationId, [forceResendingToken]) async {
         verificationCode = verificationId;
         notifyListeners();
-        // get the SMS code from the user somehow (probably using a text field)
-        // final AuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationId, smsCode: smsCode);
-        // await auth.currentUser!.updatePhoneNumber(credential as PhoneAuthCredential);
       },
       codeAutoRetrievalTimeout: (String verificationID) {
         verificationCode = verificationID;
         notifyListeners();
       },
     );
+  }
+
+  Future<void> updateUserPhoneCredential(String code, String pin) async {
+    final AuthCredential credential = PhoneAuthProvider.credential(verificationId: code, smsCode: pin);
+    await auth.currentUser!.updatePhoneNumber(credential as PhoneAuthCredential);
+  }
+
+  Future<void> deleteUserVerification(String phoneNumber) async {
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      timeout: const Duration(minutes: 2),
+      verificationCompleted: (credential) async {
+
+         //TODO: DELETE FIRESTORE RECORD && REMOVE UID FROM HANDLES
+
+        await auth.currentUser!.reauthenticateWithCredential(credential);
+        await auth.currentUser!.delete();
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        print(e.message);
+      },
+      codeSent: (verificationId, [forceResendingToken]) async {
+        verificationCode = verificationId;
+        notifyListeners();
+      },
+      codeAutoRetrievalTimeout: (String verificationID) {
+        verificationCode = verificationID;
+        notifyListeners();
+      },
+    );
+  }
+
+  Future<void> deleteUserPhoneCredential(String code, String pin) async {
+
+    //TODO: DELETE FIRESTORE RECORD && REMOVE UID FROM HANDLES
+
+    final PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: code, smsCode: pin);
+    await auth.currentUser!.reauthenticateWithCredential(credential);
+    await auth.currentUser!.delete();
   }
 }

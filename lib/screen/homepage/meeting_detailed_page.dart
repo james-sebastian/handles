@@ -20,6 +20,14 @@ class _MeetingDetailedPageState extends State<MeetingDetailedPage> {
   bool isError = false;
   TextEditingController _meetingURLController = TextEditingController();
 
+  Future<Favicon.Icon?> getFavicon(String url) async{
+    try{
+      return Favicon.Favicon.getBest(this.widget.meetingModel.meetingURL);
+    } catch (e){
+      print(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -75,7 +83,7 @@ class _MeetingDetailedPageState extends State<MeetingDetailedPage> {
                         width: MQuery.height(1, context),
                         color: Palette.handlesBackground,
                         child: FutureBuilder<Favicon.Icon?>(
-                          future: Favicon.Favicon.getBest(this.widget.meetingModel.meetingURL),
+                          future: getFavicon(widget.meetingModel.meetingURL),
                           builder: (context, snapshot){
                             return snapshot.hasData
                             ? Padding(

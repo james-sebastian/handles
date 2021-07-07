@@ -28,6 +28,15 @@ class MeetingChat extends StatefulWidget {
 class _MeetingChatState extends State<MeetingChat> {
   @override
   Widget build(BuildContext context) {
+
+    Future<Favicon.Icon?> getFavicon(String url) async{
+      try{
+        return Favicon.Favicon.getBest(this.widget.meetingModel.meetingURL);
+      } catch (e){
+        print(e);
+      }
+    }
+
     return widget.sender == "a" //TODO: CHECK IF SENDER == USER ID
       ? Container(
           width: MQuery.width(1, context),
@@ -78,7 +87,7 @@ class _MeetingChatState extends State<MeetingChat> {
                                 borderRadius: BorderRadius.all(Radius.circular(5)),
                               ),
                               child: FutureBuilder<Favicon.Icon?>(
-                                future: Favicon.Favicon.getBest(this.widget.meetingModel.meetingURL),
+                                future: getFavicon(this.widget.meetingModel.meetingURL),
                                 builder: (context, snapshot){
                                   return snapshot.hasData
                                   ? Padding(
@@ -202,7 +211,7 @@ class _MeetingChatState extends State<MeetingChat> {
                   "assets/tool_tip.svg",
                   height: MQuery.height(0.02, context),
                   width: MQuery.height(0.02, context),
-                  color: this.widget.isRecurring ? Palette.handlesBackground : Palette.primary
+                  color: this.widget.isRecurring ? Colors.transparent : Palette.primary
                 ),
               ),
             ],
@@ -219,7 +228,7 @@ class _MeetingChatState extends State<MeetingChat> {
                 "assets/tool_tip.svg",
                 height: MQuery.height(0.02, context),
                 width: MQuery.height(0.02, context),
-                color: this.widget.isRecurring ? Palette.handlesBackground : Colors.white
+                color: this.widget.isRecurring ? Colors.transparent : Colors.white
               ),
               ConstrainedBox(
                 constraints: BoxConstraints(
@@ -297,7 +306,7 @@ class _MeetingChatState extends State<MeetingChat> {
                                 borderRadius: BorderRadius.all(Radius.circular(5)),
                               ),
                               child: FutureBuilder<Favicon.Icon?>(
-                                future: Favicon.Favicon.getBest(this.widget.meetingModel.meetingURL),
+                                future: getFavicon(this.widget.meetingModel.meetingURL),
                                 builder: (context, snapshot){
                                   return snapshot.hasData
                                   ? Padding(

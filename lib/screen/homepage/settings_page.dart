@@ -225,6 +225,11 @@ class _SettingsPageState extends State<SettingsPage> {
                                   fontSize: 16,
                                 )
                               ),
+                              onTap: (){
+                                Get.dialog(PhoneNumberUpdateDialog(
+                                  isDeleting: false,
+                                ));
+                              }
                             ),
                             Divider(height: 1,),
                             ListTile(
@@ -480,11 +485,10 @@ class _FontDialogState extends State<FontDialog> {
     _fontSize = widget.fontSize;
   }
 
-
   @override
   Widget build(BuildContext context) {
     return SimpleDialog(
-      title: new Text("New Dialog"),
+      title: new Text("Font size"),
       children: <Widget>[
         new Container(
           padding: const EdgeInsets.all(10.0),
@@ -528,6 +532,223 @@ class _FontDialogState extends State<FontDialog> {
               ),
             ],
           )
+        ),
+      ],
+    );
+  }
+}
+
+class PhoneNumberUpdateDialog extends StatefulWidget {
+
+  final bool isDeleting;
+  const PhoneNumberUpdateDialog({ Key? key, required this.isDeleting}) : super(key: key);
+
+  @override
+  _PhoneNumberUpdateDialogState createState() => _PhoneNumberUpdateDialogState();
+}
+
+class _PhoneNumberUpdateDialogState extends State<PhoneNumberUpdateDialog> {
+
+  String countryCode = '+61';
+  bool isError = false;
+  TextEditingController phoneInputController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return SimpleDialog(
+      title: new Text(
+        widget.isDeleting
+        ? "Change your phone number"
+        : "Delete your account?"
+      ),
+      children: <Widget>[
+        new Container(
+          height: MQuery.height(0.425, context),
+          padding: EdgeInsets.all(
+            MQuery.height(0.02, context)
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Font.out(
+                  widget.isDeleting
+                  ? "Deleting your account is an irreversible action that will erase all of your data and automatically leave all of your Handles. Please input your account number to proceed."
+                  : "Handles will send a SMS message to verify\nyour phone number. Please enter your country code and your phone number as well.",
+                  textAlign: TextAlign.center,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w300,
+                  color: Palette.primaryText,
+                ),
+                Container(
+                  child: Column(
+                    children: [
+                      CountryListPick(
+                        appBar: AppBar(
+                          backgroundColor: Colors.blue,
+                          title: Text('Choose your country code'),
+                        ),
+                        
+                        pickerBuilder: (context, CountryCode? code){
+                          return Container(
+                            height: MQuery.height(0.075, context),
+                            width: MQuery.width(0.9, context),
+                            padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              color: Palette.formColor,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      height: MQuery.height(0.02, context),
+                                      width: MQuery.width(0.0325, context),
+                                      child: Image.asset(
+                                        code!.flagUri ?? "",
+                                        fit: BoxFit.fitHeight,
+                                        package: 'country_list_pick',
+                                      ),
+                                    ),
+                                    SizedBox(width: MQuery.width(0.02, context)),
+                                    Font.out(
+                                      code.name ?? ""
+                                    ),
+                                  ],
+                                ),
+                                Icon(CupertinoIcons.chevron_down, color: Palette.primaryText)
+                              ],
+                            )
+                          );
+                        },
+                        theme: CountryTheme(
+                          isShowFlag: true,
+                          isShowTitle: true,
+                          isShowCode: true,
+                          isDownIcon: true,
+                          showEnglishName: true,
+                        ),
+                        // Set default value
+                        initialSelection: '+61',
+                        // or
+                        // initialSelection: 'US'
+                        onChanged: (CountryCode? code) {
+                          setState(() {
+                            countryCode = code!.dialCode ?? "";
+                          });
+                        },
+                        useUiOverlay: true,
+                        useSafeArea: false
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: Container(
+                              height: MQuery.height(0.075, context),
+                              width: MQuery.width(0.9, context),
+                              margin: const EdgeInsets.only(left: 8.0, right: 0.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                color: Palette.formColor,
+                              ),
+                              child: Center(
+                                child: Font.out(
+                                  countryCode
+                                ),
+                              ),
+                            )
+                          ),
+                          SizedBox(width: MQuery.width(0.0125, context)),
+                          Expanded(
+                            flex: 8,
+                            child: Container(
+                              height: MQuery.height(0.075, context),
+                              width: MQuery.width(0.9, context),
+                              margin: const EdgeInsets.only(left: 0.0, right: 7.5),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: isError ? Palette.warning : Colors.transparent
+                                ),
+                                borderRadius: BorderRadius.circular(10.0),
+                                color: Palette.formColor,
+                              ),
+                              child: Center(
+                                child: TextFormField(
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.deny(RegExp("^0+"), replacementString: "")
+                                  ],
+                                  keyboardType: TextInputType.phone,
+                                  controller: phoneInputController,
+                                  cursorColor: Palette.primary,
+                                  style: TextStyle(
+                                    fontSize: 18
+                                  ),
+                                  decoration: InputDecoration(
+                                    hintStyle: TextStyle(
+                                      fontSize: 18,
+                                      color: isError ? Palette.warning : Colors.black.withOpacity(0.4)
+                                    ),
+                                    hintText: "Ex: 2 3456 7890",
+                                    contentPadding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                                    border: InputBorder.none
+                                  ),
+                                  onEditingComplete: (){
+                                    phoneInputController.text.replaceAll("0", "");
+                                  },
+                                  onFieldSubmitted: (value){
+                                    value.replaceAll("0", "");
+                                  },
+                                ),
+                              )
+                            ),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+                if (isError)
+                Column(
+                  children: [
+                    SizedBox(height: MQuery.height(0.02, context)),
+                    Font.out(
+                      "Please provide your phone number firstly.",
+                      fontSize: 14,
+                      color: Palette.warning
+                    ),
+                  ],
+                ) else
+                SizedBox(),
+                Button(
+                  title: "CONFIRM",
+                  color: Palette.primary,
+                  method: () async {
+                    if(phoneInputController.text != ""){
+                      if(widget.isDeleting){
+                        Get.to(() => PhoneVerificationPage(
+                          verificationStatus: PhoneVerificationType.deletion,
+                          phoneNumber: countryCode + " " + phoneInputController.text.trim(),
+                        ), transition: Transition.cupertino);
+                      } else {
+                        Get.to(() => PhoneVerificationPage(
+                          verificationStatus: PhoneVerificationType.update,
+                          phoneNumber: countryCode + " " + phoneInputController.text.trim(),
+                        ), transition: Transition.cupertino);
+                      }
+                    } else {
+                      setState(() {
+                        isError = true;
+                      });
+                    }
+                  },
+                  textColor: Colors.white,
+                ),
+              ],
+            ),
+          ),
         ),
       ],
     );
