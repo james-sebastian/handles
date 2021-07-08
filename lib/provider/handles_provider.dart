@@ -1,17 +1,17 @@
 part of "providers.dart";
 
-final userProvider = ChangeNotifierProvider<UserServices>(
-  (ref) => UserServices(
+final handlesProvider = ChangeNotifierProvider<HandlesServices>(
+  (ref) => HandlesServices(
     auth: ref.watch(firebaseAuthProvider),
     firestore: ref.watch(firebaseFirestoreProvider),
     storage: ref.watch(firebaseStorageProvider)
   )
 );
 
-final currentUserProvider = StreamProvider<UserModel>(
-  (ref) => UserServices(
+final singleHandlesProvider = StreamProvider.family<HandlesModel, String>(
+  (ref, handlesID) => HandlesServices(
     auth: ref.watch(firebaseAuthProvider),
     firestore: ref.watch(firebaseFirestoreProvider),
     storage: ref.watch(firebaseStorageProvider)
-  ).getCurrentUser()
+  ).handlesModelGetter(handlesID)
 );

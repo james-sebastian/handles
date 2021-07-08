@@ -91,6 +91,11 @@ class AuthenticationService with ChangeNotifier{
             .collection("users")
             .doc(auth.currentUser!.uid)
             .set({
+              "id": user.id,
+              "name": user.name,
+              "countryCode": user.countryCode,
+              "phoneNumber": user.phoneNumber,
+              "profilePicture": user.profilePicture,
               "role": user.role,
               "company": user.company,
               "companyAddress": user.companyAddress,
@@ -140,6 +145,12 @@ class AuthenticationService with ChangeNotifier{
       timeout: const Duration(minutes: 2),
       verificationCompleted: (credential) async {
         await auth.currentUser!.updatePhoneNumber(credential);
+        await firestore
+        .collection("users")
+        .doc(auth.currentUser!.uid)
+        .update({
+          "phoneNumber": phoneNumber,
+        });
         // either this occurs or the user needs to manually enter the SMS code
       },
       verificationFailed: (FirebaseAuthException e) {
@@ -156,7 +167,7 @@ class AuthenticationService with ChangeNotifier{
     );
   }
 
-  Future<void> updateUserPhoneCredential(String code, String pin) async {
+  Future<void> updateUserPhoneCredential(String code, String pin, String phoneNumber) async {
     final AuthCredential credential = PhoneAuthProvider.credential(verificationId: code, smsCode: pin);
     await auth.currentUser!.updatePhoneNumber(credential as PhoneAuthCredential);
   }

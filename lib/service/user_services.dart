@@ -15,18 +15,18 @@ class UserServices with ChangeNotifier{
       .snapshots()
       .map((user){
         return UserModel(
-          id: auth.currentUser!.uid,
-          countryCode: auth.currentUser!.phoneNumber!.substring(0,3),
-          name: auth.currentUser!.displayName ?? "",
-          profilePicture: auth.currentUser!.photoURL,
-          phoneNumber: auth.currentUser!.phoneNumber ?? "",
+          id: user.id,
+          countryCode: user["countryCode"],
+          name: user["name"],
+          profilePicture: user["profilePicture"],
+          phoneNumber: user["phoneNumber"],
           role: user["role"],
           company: user["company"],
           companyAddress: user["companyAddress"],
           companyLogo: user["companyLogo"],
           creditCard: user["creditCard"],
-          handlesList: [],
-          archivedHandlesList: []
+          handlesList: (user["handlesList"] as List<dynamic>).cast<String>(),
+          archivedHandlesList:(user["archivedHandlesList"] as List<dynamic>).cast<String>()
         );
       }
     );

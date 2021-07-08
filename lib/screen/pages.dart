@@ -30,6 +30,7 @@ import 'package:pinput/pin_put/pin_put.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:uuid/uuid.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:flutter_contact/contact.dart';  
