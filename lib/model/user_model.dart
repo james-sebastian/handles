@@ -13,6 +13,7 @@ class UserModel{
   String? creditCard;
   List<String>? handlesList;
   List<String>? archivedHandlesList;
+  List<String>? pinnedHandlesList;
 
   UserModel({
     required this.id,
@@ -26,6 +27,7 @@ class UserModel{
     this.companyAddress,
     this.creditCard,
     this.handlesList,
-    this.archivedHandlesList
+    this.archivedHandlesList,
+    this.pinnedHandlesList
   });
 }
