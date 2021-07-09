@@ -26,7 +26,6 @@ class UserServices with ChangeNotifier{
           companyLogo: user["companyLogo"],
           creditCard: user["creditCard"],
           handlesList: (user["handlesList"] as List<dynamic>).cast<String>(),
-          archivedHandlesList:(user["archivedHandlesList"] as List<dynamic>).cast<String>()
         );
       }
     );
