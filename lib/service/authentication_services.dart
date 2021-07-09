@@ -102,7 +102,6 @@ class AuthenticationService with ChangeNotifier{
               "companyLogo": user.companyLogo,
               "creditCard": user.creditCard,
               "handlesList": user.handlesList,
-              "archivedHandlesList": user.archivedHandlesList
             });
           }
         }

@@ -7,6 +7,7 @@ class HandlesModel{
   List<String> members;
   String cover;
   List<String>? pinnedBy;
+  List<String>? archivedBy;
   List<String>? messages; //TODO: MESSAGES MODEL
 
   HandlesModel({
@@ -15,6 +16,7 @@ class HandlesModel{
     required this.description,
     required this.members,
     required this.cover,
+    this.archivedBy,
     this.pinnedBy,
     this.messages
   });

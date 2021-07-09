@@ -378,7 +378,8 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
                                     members: memberListUID,
                                     description: descriptionController.text,
                                     name: titleController.text,
-                                    pinnedBy: [""]
+                                    pinnedBy: [""],
+                                    archivedBy: [""]
                                   )
                                 );
                               }

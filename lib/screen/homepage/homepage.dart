@@ -13,7 +13,8 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
   bool isSearchActive = false;
   int isFilterChipSelected = -1;
   int activePage = 0;
-  Set<int> selectedHandles = Set();
+  Set<String> selectedHandles = Set();
+  Set<String> selectedPinnedHandles = Set();
   late TabController _tabController;
 
   @override
@@ -31,7 +32,7 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
   @override
   Widget build(BuildContext context) {
 
-    if(selectedHandles.length == 0){
+    if(selectedHandles.length == 0 && selectedPinnedHandles.length == 0){
       setState(() {
         isHandlesSelected = false;
       });
@@ -76,7 +77,11 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                       } else {
                         setState(() {
                           isHandlesSelected = false;
-                          selectedHandles = Set();
+                          if(selectedPinnedHandles.isNotEmpty){
+                            selectedPinnedHandles = Set();
+                          } else {
+                            selectedHandles = Set();
+                          }
                         });
                       }
                     },
@@ -89,7 +94,9 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
               title: isHandlesSelected
                 ? FadeIn(
                     child: Font.out(
-                      "${selectedHandles.length}",
+                      selectedPinnedHandles.isNotEmpty
+                      ? "${selectedPinnedHandles.length}"
+                      : "${selectedHandles.length}",
                       fontSize: 22,
                       fontWeight: FontWeight.w500,
                       color: Colors.white
@@ -141,7 +148,7 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                                   return Platform.isAndroid
                                   ? AlertDialog(
                                       title: Text(
-                                        "Are you sure you want to delete Handles DevTeam?",
+                                        "Are you sure you want to delete these Handles?",
                                       ),
                                       content: Text(
                                         "This action is irreversible and will make you leave this Handles without deleting the actual one"
@@ -168,6 +175,18 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                                             )
                                           ),
                                           onPressed: (){
+                                            if(selectedPinnedHandles.isNotEmpty){
+                                              _handlesProvider.deleteHandles(selectedPinnedHandles.toList());
+                                            } else {
+                                              _handlesProvider.deleteHandles(selectedHandles.toList());
+                                            }
+                                            setState(() {
+                                              if(selectedPinnedHandles.isNotEmpty){
+                                                selectedPinnedHandles = Set();
+                                              } else {
+                                                selectedHandles = Set();
+                                              }
+                                            });
                                             Get.back();
                                           },
                                         )
@@ -219,6 +238,17 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                               iOS: CupertinoIcons.pin_fill,
                             ),
                             onPressed: (){
+                              if(selectedPinnedHandles.isNotEmpty){
+                                _handlesProvider.unpinHandles(selectedPinnedHandles.toList());
+                                setState(() {
+                                  selectedPinnedHandles = Set();
+                                });
+                              } else {
+                                _handlesProvider.pinHandles(selectedHandles.toList());
+                                setState(() {
+                                  selectedHandles = Set();
+                                });
+                              }
                             }
                           ),
                           IconButton(
@@ -228,6 +258,10 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                               iOS: CupertinoIcons.archivebox_fill,
                             ),
                             onPressed: (){
+                              _handlesProvider.archiveHandles(selectedHandles.toList());
+                              setState(() {
+                                selectedHandles = Set();
+                              });
                             }
                           ),
                         ],
@@ -282,7 +316,6 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                                       ],
                                     )
                                   : CupertinoAlertDialog(
-                                      //TODO: ASSIGN HANDLES NAME HERE...
                                       title: Text(
                                         "Are you want to delete your call logs?",
                                       ),
@@ -386,6 +419,10 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
             ),
             body: _currentUserProvider.when(
               data: (user){
+
+                print("$selectedHandles (normal)");
+                print("$selectedPinnedHandles (pinned)");
+
                 return TabBarView(
                   controller: _tabController,
                   children: [
@@ -462,114 +499,132 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
 
                                 return _singleHandlesProvider.when(
                                   data: (handles){
-                                    return ListTile(
-                                      onLongPress: (){
-                                        setState(() {
-                                          isHandlesSelected = true;
-                                          selectedHandles.add(index);
-                                        });
-                                      },
-                                      onTap: (){
-                                        if(isHandlesSelected){
-                                          print(selectedHandles.toList().indexOf(index));
-                                          if(selectedHandles.toList().indexOf(index) < 0){
-                                            setState(() {
-                                              selectedHandles.add(index);
-                                            });
+                                    return handles.archivedBy!.indexOf(user.id) >= 0
+                                    ? SizedBox()
+                                    : ListTile(
+                                        onLongPress: (){
+                                          setState(() {
+                                            isHandlesSelected = true;
+                                            if(handles.pinnedBy!.indexOf(user.id) >= 0){
+                                              selectedPinnedHandles.add(user.handlesList![index + 1]);
+                                            } else {
+                                              selectedHandles.add(user.handlesList![index + 1]);
+                                            }
+                                          });
+                                        },
+                                        onTap: (){
+                                          if(isHandlesSelected){
+                                            if(handles.pinnedBy!.indexOf(user.id) >= 0){
+                                              if(selectedPinnedHandles.toList().indexOf(user.handlesList![index + 1]) < 0){
+                                                setState(() {
+                                                  selectedPinnedHandles.add(user.handlesList![index + 1]);
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  print("a");
+                                                  selectedPinnedHandles.remove(user.handlesList![index + 1]);
+                                                });
+                                              }
+                                            } else {
+                                              if(selectedHandles.toList().indexOf(user.handlesList![index + 1]) < 0){
+                                                setState(() {
+                                                  selectedHandles.add(user.handlesList![index + 1]);
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  selectedHandles.remove(user.handlesList![index + 1]);
+                                                });
+                                              }
+                                            }
                                           } else {
-                                            setState(() {
-                                              selectedHandles.remove(index);
-                                            });
+                                            Get.to(() => HandlesPage(), transition: Transition.cupertino);
                                           }
-                                        } else {
-                                          Get.to(() => HandlesPage(), transition: Transition.cupertino);
-                                        }
-                                      },
-                                      contentPadding: EdgeInsets.fromLTRB(
-                                        MQuery.width(0.02, context),
-                                        index >= 1 ? MQuery.height(0.005, context) : MQuery.height(0.01, context),
-                                        MQuery.width(0.02, context),
-                                        MQuery.height(0.005, context),
-                                      ),
-                                      leading: Stack(
-                                        alignment: Alignment.bottomRight,
-                                        children: [
-                                          CircleAvatar(
-                                            backgroundColor: Palette.primary,
-                                            radius: MQuery.height(0.025, context),
-                                            backgroundImage: NetworkImage(handles.cover)
-                                          ),
-                                          selectedHandles.toList().indexOf(index) >= 0
-                                          ? ZoomIn(
-                                              duration: Duration(milliseconds: 100),
-                                              child: Positioned(
-                                                child: CircleAvatar(
-                                                  radius: 10,
-                                                  child: Icon(Icons.check, size: 12, color: Colors.white),
-                                                  backgroundColor: Palette.secondary
-                                                ),
-                                              ),
-                                            )
-                                          : SizedBox()
-                                        ],
-                                      ),
-                                      title: Font.out(
-                                        handles.name,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        textAlign: TextAlign.start
-                                      ),
-                                      subtitle: Font.out(
-                                        "Steve: Great! no problem. Good luck!",
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400,
-                                        textAlign: TextAlign.start,
-                                        color: //TODO: IF MESSAGE IS NEW, OPACITY 100% 
-                                          Colors.black.withOpacity(0.75)
-                                      ),
-                                      trailing: Container(
-                                        width: MQuery.width(0.06, context),
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                        },
+                                        contentPadding: EdgeInsets.fromLTRB(
+                                          MQuery.width(0.02, context),
+                                          index >= 1 ? MQuery.height(0.005, context) : MQuery.height(0.01, context),
+                                          MQuery.width(0.02, context),
+                                          MQuery.height(0.005, context),
+                                        ),
+                                        leading: Stack(
+                                          alignment: Alignment.bottomRight,
                                           children: [
-                                            Font.out(
-                                              "1:13 PM",
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w400,
-                                              textAlign: TextAlign.start,
-                                              color: Colors.black.withOpacity(0.75)
+                                            CircleAvatar(
+                                              backgroundColor: Palette.primary,
+                                              radius: MQuery.height(0.025, context),
+                                              backgroundImage: NetworkImage(handles.cover)
                                             ),
-                                            //TODO: IF MESSAGE IS NEW // PINNED, DISPLAY INDICATOR / PINNED ICON
-                                            if (index >= 1)
-                                              SizedBox()
-                                            else Row(
-                                              mainAxisAlignment: MainAxisAlignment.end,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              children: [
-                                                // CircleAvatar(
-                                                //   backgroundColor: Palette.primary,
-                                                //   radius: 10,
-                                                //   child: Center(
-                                                //     child: Font.out(
-                                                //       "1",
-                                                //       fontSize: 12
-                                                //     ),
-                                                //   ),
-                                                // ),
-                                                handles.pinnedBy!.indexOf(user.id) >= 0
-                                                ? AdaptiveIcon(
-                                                    android: Icons.push_pin,
-                                                    iOS: CupertinoIcons.pin_fill,
-                                                    size: 20
-                                                  )
-                                                : SizedBox()
-                                              ],
-                                            )
+                                            selectedHandles.toList().indexOf(user.handlesList![index + 1]) >= 0 || selectedPinnedHandles.toList().indexOf(user.handlesList![index + 1]) >= 0
+                                            ? ZoomIn(
+                                                duration: Duration(milliseconds: 100),
+                                                child: Positioned(
+                                                  child: CircleAvatar(
+                                                    radius: 10,
+                                                    child: Icon(Icons.check, size: 12, color: Colors.white),
+                                                    backgroundColor: Palette.secondary
+                                                  ),
+                                                ),
+                                              )
+                                            : SizedBox()
                                           ],
                                         ),
-                                      )
-                                    );
+                                        title: Font.out(
+                                          handles.name,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          textAlign: TextAlign.start
+                                        ),
+                                        subtitle: Font.out(
+                                          "Steve: Great! no problem. Good luck!",
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                          textAlign: TextAlign.start,
+                                          color: //TODO: IF MESSAGE IS NEW, OPACITY 100% 
+                                            Colors.black.withOpacity(0.75)
+                                        ),
+                                        trailing: Container(
+                                          width: MQuery.width(0.06, context),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            children: [
+                                              Font.out(
+                                                "1:13 PM",
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w400,
+                                                textAlign: TextAlign.start,
+                                                color: Colors.black.withOpacity(0.75)
+                                              ),
+                                              //TODO: IF MESSAGE IS NEW // PINNED, DISPLAY INDICATOR / PINNED ICON
+                                              if (index >= 1)
+                                                SizedBox()
+                                              else Row(
+                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                  // CircleAvatar(
+                                                  //   backgroundColor: Palette.primary,
+                                                  //   radius: 10,
+                                                  //   child: Center(
+                                                  //     child: Font.out(
+                                                  //       "1",
+                                                  //       fontSize: 12
+                                                  //     ),
+                                                  //   ),
+                                                  // ),
+                                                  handles.pinnedBy!.indexOf(user.id) >= 0
+                                                  ? AdaptiveIcon(
+                                                      android: Icons.push_pin,
+                                                      iOS: CupertinoIcons.pin_fill,
+                                                      size: 20
+                                                    )
+                                                  : SizedBox()
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        )
+                                      );
                                   },
                                   loading: () => SizedBox(),
                                   error: (_,__) => SizedBox()
@@ -599,6 +654,13 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                         )
                       ],
                     ),
+                    
+
+                    //
+                    ///-CALL PAGE-//
+                    //
+
+
                     user.handlesList!.isEmpty
                     ? EmptyHandles(isHandlesPage: false)
                     : ListView.builder(
@@ -610,19 +672,18 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                               onLongPress: (){
                                 setState(() {
                                   isHandlesSelected = true;
-                                  selectedHandles.add(index);
+                                  selectedHandles.add(user.handlesList![index + 1]);
                                 });
                               },
                               onTap: (){
                                 if(isHandlesSelected){
-                                  print(selectedHandles.toList().indexOf(index));
-                                  if(selectedHandles.toList().indexOf(index) < 0){
+                                  if(selectedHandles.toList().indexOf(user.handlesList![index + 1]) < 0){
                                     setState(() {
-                                      selectedHandles.add(index);
+                                      selectedHandles.add(user.handlesList![index + 1]);
                                     });
                                   } else {
                                     setState(() {
-                                      selectedHandles.remove(index);
+                                      selectedHandles.remove(user.handlesList![index + 1]);
                                     });
                                   }
                                 } else {
@@ -642,7 +703,7 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                                     backgroundColor: Palette.primary,
                                     radius: MQuery.height(0.025, context),
                                   ),
-                                  selectedHandles.toList().indexOf(index) >= 0
+                                  selectedHandles.toList().indexOf(user.handlesList![index + 1]) >= 0
                                   ? ZoomIn(
                                       duration: Duration(milliseconds: 100),
                                       child: Positioned(
@@ -706,9 +767,6 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                 );
               },
               error: (object , error){
-
-                print(object);
-
                 return Scaffold(
                   body: Center(
                     child: CircularProgressIndicator(color: Palette.warning)

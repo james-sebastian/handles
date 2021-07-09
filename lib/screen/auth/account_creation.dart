@@ -195,8 +195,6 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
                                     companyLogo: "",
                                     creditCard: "",
                                     handlesList: [""],
-                                    archivedHandlesList: [""],
-                                    pinnedHandlesList: [""]
                                   )
                                 );
                               }
