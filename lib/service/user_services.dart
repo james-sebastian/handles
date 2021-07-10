@@ -8,12 +8,35 @@ class UserServices with ChangeNotifier{
 
   UserServices({required this.auth, required this.firestore, required this.storage});
 
-  Stream<UserModel> getCurrentUser(){
+  Stream<UserModel> get getCurrentUser{
     return firestore
       .collection('users')
       .doc(auth.currentUser!.uid)
       .snapshots()
       .map((user){
+        return UserModel(
+          id: user.id,
+          countryCode: user["countryCode"],
+          name: user["name"],
+          profilePicture: user["profilePicture"],
+          phoneNumber: user["phoneNumber"],
+          role: user["role"],
+          company: user["company"],
+          companyAddress: user["companyAddress"],
+          companyLogo: user["companyLogo"],
+          creditCard: user["creditCard"],
+          handlesList: (user["handlesList"] as List<dynamic>).cast<String>(),
+        );
+      }
+    );
+  }
+
+  Future<UserModel> getUserByID(String id) async{
+    return firestore
+      .collection('users')
+      .doc(auth.currentUser!.uid)
+      .get()
+      .then((user){
         return UserModel(
           id: user.id,
           countryCode: user["countryCode"],
