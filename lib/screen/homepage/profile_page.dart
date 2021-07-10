@@ -120,7 +120,7 @@ class _ProfilePageState extends State<ProfilePage> {
           }
 
         return StreamBuilder<UserModel>(
-          stream: _userProvider.getCurrentUser(),
+          stream: _userProvider.getCurrentUser,
           builder: (context, snapshot){
 
             if(snapshot.hasData){

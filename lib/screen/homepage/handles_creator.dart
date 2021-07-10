@@ -13,18 +13,18 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   Set<UserModel> membersList = Set();
+  Set<String> rolesList = Set();
   PickedFile? _image;
 
   @override
   Widget build(BuildContext context) {
 
-    void addMember(UserModel invitee){
+    void addMember(UserModel invitee, String role){
       setState(() {
         membersList.add(invitee);
+        rolesList.add(role);
       });
     }
-
-    print(membersList);
 
     _imgFromCamera() async {
       PickedFile? image = await ImagePicker().getImage(
@@ -106,6 +106,7 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
         _currentUserProvider.whenData((value){
           setState(() {
             membersList.add(value);
+            rolesList.add("Admin");
           });
         });
 
@@ -307,11 +308,28 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
                                 ? NetworkImage(membersList.toList()[index].profilePicture!)
                                 : AssetImage("assets/sample_profile.png") as ImageProvider
                               ),
-                              title: Font.out(
-                                membersList.toList()[index].name,
-                                fontSize: 16,
-                                fontWeight: FontWeight.normal,
-                                textAlign: TextAlign.start
+                              title: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    membersList.toList()[index].name.length >= 16
+                                    ? membersList.toList()[index].name.substring(0, 16) + "..."
+                                    : membersList.toList()[index].name,
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.normal,
+                                    )
+                                  ),
+                                  Text(
+                                    rolesList.toList()[index],
+                                    textAlign: TextAlign.start,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.normal,
+                                    )
+                                  ),
+                                ],
                               ),
                               trailing: IconButton(
                                 icon:  AdaptiveIcon(
@@ -342,18 +360,18 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
                             });
                           } else if (_image == null && membersList.length >= 2){
 
-                            print("a");
+                            Map<String, String> membersMap = {};
+                            for (var i = 0; i < membersList.length; i++) {
+                              membersMap[membersList.toList()[i].id] = rolesList.toList()[i];
+                            }
 
-                            List<String> memberListUID = [];
-                            membersList.forEach((element) {
-                              memberListUID.add(element.id);
-                            });
+                            print(membersMap);
 
                             _handlesProvider.createHandles(
                               HandlesModel(
                                 id: "1",
                                 cover: "",
-                                members: memberListUID,
+                                members: membersMap,
                                 description: descriptionController.text,
                                 name: titleController.text,
                                 pinnedBy: [""]
@@ -361,21 +379,20 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
                             );
                           } else if (_image != null && membersList.length >= 2){
 
-                            List<String> memberListUID = [];
-                            membersList.forEach((element) {
-                              memberListUID.add(element.id);
-                            });
+                            Map<String, String> membersMap = {};
+                            for (var i = 0; i < membersList.length; i++) {
+                              membersMap[membersList.toList()[i].id] = rolesList.toList()[i];
+                            }
+
+                            print(membersMap);
 
                             _handlesProvider.uploadHandlesCover(_image!.path, titleController.text).then((value){
-
-                              print(value);
-
                               if(value != null){
                                 _handlesProvider.createHandles(
                                   HandlesModel(
                                     id: Uuid().v4(),
                                     cover: value,
-                                    members: memberListUID,
+                                    members: membersMap,
                                     description: descriptionController.text,
                                     name: titleController.text,
                                     pinnedBy: [""],
@@ -403,7 +420,7 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
 
 class AddMemberViaNumberDialog extends StatefulWidget {
   
-  final void Function(UserModel) addMember;
+  final void Function(UserModel, String) addMember;
   const AddMemberViaNumberDialog({ Key? key, required this.addMember }) : super(key: key);
 
   @override
@@ -415,6 +432,7 @@ class _AddMemberViaNumberDialogState extends State<AddMemberViaNumberDialog> {
   TextEditingController phoneNumberController = TextEditingController();
   TextEditingController countryCodeController = TextEditingController();
   bool isError = false;
+  String dropdownValue = "Member";
 
   @override
   Widget build(BuildContext context) {
@@ -536,6 +554,63 @@ class _AddMemberViaNumberDialogState extends State<AddMemberViaNumberDialog> {
                         ],
                       )
                     ),
+                    SizedBox(height: MQuery.height(0.01, context)),
+                    Container(
+                      child: Row(
+                        children: [
+                          SizedBox(width: MQuery.width(0.01, context)),
+                          Text(
+                            "Role: ",
+                            style: TextStyle(
+                              fontSize: 14
+                            ),
+                          ),
+                          SizedBox(width: MQuery.width(0.01, context)),
+                          Expanded(
+                            flex: 14,
+                            child: Container(
+                              height: MQuery.height(0.065, context),
+                              width: MQuery.width(0.9, context),
+                              margin: const EdgeInsets.only(left: 0.0, right: 7.5),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: MQuery.width(0.015, context)
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: isError ? Palette.warning : Colors.transparent
+                                ),
+                                borderRadius: BorderRadius.circular(10.0),
+                                color: Palette.formColor,
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton(
+                                  value: dropdownValue,
+                                  items: [
+                                    DropdownMenuItem(
+                                      child: Text("Admin"),
+                                      value: "Admin",
+                                    ),
+                                    DropdownMenuItem(
+                                      child: Text("Client"),
+                                      value: "Client",
+                                    ),
+                                    DropdownMenuItem(
+                                      child: Text("Member"),
+                                      value: "Member",
+                                    )
+                                  ],
+                                  onChanged: (String? value){
+                                    setState(() {
+                                      dropdownValue = value!;
+                                    });
+                                  }
+                                )
+                              )
+                            ),
+                          )
+                        ],
+                      )
+                    ),
                     SizedBox(height: MQuery.height(0.02, context)),
                     Button(
                       title: "Add Member",
@@ -543,7 +618,7 @@ class _AddMemberViaNumberDialogState extends State<AddMemberViaNumberDialog> {
                       method: (){
                         _handlesProvider.addMember("+" + countryCodeController.text + phoneNumberController.text).then((value){
                           if(value != null){
-                            widget.addMember(value);
+                            widget.addMember(value, dropdownValue);
                             Get.back();
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('The user with that phone number cannot be found.')));

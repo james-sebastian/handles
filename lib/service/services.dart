@@ -12,3 +12,4 @@ import 'package:shared_preferences/shared_preferences.dart';
 part "authentication_services.dart";
 part 'user_services.dart';
 part 'handles_services.dart';
+part 'chat_services.dart';

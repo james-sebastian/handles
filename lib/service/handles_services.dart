@@ -52,17 +52,34 @@ class HandlesServices with ChangeNotifier{
         "archivedBy": handlesModel.archivedBy
       }
     ).then((value){
-      handlesModel.members.forEach((element) {
+
+      firestore
+      .collection('handles')
+      .doc(handlesModel.id)
+      .collection('messages')
+      .doc()
+      .set({
+        "sender": auth.currentUser!.uid,
+        "content": "${auth.currentUser!.displayName} created ${handlesModel.name}",
+        "mediaURL": null,
+        "type": "status",
+        "timestamp": DateTime.now().toString(),
+        "isPinned": false,
+        "deletedBy": [],
+        "readBy": []
+      });
+
+      handlesModel.members.forEach((uid, role) {
         firestore
           .collection('users')
-          .doc(element)
+          .doc(uid)
           .get().then((value){
 
             List<dynamic> oldHandlesList = (value["handlesList"] as List<dynamic>);
             oldHandlesList.add(handlesModel.id);
 
             firestore.collection('users')
-            .doc(element)
+            .doc(uid)
             .update({
               "handlesList": oldHandlesList
             });
@@ -216,7 +233,7 @@ class HandlesServices with ChangeNotifier{
     HandlesModel out = HandlesModel(
       id: snapshot.id,
       description: snapshot['description'],
-      members: (snapshot['members'] as List<dynamic>).cast<String>(),
+      members: (snapshot['members'] as Map<dynamic, dynamic>).cast<String, String>(),
       name: snapshot['name'],
       cover: snapshot['cover'],
       pinnedBy: (snapshot['pinnedBy'] as List<dynamic>).cast<String>(),

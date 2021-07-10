@@ -537,7 +537,9 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                                               }
                                             }
                                           } else {
-                                            Get.to(() => HandlesPage(), transition: Transition.cupertino);
+                                            Get.to(() => HandlesPage(
+                                              handlesID: user.handlesList![index + 1]
+                                            ), transition: Transition.cupertino);
                                           }
                                         },
                                         contentPadding: EdgeInsets.fromLTRB(

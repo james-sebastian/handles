@@ -4,7 +4,7 @@ class HandlesModel{
   String id;
   String name;
   String description;
-  List<String> members;
+  Map<String, String> members;
   String cover;
   List<String>? pinnedBy;
   List<String>? archivedBy;

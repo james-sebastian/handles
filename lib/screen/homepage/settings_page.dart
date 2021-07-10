@@ -65,7 +65,7 @@ class _SettingsPageState extends State<SettingsPage> {
         }
         
         return StreamBuilder<UserModel>(
-          stream: _userProvider.getCurrentUser(),
+          stream: _userProvider.getCurrentUser,
           builder: (context, snapshot){
 
             // print(snapshot);

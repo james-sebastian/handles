@@ -13,3 +13,4 @@ part "firestore_provider.dart";
 part 'storage_provider.dart';
 part 'user_provider.dart';
 part 'handles_provider.dart';
+part 'chat_provider.dart';

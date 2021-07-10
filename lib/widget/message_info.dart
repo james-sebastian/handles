@@ -8,7 +8,7 @@ class MessageInfoBottomSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, watch) {
 
-    final _userService = watch(userProvider).getCurrentUser();
+    final _userService = watch(userProvider).getCurrentUser;
 
     return BottomSheet(
       enableDrag: true,
