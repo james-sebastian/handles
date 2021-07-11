@@ -8,7 +8,7 @@ class HandlesModel{
   String cover;
   List<String>? pinnedBy;
   List<String>? archivedBy;
-  List<String>? messages; //TODO: MESSAGES MODEL
+  List<ChatModel>? messages;
 
   HandlesModel({
     required this.id,

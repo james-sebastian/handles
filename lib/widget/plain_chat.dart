@@ -1,6 +1,6 @@
 part of "widgets.dart";
 
-class PlainChat extends StatelessWidget {
+class PlainChat extends ConsumerWidget {
   final String userID;
   final int index;
   final DateTime timestamp;
@@ -29,9 +29,9 @@ class PlainChat extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, watch) {
 
-    print(sender);
+    final _userProvider = watch(userProvider);
 
     return sender == userID
     ? Container(
@@ -154,123 +154,127 @@ class PlainChat extends StatelessWidget {
             ],
           ),
         ))
-    : Container(
-        width: MQuery.width(1, context),
-        margin: EdgeInsets.only(
-          bottom: MQuery.width(0.01, context)),
-        padding: EdgeInsets.symmetric(horizontal: MQuery.width(0.01, context)),
-        color: selectedChats.toList().indexOf(index) >= 0
-          ? Palette.primary.withOpacity(0.25)
-          : Colors.transparent, 
-        child: InkWell(
-          onTap: (){
-            chatOnTap(index);
-          },
-          onLongPress: (){
-            selectChatMethod(index);
-          },
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SvgPicture.asset(
-                "assets/tool_tip.svg",
-                height: MQuery.height(0.02, context),
-                width: MQuery.height(0.02, context),
-                color: this.isRecurring ? Colors.transparent : Colors.white
-              ),
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                    maxWidth: MQuery.width(
-                      this.content.length >= 30
-                      ? 0.35
-                      : this.content.length <= 12
-                        ? 0.15
-                        : this.content.length * 0.0145
-                      , context
-                    ),
-                    minWidth: MQuery.width(0.14, context),
-                    minHeight: MQuery.height(0.045, context)),
-                child: Container(
-                    padding: EdgeInsets.all(MQuery.height(0.01, context)),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: isRecurring ? Radius.circular(7) : Radius.circular(0),
-                            topRight: Radius.circular(7),
-                            bottomRight: Radius.circular(7),
-                            bottomLeft: Radius.circular(7))),
-                    child: Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        Text(
-                          DateFormat.jm().format(timestamp),
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                              color: Colors.black.withOpacity(0.5),
-                              fontWeight: FontWeight.w400,
-                              fontSize: 12),
+    : FutureBuilder<UserModel>(
+        future: _userProvider.getUserByID(this.sender),
+        builder: (context, snapshot) {
+          return Container(
+            width: MQuery.width(1, context),
+            margin: EdgeInsets.only(
+              bottom: MQuery.width(0.01, context)),
+            padding: EdgeInsets.symmetric(horizontal: MQuery.width(0.01, context)),
+            color: selectedChats.toList().indexOf(index) >= 0
+              ? Palette.primary.withOpacity(0.25)
+              : Colors.transparent, 
+            child: InkWell(
+              onTap: (){
+                chatOnTap(index);
+              },
+              onLongPress: (){
+                selectChatMethod(index);
+              },
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SvgPicture.asset(
+                    "assets/tool_tip.svg",
+                    height: MQuery.height(0.02, context),
+                    width: MQuery.height(0.02, context),
+                    color: this.isRecurring ? Colors.transparent : Colors.white
+                  ),
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                        maxWidth: MQuery.width(
+                          this.content.length >= 30
+                          ? 0.35
+                          : this.content.length <= 12
+                            ? 0.15
+                            : this.content.length * 0.0145
+                          , context
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        minWidth: MQuery.width(0.14, context),
+                        minHeight: MQuery.height(0.045, context)),
+                    child: Container(
+                        padding: EdgeInsets.all(MQuery.height(0.01, context)),
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                                topLeft: isRecurring ? Radius.circular(7) : Radius.circular(0),
+                                topRight: Radius.circular(7),
+                                bottomRight: Radius.circular(7),
+                                bottomLeft: Radius.circular(7))),
+                        child: Stack(
+                          alignment: Alignment.bottomRight,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                isRecurring && isPinned == false
-                                ? SizedBox()
-                                : RichText(
-                                    text: TextSpan(
-                                      text: "${this.sender} ",
-                                      style: TextStyle(
-                                        //TODO: DYNAMIC COLOR CREATION
-                                        color: Palette.primary,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 15
-                                      ),
-                                      children: [
-                                        TextSpan(
-                                          text: "(${this.senderRole})",
-                                          style: TextStyle(
-                                            color: Palette.primary,
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 15
-                                          )
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                isPinned
-                                ? AdaptiveIcon(
-                                    android: Icons.push_pin,
-                                    iOS: CupertinoIcons.pin_fill,
-                                    size: 12
-                                  )
-                                : SizedBox()
-                              ],
-                            ),
-                            SizedBox(height: MQuery.height(0.005, context)),
-                            SelectableLinkify(
-                              onOpen: (link) async {
-                                print(link.url);
-                                await launch(link.url);
-                              },
-                              text: this.content,
+                            Text(
+                              DateFormat.jm().format(timestamp),
                               textAlign: TextAlign.start,
                               style: TextStyle(
-                                  height: 1.25,
-                                  color: Colors.black,
+                                  color: Colors.black.withOpacity(0.5),
                                   fontWeight: FontWeight.w400,
-                                  fontSize: 15),
+                                  fontSize: 12),
                             ),
-                            SizedBox(height: MQuery.height(0.02, context)),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    isRecurring && isPinned == false
+                                    ? SizedBox()
+                                    : RichText(
+                                        text: TextSpan(
+                                          text: snapshot.hasData ? "${snapshot.data!.name} " : " ",
+                                          style: TextStyle(
+                                            color: Palette.primary,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 15
+                                          ),
+                                          children: [
+                                            TextSpan(
+                                              text: "(${this.senderRole})",
+                                              style: TextStyle(
+                                                color: Palette.primary,
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 15
+                                              )
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    isPinned
+                                    ? AdaptiveIcon(
+                                        android: Icons.push_pin,
+                                        iOS: CupertinoIcons.pin_fill,
+                                        size: 12
+                                      )
+                                    : SizedBox()
+                                  ],
+                                ),
+                                SizedBox(height: MQuery.height(0.005, context)),
+                                SelectableLinkify(
+                                  onOpen: (link) async {
+                                    print(link.url);
+                                    await launch(link.url);
+                                  },
+                                  text: this.content,
+                                  textAlign: TextAlign.start,
+                                  style: TextStyle(
+                                      height: 1.25,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 15),
+                                ),
+                                SizedBox(height: MQuery.height(0.02, context)),
+                              ],
+                            ),
                           ],
-                        ),
-                      ],
-                    )),
-              )
-            ],
-          ),
-        ));
+                        )),
+                  )
+                ],
+              ),
+            ));
+        }
+      );
   }
 }

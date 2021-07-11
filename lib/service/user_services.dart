@@ -34,7 +34,7 @@ class UserServices with ChangeNotifier{
   Future<UserModel> getUserByID(String id) async{
     return firestore
       .collection('users')
-      .doc(auth.currentUser!.uid)
+      .doc(id)
       .get()
       .then((user){
         return UserModel(

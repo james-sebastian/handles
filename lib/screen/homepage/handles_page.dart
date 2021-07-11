@@ -95,7 +95,6 @@ class _HandlesPageState extends State<HandlesPage> {
         final _chatListProvider = watch(chatListProvider(widget.handlesID));
         final _singleHandlesProvider = watch(singleHandlesProvider(widget.handlesID));
         final _chatProvider = watch(chatProvider);
-        final _userProvider = watch(userProvider);
 
         return _singleHandlesProvider.when(
           data: (handles){
@@ -282,7 +281,6 @@ class _HandlesPageState extends State<HandlesPage> {
                   body: _chatListProvider.when(
                     data: (chatList){
 
-                      print(chatList);
                       if(!isChatSelected){
                         WidgetsBinding.instance!.addPostFrameCallback((_) => scrollToBottom());
                       }
@@ -407,52 +405,119 @@ class _HandlesPageState extends State<HandlesPage> {
                               reverse: false,
                               itemCount: chatList.length,
                               itemBuilder: (context, index){
-
-                                print(chatList[index].content);
-
                                 return Column(
                                   children: [
-                                    chatList.first.id != chatList[index].id
-                                    ? chatList[index].timestamp.day == chatList[index - 1].timestamp.day
-                                      ? SizedBox()
-                                      : chatList[index].timestamp.day == DateTime.now().subtract(Duration(days: 1)).day
+                                    
+                                    chatList[index].id == chatList.first.id
+                                    ? SizedBox()
+                                    : chatList[index].id == chatList[1].id
                                       ? HandlesStatusBlock(
-                                          isDateBlock: true,
-                                          content: "YESTERDAY"
-                                        )
-                                      : HandlesStatusBlock(
-                                          isDateBlock: true,
+                                          isDateBlock: false,
                                           content: DateFormat.yMMMMd('en_US').format(chatList[index].timestamp).toUpperCase()
                                         )
-                                    : HandlesStatusBlock(
-                                        isDateBlock: true,
-                                        content: "TODAY"
-                                      ),
-                                   
-                                  chatList[index].type == ChatType.status
-                                    ? HandlesStatusBlock(
-                                        isDateBlock: false,
-                                        content: chatList[index].content ?? ""
-                                      )
-                                    : chatList[index].type == ChatType.plain
-                                    ? PlainChat(
-                                        userID: currentUser.id,
-                                        index: index,
-                                        timestamp: chatList[index].timestamp,
-                                        sender: chatList[index].sender,
-                                        senderRole: handles.members[chatList[index].sender] == "Members"
-                                        ? ""
-                                        : handles.members[chatList[index].sender] ?? "",
-                                        isRecurring: chatList.first.id == chatList[index].id
-                                        ? false
-                                        : chatList[index].sender == chatList [index - 1].sender,
-                                        content: chatList[index].content ?? "",
-                                        isPinned: chatList[index].isPinned,
-                                        selectChatMethod: selectChat,
-                                        chatOnTap: chatOnTap,
-                                        selectedChats: selectedChats
-                                      )
-                                    : SizedBox()
+                                      : chatList[index].timestamp.day == DateTime.now().day && !(chatList[index].timestamp.day == chatList[index - 1].timestamp.day)
+                                        ? HandlesStatusBlock(
+                                            isDateBlock: false,
+                                            content: "TODAY"
+                                          )
+                                        : chatList[index].timestamp.day == DateTime.now().day && (chatList[index].timestamp.day == chatList[index - 1].timestamp.day)
+                                          ? SizedBox()
+                                          : chatList[index].timestamp.day == DateTime.now().subtract(Duration(days: 1)).day && chatList[index].timestamp.day != chatList[index - 1].timestamp.day
+                                            ? HandlesStatusBlock(
+                                                isDateBlock: false,
+                                                content: "YESTERDAY"
+                                              )
+                                            : chatList[index].timestamp.day >= DateTime.now().subtract(Duration(days: 2)).day && chatList[index].timestamp.day != chatList[index - 1].timestamp.day
+                                              ? HandlesStatusBlock(
+                                                  isDateBlock: false,
+                                                  content: DateFormat.yMMMMd('en_US').format(chatList[index].timestamp).toUpperCase()
+                                                )
+                                              : SizedBox(),
+
+                                    chatList[index].type == ChatType.status
+                                      ? HandlesStatusBlock(
+                                          isDateBlock: true,
+                                          content: chatList[index].content ?? ""
+                                        )
+                                      : chatList[index].type == ChatType.plain
+                                      ? PlainChat(
+                                          userID: currentUser.id,
+                                          index: index,
+                                          timestamp: chatList[index].timestamp,
+                                          sender: chatList[index].sender,
+                                          senderRole: handles.members[chatList[index].sender] == "Members"
+                                            ? ""
+                                            : handles.members[chatList[index].sender] ?? "",
+                                          isRecurring: chatList.first.id == chatList[index].id
+                                            ? false
+                                            : chatList[index].sender == chatList [index - 1].sender && chatList[index-1].type != ChatType.status,
+                                          content: chatList[index].content ?? "",
+                                          isPinned: chatList[index].isPinned,
+                                          selectChatMethod: selectChat,
+                                          chatOnTap: chatOnTap,
+                                          selectedChats: selectedChats
+                                        )
+                                      : chatList[index].type == ChatType.image
+                                      ? ImageChat(
+                                          userID: currentUser.id,
+                                          index: index,
+                                          timestamp: chatList[index].timestamp,
+                                          sender: chatList[index].sender,
+                                          senderRole: handles.members[chatList[index].sender] == "Members"
+                                            ? ""
+                                            : handles.members[chatList[index].sender] ?? "",
+                                          isRecurring: chatList.first.id == chatList[index].id
+                                            ? false
+                                            : chatList[index].sender == chatList [index - 1].sender && chatList[index-1].type != ChatType.status,
+                                          content: chatList[index - 1].type == ChatType.image && chatList[index-1].sender == currentUser.id
+                                            ? ""
+                                            : chatList[index].content ?? "",
+                                          isPinned: chatList[index].isPinned,
+                                          imageURL: chatList[index].mediaURL ?? "",
+                                          selectChatMethod: selectChat,
+                                          chatOnTap: chatOnTap,
+                                          selectedChats: selectedChats
+                                        )
+                                      : chatList[index].type == ChatType.video
+                                      ? VideoChat(
+                                          userID: currentUser.id,
+                                          index: index,
+                                          timestamp: chatList[index].timestamp,
+                                          sender: chatList[index].sender,
+                                          senderRole: handles.members[chatList[index].sender] == "Members"
+                                            ? ""
+                                            : handles.members[chatList[index].sender] ?? "",
+                                          isRecurring: chatList.first.id == chatList[index].id
+                                            ? false
+                                            : chatList[index].sender == chatList [index - 1].sender && chatList[index-1].type != ChatType.status,
+                                          content: chatList[index - 1].type == ChatType.image && chatList[index-1].sender == currentUser.id
+                                            ? ""
+                                            : chatList[index].content ?? "",
+                                          isPinned: chatList[index].isPinned,
+                                          videoURL: chatList[index].mediaURL ?? "",
+                                          selectChatMethod: selectChat,
+                                          chatOnTap: chatOnTap,
+                                          selectedChats: selectedChats
+                                        )
+                                      : chatList[index].type == ChatType.docs 
+                                      ? DocumentChat(
+                                          index: index,
+                                          userID: currentUser.id,
+                                          timestamp: chatList[index].timestamp,
+                                          sender: chatList[index].sender,
+                                          senderRole: handles.members[chatList[index].sender] == "Members"
+                                            ? ""
+                                            : handles.members[chatList[index].sender] ?? "",
+                                          isRecurring: chatList.first.id == chatList[index].id
+                                            ? false
+                                            : chatList[index].sender == chatList [index - 1].sender && chatList[index-1].type != ChatType.status,
+                                          isPinned: chatList[index].isPinned,
+                                          documentURL: chatList[index].mediaURL ?? "",
+                                          selectChatMethod: selectChat,
+                                          chatOnTap: chatOnTap,
+                                          selectedChats: selectedChats
+                                        )
+                                      : SizedBox()
                                   ]
                                 );
                               }
@@ -514,9 +579,6 @@ class _HandlesPageState extends State<HandlesPage> {
                                     ? GestureDetector(
                                         onTap: (){
                                           _currentUserProvider.whenData((user){
-
-                                            print(user);
-
                                             _chatProvider.sendPlainChat(
                                               handles.id,
                                               ChatModel(
@@ -571,7 +633,9 @@ class _HandlesPageState extends State<HandlesPage> {
                                                           child: ElevatedButton(
                                                             onPressed: () {
                                                               Get.back();
-                                                              Get.to(() => PickImagesPage(), transition: Transition.cupertino);
+                                                              Get.to(() => PickImagesPage(
+                                                                handlesID: widget.handlesID
+                                                              ), transition: Transition.cupertino);
                                                             },
                                                             child: Constants.mediaAvatar[keys[0]],
                                                             style: ElevatedButton.styleFrom(
@@ -587,7 +651,9 @@ class _HandlesPageState extends State<HandlesPage> {
                                                           child: ElevatedButton(
                                                             onPressed: () {
                                                               Get.back();
-                                                              Get.to(() => PickVideosPage(), transition: Transition.cupertino);
+                                                              Get.to(() => PickVideosPage(
+                                                                handlesID: widget.handlesID,
+                                                              ), transition: Transition.cupertino);
                                                             },
                                                             child: Constants.mediaAvatar[keys[1]],
                                                             style: ElevatedButton.styleFrom(
@@ -636,7 +702,24 @@ class _HandlesPageState extends State<HandlesPage> {
                                                                             ),
                                                                             onPressed: (){
                                                                               Get.back();
-                                                                              //TODO: FILE SEND LOGIC...
+                                                                              _chatProvider.uploadDocument(file.path!, handles.name).then((mediaURL){
+                                                                                print(mediaURL);
+        
+                                                                                _chatProvider.sendDocumentChat(
+                                                                                  widget.handlesID,
+                                                                                  ChatModel(
+                                                                                    id: Uuid().v4(),
+                                                                                    type: ChatType.docs,
+                                                                                    content: chatController.text,
+                                                                                    mediaURL: mediaURL,
+                                                                                    readBy: [],
+                                                                                    deletedBy: [],
+                                                                                    timestamp: DateTime.now(),
+                                                                                    sender: "",
+                                                                                    isPinned: false
+                                                                                  )
+                                                                                );
+                                                                              });
                                                                             },
                                                                           )
                                                                         ],
@@ -668,7 +751,24 @@ class _HandlesPageState extends State<HandlesPage> {
                                                                             ),
                                                                             onPressed: (){
                                                                               Get.back();
-                                                                              //TODO: FILE SEND LOGIC...
+                                                                              _chatProvider.uploadDocument(file.path!, handles.name).then((mediaURL){
+                                                                                print(mediaURL);
+        
+                                                                                _chatProvider.sendDocumentChat(
+                                                                                  widget.handlesID,
+                                                                                  ChatModel(
+                                                                                    id: Uuid().v4(),
+                                                                                    type: ChatType.docs,
+                                                                                    content: chatController.text,
+                                                                                    mediaURL: mediaURL,
+                                                                                    readBy: [],
+                                                                                    deletedBy: [],
+                                                                                    timestamp: DateTime.now(),
+                                                                                    sender: "",
+                                                                                    isPinned: false
+                                                                                  )
+                                                                                );
+                                                                              });
                                                                             },
                                                                           )
                                                                         ],

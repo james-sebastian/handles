@@ -33,7 +33,6 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
       videoPlayerController: VideoPlayerController.network(
         this.widget.videoURL
       ),
-      aspectRatio: 16/9,
       autoInitialize: true,
       autoPlay: false,
       looping: false,
@@ -89,16 +88,6 @@ class _VideoPreviewerState extends State<VideoPreviewer> {
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            tooltip: "Settings",
-            icon: AdaptiveIcon(
-              android: Icons.more_vert_rounded,
-              iOS: CupertinoIcons.ellipsis,
-            ),
-            onPressed: (){}
-          ),
-        ]
       ),
       body: Container(
         height: MQuery.height(0.9, context),

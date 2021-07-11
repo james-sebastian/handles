@@ -193,9 +193,8 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                                       ],
                                     )
                                   : CupertinoAlertDialog(
-                                      //TODO: ASSIGN HANDLES NAME HERE...
                                       title: Text(
-                                        "Are you sure you want to delete Handles DevTeam?",
+                                        "Are you sure you want to delete this Handles?",
                                       ),
                                       content: Text(
                                         "This action is irreversible and will make you leave this Handles without deleting the actual one"

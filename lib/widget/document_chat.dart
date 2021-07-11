@@ -2,6 +2,7 @@ part of "widgets.dart";
 
 class DocumentChat extends StatefulWidget {
   final int index;
+  final String userID;
   final DateTime timestamp;
   final String sender;
   final String senderRole;
@@ -15,6 +16,7 @@ class DocumentChat extends StatefulWidget {
   const DocumentChat({
     Key? key,
     required this.index,
+    required this.userID,
     required this.timestamp,
     required this.sender,
     required this.senderRole,
@@ -33,10 +35,6 @@ class DocumentChat extends StatefulWidget {
 class _DocumentChatState extends State<DocumentChat> {
   @override
   Widget build(BuildContext context) {
-
-    final String _filename = basename(widget.documentURL);
-    final String _extension = extension(widget.documentURL);
-
     Future<String> getFileSize(String filepath, int decimals) async {
       http.Response r = await http.get(Uri.parse(filepath));
       final bytes = int.parse(r.headers["content-length"] ?? "0");      
@@ -48,7 +46,21 @@ class _DocumentChatState extends State<DocumentChat> {
       return ((bytes / pow(1024, i)).toStringAsFixed(decimals)) + ' ' + suffixes[i];
     }
 
-    return widget.sender == "a" //TODO: CHECK IF SENDER == USER ID
+    Future<String> getFileExtension(String filePath) async {
+      http.Response r = await http.get(Uri.parse(filePath));
+      String? extension = r.headers["content-type"];
+
+      return extension!.substring(12, extension.length);
+    }
+
+    Future<String?> getFileName(String filePath) async {
+      String baseName = basenameWithoutExtension(widget.documentURL);
+      int indexLocation = baseName.lastIndexOf("%");
+      print(baseName.substring(indexLocation + 1, baseName.length));
+      return baseName.substring(indexLocation + 1, baseName.length);
+    } 
+
+    return widget.sender == widget.userID
       ? Container(
           width: MQuery.width(1, context),
           margin: EdgeInsets.only(
@@ -104,15 +116,17 @@ class _DocumentChatState extends State<DocumentChat> {
                                 FutureBuilder<String>(
                                   future: getFileSize(widget.documentURL, 2),
                                   builder: (context, snapshot){
-                                    return Text(
-                                      snapshot.data ?? "",
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(
-                                        color: Colors.white.withOpacity(0.5),
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 12
-                                      ),
-                                    );
+                                    return snapshot.hasData
+                                    ? Text(
+                                        snapshot.data ?? "",
+                                        textAlign: TextAlign.start,
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.5),
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 12
+                                        ),
+                                      )
+                                    : SizedBox();
                                   }
                                 ),
                                 SizedBox(width: 5),
@@ -125,14 +139,21 @@ class _DocumentChatState extends State<DocumentChat> {
                                   )
                                 ),
                                 SizedBox(width: 5),
-                                Text(
-                                  _extension.substring(1, _extension.length).toUpperCase(),
-                                  textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                    color: Colors.white.withOpacity(0.5),
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 12
-                                  ),
+                                FutureBuilder<String>(
+                                  future: getFileExtension(widget.documentURL),
+                                  builder: (context, snapshot) {
+                                    return snapshot.hasData
+                                    ? Text(
+                                        snapshot.data!.toUpperCase(),
+                                        textAlign: TextAlign.start,
+                                        style: TextStyle(
+                                          color: Colors.white.withOpacity(0.5),
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 12
+                                        ),
+                                      )
+                                    : SizedBox();
+                                  }
                                 ),
                               ],
                             ),
@@ -172,13 +193,22 @@ class _DocumentChatState extends State<DocumentChat> {
                                         children: [
                                           SvgPicture.asset("assets/mdi_file-document.svg", height: 18, width: 18, color: Palette.primary),
                                           SizedBox(width: MQuery.width(0.01, context)),
-                                          Text(
-                                            _filename,
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 14
-                                            )
+                                          FutureBuilder<String?>(
+                                            future: getFileName(widget.documentURL),
+                                            builder: (context, snapshot) {
+                                              return snapshot.hasData
+                                              ? Text(
+                                                  snapshot.data!.length >= 23
+                                                  ? snapshot.data!.substring(0, 23) + "..."
+                                                  : snapshot.data!,
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 14
+                                                  )
+                                                )
+                                              : SizedBox();
+                                            }
                                           ),
                                         ],
                                       ),
@@ -275,15 +305,17 @@ class _DocumentChatState extends State<DocumentChat> {
                                 FutureBuilder<String>(
                                   future: getFileSize(widget.documentURL, 2),
                                   builder: (context, snapshot){
-                                    return Text(
-                                      snapshot.data ?? "",
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(
-                                        color: Colors.black.withOpacity(0.5),
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 12
-                                      ),
-                                    );
+                                    return snapshot.hasData
+                                    ? Text(
+                                        snapshot.data ?? "",
+                                        textAlign: TextAlign.start,
+                                        style: TextStyle(
+                                          color: Colors.black.withOpacity(0.5),
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 12
+                                        ),
+                                      )
+                                    : SizedBox();
                                   }
                                 ),
                                 SizedBox(width: 5),
@@ -296,14 +328,21 @@ class _DocumentChatState extends State<DocumentChat> {
                                   )
                                 ),
                                 SizedBox(width: 5),
-                                Text(
-                                  _extension.substring(1, _extension.length).toUpperCase(),
-                                  textAlign: TextAlign.start,
-                                  style: TextStyle(
-                                    color: Colors.black.withOpacity(0.5),
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 12
-                                  ),
+                                FutureBuilder<String>(
+                                  future: getFileExtension(widget.documentURL),
+                                  builder: (context, snapshot) {
+                                    return snapshot.hasData
+                                    ? Text(
+                                        snapshot.data!.substring(1, snapshot.data!.length).toUpperCase(),
+                                        textAlign: TextAlign.start,
+                                        style: TextStyle(
+                                          color: Colors.black.withOpacity(0.5),
+                                          fontWeight: FontWeight.w400,
+                                          fontSize: 12
+                                        ),
+                                      )
+                                    : SizedBox();
+                                  }
                                 ),
                               ],
                             ),
@@ -331,7 +370,6 @@ class _DocumentChatState extends State<DocumentChat> {
                                     text: TextSpan(
                                       text: "${this.widget.sender} ",
                                       style: TextStyle(
-                                        //TODO: DYNAMIC COLOR CREATION
                                         color: Palette.primary,
                                         fontWeight: FontWeight.w500,
                                         fontSize: 15
@@ -378,15 +416,22 @@ class _DocumentChatState extends State<DocumentChat> {
                                         children: [
                                           SvgPicture.asset("assets/mdi_file-document.svg", height: 18, width: 18, color: Palette.primary),
                                           SizedBox(width: MQuery.width(0.01, context)),
-                                          Text(
-                                            _filename.length >= 20
-                                            ? _filename.substring(0, 20) + "..."
-                                            : _filename,
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 14
-                                            )
+                                          FutureBuilder<String?>(
+                                            future: getFileName(widget.documentURL),
+                                            builder: (context, snapshot) {
+                                              return snapshot.hasData
+                                              ? Text(
+                                                  snapshot.data!.length >= 23
+                                                  ? snapshot.data!.substring(0, 23) + "..."
+                                                  : snapshot.data!,
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 14
+                                                  )
+                                                )
+                                              : SizedBox();
+                                            }
                                           ),
                                         ],
                                       ),
