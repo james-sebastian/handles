@@ -180,7 +180,6 @@ class _ArchivedHandlesState extends State<ArchivedHandles> {
                                     ],
                                   )
                                 : CupertinoAlertDialog(
-                                    //TODO: ASSIGN HANDLES NAME HERE...
                                     title: Text(
                                       "Are you sure you want to delete these archived Handles?",
                                     ),

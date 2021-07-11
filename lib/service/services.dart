@@ -8,6 +8,9 @@ import 'package:get/get.dart';
 import 'package:handles/model/models.dart';
 import 'package:handles/screen/pages.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
+import 'package:video_compress/video_compress.dart';
+import 'package:path/path.dart' as flutter_path;
 
 part "authentication_services.dart";
 part 'user_services.dart';

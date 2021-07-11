@@ -477,6 +477,7 @@ class FontDialog extends StatefulWidget {
 
 class _FontDialogState extends State<FontDialog> {
 
+  // ignore: unused_field
   late FontSize _fontSize;
 
   @override

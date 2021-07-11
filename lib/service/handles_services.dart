@@ -123,7 +123,6 @@ class HandlesServices with ChangeNotifier{
   }
 
   Future<String?> uploadHandlesCover(String filePath, String handlesName) async {
-
     String? outputURL;
     File file = File(filePath);
     try {
