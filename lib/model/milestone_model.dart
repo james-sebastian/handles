@@ -1,6 +1,7 @@
 part of 'models.dart';
 
 class MilestoneModel{
+  String id;
   String milestoneName;
   String description;
   bool isCompleted;
@@ -12,6 +13,7 @@ class MilestoneModel{
   MilestoneModel({
     this.fee,
     this.dueDate,
+    required this.id,
     required this.paymentStatus,
     required this.status,
     required this.milestoneName,

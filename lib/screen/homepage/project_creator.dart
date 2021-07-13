@@ -3,7 +3,8 @@ part of "../pages.dart";
 class ProjectCreator extends StatefulWidget {
 
   final String handlesID;
-  const ProjectCreator({ Key? key, required this.handlesID }) : super(key: key);
+  final ProjectModel? projectModel;
+  const ProjectCreator({ Key? key, required this.handlesID, this.projectModel }) : super(key: key);
 
   @override
   _ProjectCreatorState createState() => _ProjectCreatorState();
@@ -15,6 +16,15 @@ class _ProjectCreatorState extends State<ProjectCreator> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   List<MilestoneModel> milestones = [];
+
+  @override
+  void initState() { 
+    super.initState();
+    if(widget.projectModel != null){
+      titleController.text = widget.projectModel!.serviceName;
+      descriptionController.text = widget.projectModel!.description;
+    }
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -31,6 +41,13 @@ class _ProjectCreatorState extends State<ProjectCreator> {
       builder: (ctx, watch,child) {
 
         final _chatProvider = watch(chatProvider);
+        if(widget.projectModel != null){
+          watch(projectChatMilestonesProvider(widget.projectModel!.id)).whenData((value){
+            setState(() {
+              milestones = value;
+            });
+          });
+        }
 
         return Scaffold(
           backgroundColor: Colors.white,
@@ -48,7 +65,7 @@ class _ProjectCreatorState extends State<ProjectCreator> {
               },
             ),
             title: Text(
-              "Send a Project Chat",
+              widget.projectModel != null ? "Edit Project Chat" : "Send a Project Chat",
               textAlign: TextAlign.start,
               style: TextStyle(
                 fontSize: 18,
@@ -56,6 +73,91 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                 color: Colors.white
               )
             ),
+            actions: [
+              widget.projectModel != null
+              ? IconButton(
+                icon: AdaptiveIcon(
+                  android: Icons.delete,
+                  iOS: CupertinoIcons.trash,
+                ),
+                onPressed: (){
+                  Get.dialog(
+                    Platform.isAndroid
+                      ? AlertDialog(
+                          title: Text(
+                            "Are you sure you want to delete this project chat?",
+                          ),
+                          content: Text(
+                            "This action is irreversible"
+                          ),
+                          actions: [
+                            TextButton(
+                              child: Text("CANCEL"),
+                              style: TextButton.styleFrom(
+                                textStyle: TextStyle(
+                                  color: Palette.warning,
+                                  fontWeight: FontWeight.w500
+                                )
+                              ),
+                              onPressed: (){
+                                Get.back();
+                              },
+                            ),
+                            TextButton(
+                              child: Text("DELETE"),
+                              style: TextButton.styleFrom(
+                                textStyle: TextStyle(
+                                  color: Palette.primary,
+                                  fontWeight: FontWeight.w500
+                                )
+                              ),
+                              onPressed: (){
+                                _chatProvider.deleteProjectChat(widget.handlesID, widget.projectModel!);
+                                Get.off(HandlesPage(handlesID: widget.handlesID));
+                              },
+                            )
+                          ],
+                        )
+                      : CupertinoAlertDialog(
+                          title: Text(
+                            "Are you sure you want to delete this project chat?",
+                          ),
+                          content: Text(
+                            "This action is irreversible"
+                          ),
+                          actions: [
+                            TextButton(
+                              child: Text("CANCEL"),
+                              style: TextButton.styleFrom(
+                                textStyle: TextStyle(
+                                  color: Palette.warning,
+                                  fontWeight: FontWeight.w500
+                                )
+                              ),
+                              onPressed: (){
+                                Get.back();
+                              },
+                            ),
+                            TextButton(
+                              child: Text("DELETE"),
+                              style: TextButton.styleFrom(
+                                textStyle: TextStyle(
+                                  color: Palette.primary,
+                                  fontWeight: FontWeight.w500
+                                )
+                              ),
+                              onPressed: (){
+                                _chatProvider.deleteProjectChat(widget.handlesID, widget.projectModel!);
+                                Get.off(HandlesPage(handlesID: widget.handlesID));
+                              },
+                            )
+                          ],
+                        )
+                      );
+                    }
+                  )
+                : SizedBox()
+            ]
           ),
           body: SingleChildScrollView(
             child: Container(
@@ -172,7 +274,7 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                     ],
                   ),
                   SizedBox(height: MQuery.height(0.02, context)),
-                  Container(
+                Container(
                     height: MQuery.height(
                       milestones.length == 0
                       ? 0
@@ -206,140 +308,123 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                             ),
                             axis: TimelineAxis.vertical,
                             alignment: TimelineAlign.start,
-                            endChild: GestureDetector(
-                              onTap: (){
-                                Get.dialog(
-                                  Dialog(
-                                    child: MilestoneDialog(
-                                      fee: target.fee,
-                                      milestoneName: target.milestoneName,
-                                      description: target.description,
-                                      paymentStatus: target.paymentStatus,
-                                      isCompleted: target.isCompleted,
-                                      status: target.status,
-                                      dueDate: target.dueDate
-                                    )
-                                  )
-                                );
-                              },
-                              child: Container(
-                                margin: EdgeInsets.fromLTRB(
-                                  MQuery.width(0.02, context),
-                                  MQuery.width(0.02, context),
-                                  0,
-                                  MQuery.width(0.02, context)
-                                ),
-                                padding: EdgeInsets.all(
-                                  MQuery.height(0.0125, context)
-                                ),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Palette.handlesChat
-                                  ),
-                                  borderRadius: BorderRadius.all(Radius.circular(5))
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              target.milestoneName.length >= 23
-                                                ? target.milestoneName.substring(0, 20) + "..."
-                                                : target.milestoneName,
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color: Palette.primaryText,
-                                                fontWeight: FontWeight.w500
-                                              ),
-                                            ),
-                                            Text(
-                                              NumberFormat.simpleCurrency(locale: 'en_AU').format(target.fee),
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: Palette.primaryText,
-                                                fontWeight: FontWeight.w500
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: MQuery.height(0.01, context)),
-                                        Text(
-                                          target.description.length >= 107
-                                          ? target.description.substring(0, 107) + " .."
-                                          : target.description,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Palette.primaryText,
-                                            fontWeight: FontWeight.w300
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          target.dueDate != null
-                                          ? "Due: ${DateFormat.yMMMMd('en_US').format(target.dueDate!)}"
-                                          : "No due date",
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Palette.primaryText,
-                                            fontWeight: FontWeight.w400
-                                          ),
-                                        ),
-                                        Row(
-                                          children: [
-                                            target.paymentStatus == ProjectPaymentStatus.paid
-                                            ? GeneralStatusTag(
-                                                mini: true,
-                                                status: "PAID",
-                                                color: Palette.secondary
-                                              )
-                                            : target.paymentStatus == ProjectPaymentStatus.unpaid
-                                            ? GeneralStatusTag(
-                                                mini: true,
-                                                status: "UNPAID",
-                                                color: Palette.primary
-                                              )
-                                            : SizedBox(),
-                                            SizedBox(width: MQuery.width(0.005, context)),
-                                            target.status == ProjectStatus.pending
-                                            ? GeneralStatusTag(
-                                                mini: true,
-                                                status: "PENDING",
-                                                color: Colors.grey[800]!
-                                              )
-                                            : target.status == ProjectStatus.in_progress
-                                            ? GeneralStatusTag(
-                                                mini: true,
-                                                status: "IN PROGRESS",
-                                                color: Palette.tertiary
-                                              )
-                                            : target.status == ProjectStatus.completed
-                                            ? GeneralStatusTag(
-                                                mini: true,
-                                                status: "COMPLETED",
-                                                color: Palette.secondary
-                                              )
-                                            : GeneralStatusTag(
-                                                mini: true,
-                                                status: "CANCELLED",
-                                                color: Palette.warning
-                                              ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                )
+                            endChild: Container(
+                              margin: EdgeInsets.fromLTRB(
+                                MQuery.width(0.02, context),
+                                MQuery.width(0.02, context),
+                                0,
+                                MQuery.width(0.02, context)
                               ),
+                              padding: EdgeInsets.all(
+                                MQuery.height(0.0125, context)
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Palette.handlesChat
+                                ),
+                                borderRadius: BorderRadius.all(Radius.circular(5))
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            target.milestoneName.length >= 23
+                                              ? target.milestoneName.substring(0, 20) + "..."
+                                              : target.milestoneName,
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: Palette.primaryText,
+                                              fontWeight: FontWeight.w500
+                                            ),
+                                          ),
+                                          Text(
+                                            NumberFormat.simpleCurrency(locale: 'en_AU').format(target.fee),
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Palette.primaryText,
+                                              fontWeight: FontWeight.w500
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: MQuery.height(0.01, context)),
+                                      Text(
+                                        target.description.length >= 107
+                                        ? target.description.substring(0, 107) + " .."
+                                        : target.description,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Palette.primaryText,
+                                          fontWeight: FontWeight.w300
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        target.dueDate != null
+                                        ? "Due: ${DateFormat.yMMMMd('en_US').format(target.dueDate!)}"
+                                        : "No due date",
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Palette.primaryText,
+                                          fontWeight: FontWeight.w400
+                                        ),
+                                      ),
+                                      Row(
+                                        children: [
+                                          target.paymentStatus == ProjectPaymentStatus.paid
+                                          ? GeneralStatusTag(
+                                              mini: true,
+                                              status: "PAID",
+                                              color: Palette.secondary
+                                            )
+                                          : target.paymentStatus == ProjectPaymentStatus.unpaid
+                                          ? GeneralStatusTag(
+                                              mini: true,
+                                              status: "UNPAID",
+                                              color: Palette.primary
+                                            )
+                                          : SizedBox(),
+                                          SizedBox(width: MQuery.width(0.005, context)),
+                                          target.status == ProjectStatus.pending
+                                          ? GeneralStatusTag(
+                                              mini: true,
+                                              status: "PENDING",
+                                              color: Colors.grey[800]!
+                                            )
+                                          : target.status == ProjectStatus.in_progress
+                                          ? GeneralStatusTag(
+                                              mini: true,
+                                              status: "IN PROGRESS",
+                                              color: Palette.tertiary
+                                            )
+                                          : target.status == ProjectStatus.completed
+                                          ? GeneralStatusTag(
+                                              mini: true,
+                                              status: "COMPLETED",
+                                              color: Palette.secondary
+                                            )
+                                          : GeneralStatusTag(
+                                              mini: true,
+                                              status: "CANCELLED",
+                                              color: Palette.warning
+                                            ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              )
                             ),
                           ),
                         );
@@ -366,7 +451,7 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                   SizedBox(height: MQuery.height(0.025, context)),
                   Button(
                     width: double.infinity,
-                    title: "Send Project Chat",
+                    title: widget.projectModel != null ? "Edit Project Chat" : "Send Project Chat",
                     textColor: Colors.white,
                     color: Palette.primary,
                     method: (){
@@ -375,20 +460,39 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                           errorLocation = FormError.title;
                         });
                       } else {
-                        _chatProvider.sendProjectChat(
-                          widget.handlesID,
-                          ProjectModel(
-                            id: Uuid().v4(),
-                            timestamp: DateTime.now(),
-                            serviceName: titleController.text,
-                            description: descriptionController.text,
-                            status: ProjectStatus.pending,
-                            paymentStatus: ProjectPaymentStatus.unpaid,
-                            milestones: milestones
-                          )
-                        ).then((value){
-                          Get.back();
-                        });
+                        if(widget.projectModel != null){
+                          _chatProvider.editProjectChat(
+                            widget.projectModel!.id,
+                            ProjectModel(
+                              id: widget.projectModel!.id,
+                              description: descriptionController.text,
+                              status: widget.projectModel!.status,
+                              serviceName: titleController.text,
+                              timestamp: widget.projectModel!.timestamp,
+                              paymentStatus: widget.projectModel!.paymentStatus,
+                              sender: widget.projectModel!.sender,
+                              isPinned: widget.projectModel!.isPinned,
+                              milestones: milestones
+                            )
+                          ).then((value){
+                            Get.back();
+                          });
+                        } else {
+                          _chatProvider.sendProjectChat(
+                            widget.handlesID,
+                            ProjectModel(
+                              id: Uuid().v4(),
+                              timestamp: DateTime.now(),
+                              serviceName: titleController.text,
+                              description: descriptionController.text,
+                              status: ProjectStatus.pending,
+                              paymentStatus: ProjectPaymentStatus.unpaid,
+                              milestones: milestones
+                            )
+                          ).then((value){
+                            Get.back();
+                          });
+                        }
                       }
                     }
                   )
@@ -645,6 +749,7 @@ class _MilestoneCreatorDialogState extends State<MilestoneCreatorDialog> {
                   } else {
                     widget.addMilestoneFunction(
                       MilestoneModel(
+                        id: "",
                         milestoneName: titleController.text,
                         description: descriptionController.text,
                         status: ProjectStatus.pending,

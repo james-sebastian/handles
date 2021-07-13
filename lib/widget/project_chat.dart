@@ -86,6 +86,7 @@ class _ProjectChatState extends State<ProjectChat> {
                       GestureDetector(
                         onTap: (){
                           Get.to(() => ProjectDetailedPage(
+                            handlesID: widget.handlesID,
                             projectModel: this.widget.projectModel,
                             currentUserID: this.widget.userID
                           ), transition: Transition.cupertino);
@@ -311,6 +312,7 @@ class _ProjectChatState extends State<ProjectChat> {
                       GestureDetector(
                         onTap: (){
                           Get.to(() => ProjectDetailedPage(
+                            handlesID: widget.handlesID,
                             projectModel: this.widget.projectModel,
                             currentUserID: this.widget.userID
                           ), transition: Transition.cupertino);

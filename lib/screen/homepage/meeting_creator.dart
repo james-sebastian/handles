@@ -127,6 +127,91 @@ class _MeetingCreatorState extends State<MeetingCreator> {
                     color: Colors.white
                   )
                 ),
+                actions: [
+                  widget.meetingModel != null
+                  ? IconButton(
+                    icon: AdaptiveIcon(
+                      android: Icons.delete,
+                      iOS: CupertinoIcons.trash,
+                    ),
+                    onPressed: (){
+                      Get.dialog(
+                        Platform.isAndroid
+                          ? AlertDialog(
+                              title: Text(
+                                "Are you sure you want to delete this meet chat?",
+                              ),
+                              content: Text(
+                                "This action is irreversible"
+                              ),
+                              actions: [
+                                TextButton(
+                                  child: Text("CANCEL"),
+                                  style: TextButton.styleFrom(
+                                    textStyle: TextStyle(
+                                      color: Palette.warning,
+                                      fontWeight: FontWeight.w500
+                                    )
+                                  ),
+                                  onPressed: (){
+                                    Get.back();
+                                  },
+                                ),
+                                TextButton(
+                                  child: Text("DELETE"),
+                                  style: TextButton.styleFrom(
+                                    textStyle: TextStyle(
+                                      color: Palette.primary,
+                                      fontWeight: FontWeight.w500
+                                    )
+                                  ),
+                                  onPressed: (){
+                                    _chatProvider.deleteMeetingChat(widget.handlesID, widget.meetingModel!.id);
+                                    Get.back();
+                                  },
+                                )
+                              ],
+                            )
+                          : CupertinoAlertDialog(
+                              title: Text(
+                                "Are you sure you want to delete this meet chat?",
+                              ),
+                              content: Text(
+                                "This action is irreversible"
+                              ),
+                              actions: [
+                                TextButton(
+                                  child: Text("CANCEL"),
+                                  style: TextButton.styleFrom(
+                                    textStyle: TextStyle(
+                                      color: Palette.warning,
+                                      fontWeight: FontWeight.w500
+                                    )
+                                  ),
+                                  onPressed: (){
+                                    Get.back();
+                                  },
+                                ),
+                                TextButton(
+                                  child: Text("DELETE"),
+                                  style: TextButton.styleFrom(
+                                    textStyle: TextStyle(
+                                      color: Palette.primary,
+                                      fontWeight: FontWeight.w500
+                                    )
+                                  ),
+                                  onPressed: (){
+                                    _chatProvider.deleteMeetingChat(widget.handlesID, widget.meetingModel!.id);
+                                    Get.back();
+                                  },
+                                )
+                              ],
+                            )
+                          );
+                        }
+                      )
+                    : SizedBox()
+                ]
               ),
               body: SingleChildScrollView(
                 child: Container(

@@ -31,9 +31,7 @@ class ChatServices with ChangeNotifier{
 
   String projectStatusDeterminer(ProjectStatus status){
     String out = "";
-    if(status == ProjectStatus.cancelled){
-      out = "cancelled";
-    } else if (status == ProjectStatus.completed){
+    if (status == ProjectStatus.completed){
       out = "completed";
     } else if (status == ProjectStatus.in_progress){
       out = "in_progress";
@@ -58,8 +56,6 @@ class ChatServices with ChangeNotifier{
     
     if(raw == "pending"){
       out = ProjectStatus.pending;
-    } else if(raw == "cancelled"){
-      out = ProjectStatus.cancelled;
     } else if(raw == "completed"){
       out = ProjectStatus.completed;
     } else if(raw == "in_progress"){
@@ -322,6 +318,20 @@ class ChatServices with ChangeNotifier{
     });
   }
 
+  Future<void> deleteMeetingChat(String handlesID, String meetChatID) async{
+    await firestore
+    .collection("meet_chat")
+    .doc(meetChatID)
+    .delete();
+
+    return firestore
+    .collection("handles")
+    .doc(handlesID)
+    .collection('messages')
+    .doc(meetChatID)
+    .delete();
+  }
+
   Stream<MeetingModel> getMeetingChat(String meetChatID){
     return firestore
     .collection("meet_chat")
@@ -372,15 +382,26 @@ class ChatServices with ChangeNotifier{
       List<MilestoneModel> milestones = [];
       snapshot.docs.forEach((doc) {
         milestones.add(
-          MilestoneModel(
-            milestoneName: doc["milestoneName"],
-            description: doc["description"],
-            status: projectStatusGetter(doc["status"]),
-            paymentStatus: projectStatusPaymentGetter(doc["paymentStatus"]),
-            isCompleted: doc["isCompleted"],
-            fee: doc["fee"],
-            dueDate: DateTime.parse(doc["dueDate"])
-          )
+          doc["dueDate"] == "null"
+          ? MilestoneModel(
+              id: doc.id,
+              milestoneName: doc["milestoneName"],
+              description: doc["description"],
+              status: projectStatusGetter(doc["status"]),
+              paymentStatus: projectStatusPaymentGetter(doc["paymentStatus"]),
+              isCompleted: doc["isCompleted"],
+              fee: doc["fee"],
+            )
+          : MilestoneModel(
+              id: doc.id,
+              milestoneName: doc["milestoneName"],
+              description: doc["description"],
+              status: projectStatusGetter(doc["status"]),
+              paymentStatus: projectStatusPaymentGetter(doc["paymentStatus"]),
+              isCompleted: doc["isCompleted"],
+              fee: doc["fee"],
+              dueDate: DateTime.parse(doc["dueDate"]),
+            )
         );
       });
 
@@ -436,5 +457,114 @@ class ChatServices with ChangeNotifier{
       "deletedBy": [],
       "readBy": []
     });
+  }
+
+  Future<void> editProjectChat(String projectChatID, ProjectModel projectModel) async {
+    await firestore
+    .collection("project_chat")
+    .doc(projectModel.id)
+    .update({
+      "serviceName": projectModel.serviceName,
+      "description": projectModel.description,
+      "timestamp": projectModel.timestamp.toString(),
+      "status": projectStatusDeterminer(projectModel.status),
+      "paymentStatus": projectPaymentStatusDeterminer(projectModel.paymentStatus),
+      "isPinned": projectModel.isPinned,
+      "sender": projectModel.sender,
+    });
+
+    projectModel.milestones!.forEach((milestone) async {
+      await firestore
+      .collection("project_chat")
+      .doc(projectModel.id)
+      .collection("milestones")
+      .doc()
+      .set({
+        "milestoneName": milestone.milestoneName,
+        "description": milestone.description,
+        "dueDate": milestone.dueDate.toString(),
+        "fee": milestone.fee,
+        "paymentStatus": projectPaymentStatusDeterminer(milestone.paymentStatus),
+        "status": projectStatusDeterminer(milestone.status),
+        "isCompleted": milestone.isCompleted
+      });
+    });
+  }
+
+  Future<void> deleteProjectChat(String handlesID, ProjectModel projectChat) async{
+
+    print(projectChat.id);
+    print(handlesID);
+
+    await firestore
+    .collection("project_chat")
+    .doc(projectChat.id)
+    .collection("milestones")
+    .get().then((value){
+      if(value.docs.isNotEmpty){
+        value.docs.forEach((element) {
+          firestore
+          .collection("project_chat")
+          .doc(projectChat.id)
+          .collection("milestones")
+          .doc(element.id)
+          .delete();
+        });
+      }
+    });
+
+    await firestore
+    .collection("project_chat")
+    .doc(projectChat.id)
+    .delete();
+
+    return firestore
+    .collection("handles")
+    .doc(handlesID)
+    .collection('messages')
+    .doc(projectChat.id)
+    .delete();
+  }
+
+  Future<void> markMilestoneAsWorking(String projectChatID, String milestoneID) async {
+    return firestore
+    .collection("project_chat")
+    .doc(projectChatID)
+    .collection("milestones")
+    .doc(milestoneID)
+    .update({
+      "status": "in_progress"
+    });
+  }
+
+  Future<void> markMilestoneAsCompleted(String projectChatID, String milestoneID) async {
+    return firestore
+    .collection("project_chat")
+    .doc(projectChatID)
+    .collection("milestones")
+    .doc(milestoneID)
+    .update({
+      "status": "completed"
+    });
+  }
+
+  Future<void> markMilestoneAsPaid(String projectChatID, String milestoneID) async {
+    return firestore
+    .collection("project_chat")
+    .doc(projectChatID)
+    .collection("milestones")
+    .doc(milestoneID)
+    .update({
+      "paymentStatus": "paid"
+    });
+  }
+
+  Future<void> deleteMilestone(String projectChatID, String milestoneID) async {
+    return firestore
+    .collection("project_chat")
+    .doc(projectChatID)
+    .collection("milestones")
+    .doc(milestoneID)
+    .delete();
   }
 }
