@@ -22,14 +22,6 @@ class _SettingsPageState extends State<SettingsPage> {
 
         final _userProvider = watch(userProvider);
 
-        Future<void> setFontSize (FontSize? value) async{
-          setState((){
-            fontSize = value ?? FontSize.medium;
-          });
-
-          await _userProvider.setFontSize(value ?? FontSize.medium);
-        }
-
         Future<void> getFontSize() async {
           await _userProvider.getFontSize().then((value){
             if(value == "small"){
@@ -226,9 +218,10 @@ class _SettingsPageState extends State<SettingsPage> {
                                 )
                               ),
                               onTap: (){
-                                Get.dialog(PhoneNumberUpdateDialog(
-                                  isDeleting: false,
-                                ));
+                                Get.dialog(
+                                  PhoneNumberUpdateDialog(
+                                    isDeleting: false,
+                                  ));
                               }
                             ),
                             Divider(height: 1,),
@@ -250,39 +243,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                 )
                               ),
                               onTap: (){Get.to(() => SubscriptionPage(), transition: Transition.cupertino);}
-                            ),
-                            Divider(height: 1,),
-                            ListTile(
-                              onTap: (){
-                                Get.dialog(
-                                  FontDialog(
-                                    fontSize: fontSize,
-                                    fontModifier: setFontSize
-                                  )
-                                );
-                              },
-                              shape: Border.symmetric(
-                                vertical: BorderSide(color: Colors.grey.withOpacity(0.5))
-                              ),
-                              leading: AdaptiveIcon(
-                                android: Icons.text_fields,
-                                iOS: CupertinoIcons.textformat_size,
-                                color: Palette.primary
-                              ),
-                              title: Text(
-                                "Font size " + "${
-                                  fontSize == FontSize.small
-                                  ? "(Small)"
-                                  : fontSize == FontSize.medium
-                                    ? "(Medium)"
-                                    : "(Big)"
-                                }",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 16,
-                                )
-                              ),
                             ),
                             Divider(height: 1,),
                             ListTile(
@@ -460,81 +420,6 @@ class _SettingsPageState extends State<SettingsPage> {
           }
         );
       },
-    );
-  }
-}
-
-class FontDialog extends StatefulWidget {
-
-  final FontSize fontSize;
-  final void Function(FontSize) fontModifier;
-
-  const FontDialog({ Key? key, required this.fontSize, required this.fontModifier }) : super(key: key);
-
-  @override
-  _FontDialogState createState() => _FontDialogState();
-}
-
-class _FontDialogState extends State<FontDialog> {
-
-  // ignore: unused_field
-  late FontSize _fontSize;
-
-  @override
-  void initState() {
-    super.initState();
-    _fontSize = widget.fontSize;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SimpleDialog(
-      title: new Text("Font size"),
-      children: <Widget>[
-        new Container(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            children: <Widget>[
-              RadioListTile<FontSize>(
-                title: const Text('Small'),
-                value: FontSize.small,
-                groupValue: widget.fontSize,
-                onChanged: (FontSize? value) {
-                  setState(() {
-                    _fontSize = value!;
-                  });
-                  widget.fontModifier(value!);
-                  Get.back();
-                },
-              ),
-              RadioListTile<FontSize>(
-                title: const Text('Medium'),
-                value: FontSize.medium,
-                groupValue: widget.fontSize,
-                onChanged: (FontSize? value) {
-                  setState(() {
-                    _fontSize = value!;
-                  });
-                  widget.fontModifier(value!);
-                  Get.back();
-                },
-              ),
-              RadioListTile<FontSize>(
-                title: const Text('Big'),
-                value: FontSize.big,
-                groupValue: widget.fontSize,
-                onChanged: (FontSize? value) {
-                  setState(() {
-                    _fontSize = value!;
-                  });
-                  widget.fontModifier(value!);
-                  Get.back();
-                },
-              ),
-            ],
-          )
-        ),
-      ],
     );
   }
 }

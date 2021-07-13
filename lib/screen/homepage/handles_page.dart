@@ -18,6 +18,7 @@ class _HandlesPageState extends State<HandlesPage> {
   bool isChatting = false;
   int isFilterChipSelected = -1;
   int lineCount = 4;
+  final player = flutterSound.FlutterSoundRecorder();
   Set<int> selectedChats = Set();
 
   void scrollToBottom() {
@@ -48,7 +49,8 @@ class _HandlesPageState extends State<HandlesPage> {
       "Videos",
       "Docs",
       "Meetings",
-      "Services"
+      "Services",
+      "Audio"
     ];
 
     void selectChat(int index){
@@ -95,6 +97,18 @@ class _HandlesPageState extends State<HandlesPage> {
         final _chatListProvider = watch(chatListProvider(widget.handlesID));
         final _singleHandlesProvider = watch(singleHandlesProvider(widget.handlesID));
         final _chatProvider = watch(chatProvider);
+        
+        Future<List<UserModel>> getUserModelFromList(List<String> usersID) async{
+          List<UserModel> userModel = [];
+          
+          usersID.forEach((id) {
+            watch(userProvider).getUserByID(id).then((value){
+              userModel.add(value);
+            });
+          });
+
+          return userModel;
+        }
 
         return _singleHandlesProvider.when(
           data: (handles){
@@ -126,7 +140,9 @@ class _HandlesPageState extends State<HandlesPage> {
                               tag: "handles_picture",
                               child: CircleAvatar(
                                 backgroundColor: Colors.white,
-                                backgroundImage: AssetImage("assets/handles_logo.png"),
+                                backgroundImage: handles.cover != ""
+                                ? NetworkImage(handles.cover) as ImageProvider
+                                : AssetImage("assets/handles_logo.png"),
                                 radius: MQuery.height(0.0215, context),
                               ),
                             )
@@ -177,31 +193,50 @@ class _HandlesPageState extends State<HandlesPage> {
                           color: Colors.white
                         )
                       )
-                    : ListTile(
-                        onTap: (){
-                          Get.to(() => HandlesDetailedPage());
-                        },
-                        contentPadding: EdgeInsets.fromLTRB(
-                          MQuery.width(0, context),
-                          MQuery.height(0.01, context),
-                          MQuery.width(0, context),
-                          MQuery.height(0.0075, context),
-                        ),
-                        title: Font.out(
-                          "Handles DevTeam",
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          textAlign: TextAlign.start,
-                          color: Colors.white
-                        ),
-                        subtitle: Font.out(
-                          "Andy, Grant, Steve, Mark, Luke, ...",
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          textAlign: TextAlign.start,
-                          color: Colors.white.withOpacity(0.75)
-                        ),
-                      ),
+                    : FutureBuilder<List<UserModel>>(
+                        future: getUserModelFromList(handles.members.keys.toList()),
+                        builder: (context, snapshot){
+                          return snapshot.hasData
+                          ? ListTile(
+                              onTap: (){
+                                Get.to(() => HandlesDetailedPage());
+                              },
+                              contentPadding: EdgeInsets.fromLTRB(
+                                MQuery.width(0, context),
+                                MQuery.height(0.01, context),
+                                MQuery.width(0, context),
+                                MQuery.height(0.0075, context),
+                              ),
+                              title: Font.out(
+                                handles.name,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                textAlign: TextAlign.start,
+                                color: Colors.white
+                              ),
+                              subtitle: Row(
+                                children: List.generate(snapshot.data!.length > 4 ? 4 : snapshot.data!.length, (index){
+                                  return index < 4
+                                  ? Font.out(
+                                      snapshot.data![index].name.split(" ")[0] + ", ",
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                      textAlign: TextAlign.start,
+                                      color: Colors.white.withOpacity(0.75)
+                                    )
+                                  : Font.out(
+                                    "...",
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                    textAlign: TextAlign.start,
+                                    color: Colors.white.withOpacity(0.75)
+                                  );
+                                })
+                              )
+                            )
+                          : SizedBox();
+                        }
+                    ),
                     actions: [
                       if (isSearchActive)
                         IconButton(
@@ -517,6 +552,59 @@ class _HandlesPageState extends State<HandlesPage> {
                                           chatOnTap: chatOnTap,
                                           selectedChats: selectedChats
                                         )
+                                      : chatList[index].type == ChatType.meets
+                                      ? watch(meetChatProvider(chatList[index].id)).when(
+                                          data: (meetChat){
+                                            return MeetingChat(
+                                              handlesID: handles.id,
+                                              index: index,
+                                              userID: currentUser.id,
+                                              timestamp: chatList[index].timestamp,
+                                              sender: chatList[index].sender,
+                                              senderRole: handles.members[chatList[index].sender] == "Members"
+                                                ? ""
+                                                : handles.members[chatList[index].sender] ?? "",
+                                              isRecurring: chatList.first.id == chatList[index].id
+                                                ? false
+                                                : chatList[index].sender == chatList [index - 1].sender && chatList[index-1].type != ChatType.status && chatList[index - 1].timestamp.day == chatList[index].timestamp.day,
+                                              isPinned: chatList[index].isPinned,
+                                              meetingModel: meetChat
+                                            );
+                                          },
+                                          loading: (){
+                                            return SizedBox();
+                                          },
+                                          error: (object , error){
+                                            return SizedBox();
+                                          }
+                                        )
+                                      : chatList[index].type == ChatType.project
+                                      ? watch(projectChatProvider(chatList[index].id)).when(
+                                          data: (projectModel){
+                                            return ProjectChat(
+                                              handlesID: handles.id,
+                                              index: index,
+                                              userID: currentUser.id,
+                                              timestamp: chatList[index].timestamp,
+                                              sender: chatList[index].sender,
+                                              senderRole: handles.members[chatList[index].sender] == "Members"
+                                                ? ""
+                                                : handles.members[chatList[index].sender] ?? "",
+                                              isRecurring: chatList.first.id == chatList[index].id
+                                                ? false
+                                                : chatList[index].sender == chatList [index - 1].sender && chatList[index-1].type != ChatType.status && chatList[index - 1].timestamp.day == chatList[index].timestamp.day,
+                                              isPinned: chatList[index].isPinned,
+                                              projectModel: projectModel
+                                            );
+                                          },
+                                          loading: (){
+                                            return SizedBox();
+                                          },
+                                          error: (object , error){
+                                            print(object);
+                                            return SizedBox();
+                                          }
+                                        )
                                       : SizedBox()
                                   ]
                                 );
@@ -799,7 +887,9 @@ class _HandlesPageState extends State<HandlesPage> {
                                                           child: ElevatedButton(
                                                             onPressed: () {
                                                               Get.back();
-                                                              Get.to(() => MeetingCreator(), transition: Transition.cupertino);
+                                                              Get.to(() => MeetingCreator(
+                                                                handlesID: handles.id
+                                                              ), transition: Transition.cupertino);
                                                             },
                                                             child: Constants.mediaAvatar[keys[3]],
                                                             style: ElevatedButton.styleFrom(
@@ -815,7 +905,9 @@ class _HandlesPageState extends State<HandlesPage> {
                                                           child: ElevatedButton(
                                                             onPressed: () {
                                                               Get.back();
-                                                              Get.to(() => ProjectCreator(), transition: Transition.cupertino);
+                                                              Get.to(() => ProjectCreator(
+                                                                handlesID: handles.id
+                                                              ), transition: Transition.cupertino);
                                                             },
                                                             child: Constants.mediaAvatar[keys[4]],
                                                             style: ElevatedButton.styleFrom(
@@ -826,14 +918,30 @@ class _HandlesPageState extends State<HandlesPage> {
                                                             ),
                                                           ),
                                                         ),
-                                                        ElevatedButton(
-                                                          onPressed: () {},
-                                                          child: Constants.mediaAvatar[keys[2]],
-                                                          style: ElevatedButton.styleFrom(
-                                                            elevation: 0,
-                                                            shape: CircleBorder(),
-                                                            padding: EdgeInsets.all(20),
-                                                            primary: Colors.transparent, // <-- Button color
+                                                        Container(
+                                                          height: MQuery.height(0.1, context),
+                                                          child: ElevatedButton(
+                                                            onPressed: () async {
+                                                              await player.openAudioSession();
+
+                                                              Directory appDocDir = await getApplicationDocumentsDirectory();
+
+                                                              await player.startRecorder(
+                                                                codec: Codec.aacMP4,
+                                                                toFile: appDocDir.path
+                                                              );
+                                                            },
+                                                            onLongPress: () async {
+                                                              await player.stopRecorder();
+                                                              await player.closeAudioSession();
+                                                            },
+                                                            child: Constants.mediaAvatar[keys[5]],
+                                                            style: ElevatedButton.styleFrom(
+                                                              shape: CircleBorder(),
+                                                              padding: EdgeInsets.all(20),
+                                                              primary: Palette.primary, // <-- Button color
+                                                              onPrimary: Palette.primary,// <-- Button color
+                                                            ),
                                                           ),
                                                         ),
                                                       ],
@@ -867,6 +975,8 @@ class _HandlesPageState extends State<HandlesPage> {
                       return SizedBox();
                     },
                     error: (object , error){
+                      print(object);
+                      print(error);
                       return SizedBox();
                     }
                   )

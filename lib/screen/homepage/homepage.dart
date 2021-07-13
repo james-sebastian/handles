@@ -498,6 +498,9 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
 
                                 return _singleHandlesProvider.when(
                                   data: (handles){
+
+                                    print(handles.cover);
+
                                     return handles.archivedBy!.indexOf(user.id) >= 0
                                     ? SizedBox()
                                     : ListTile(
