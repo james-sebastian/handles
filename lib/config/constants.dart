@@ -43,7 +43,12 @@ class Constants{
       android: Icons.shopping_cart,
       iOS: CupertinoIcons.cart_fill,
       color: Colors.white, size: 28
-    )
+    ),
+    "Audio": AdaptiveIcon(
+      android: Icons.mic,
+      iOS: CupertinoIcons.mic_fill,
+      color: Colors.white, size: 28,
+    ),
   };
   
 }

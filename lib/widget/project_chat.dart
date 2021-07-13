@@ -1,43 +1,56 @@
 part of "widgets.dart";
 
-class ServiceChat extends StatefulWidget {
+class ProjectChat extends StatefulWidget {
 
   final int index;
   final DateTime timestamp;
+  final String userID;
+  final String handlesID;
   final String sender;
   final String senderRole;
-  final ServiceModel serviceModel;
+  final ProjectModel projectModel;
   final bool isRecurring;
   final bool isPinned;
 
-  const ServiceChat({
+  const ProjectChat({
     Key? key,
     required this.index,
     required this.timestamp,
     required this.sender,
     required this.senderRole,
-    required this.serviceModel,
+    required this.projectModel,
     required this.isRecurring,
     required this.isPinned,
+    required this.userID,
+    required this.handlesID
   }) : super(key: key);
 
   @override
-  _ServiceChatState createState() => _ServiceChatState();
+  _ProjectChatState createState() => _ProjectChatState();
 }
 
-class _ServiceChatState extends State<ServiceChat> {
+class _ProjectChatState extends State<ProjectChat> {
   @override
   Widget build(BuildContext context) {
 
-    int calculateTotalFee(){
+    int calculateTotalFee(List<MilestoneModel> milestones){
       int output = 0;
-      widget.serviceModel.milestones!.forEach((element) {
+      milestones.forEach((element) {
         output += (element.fee ?? 0);
       });
       return output;
     }
 
-    return widget.sender == "a" //TODO: CHECK IF SENDER == USER ID
+    return Consumer(
+      builder: (ctx, watch,child) {
+
+        final _projectChatMilestonesProvider = watch(projectChatMilestonesProvider(widget.projectModel.id));
+
+        _projectChatMilestonesProvider.whenData((value){
+          print(value);
+        }); 
+
+        return widget.sender == widget.userID
       ? Container(
           width: MQuery.width(1, context),
           margin: EdgeInsets.only(
@@ -73,8 +86,8 @@ class _ServiceChatState extends State<ServiceChat> {
                       GestureDetector(
                         onTap: (){
                           Get.to(() => ProjectDetailedPage(
-                            serviceModel: this.widget.serviceModel,
-                            senderUID: this.widget.sender
+                            projectModel: this.widget.projectModel,
+                            currentUserID: this.widget.userID
                           ), transition: Transition.cupertino);
                         },
                         child: Row(
@@ -86,8 +99,7 @@ class _ServiceChatState extends State<ServiceChat> {
                                 color: Palette.handlesBackground,
                                 borderRadius: BorderRadius.all(Radius.circular(5)),
                               ),
-                              child: //TODO: GET SERVICE PHOTO =X DISPLAY SAMPLE
-                              AdaptiveIcon(
+                              child: AdaptiveIcon(
                                 android: Icons.shopping_cart,
                                 iOS: CupertinoIcons.cart_fill,
                                 color: Palette.primary,
@@ -107,27 +119,42 @@ class _ServiceChatState extends State<ServiceChat> {
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
                                     Text(
-                                      widget.serviceModel.serviceName,
+                                      widget.projectModel.serviceName,
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500,
                                         color: Colors.white
                                       )
                                     ),
-                                    Text(
-                                      //TODO: GET SHAREDPREF CURRENCY HERE
-                                      NumberFormat.simpleCurrency(locale: 'en_AU').format(calculateTotalFee()),
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.white
-                                      )
+                                    _projectChatMilestonesProvider.when(
+                                      data: (milestones){
+                                        return Text(
+                                          NumberFormat.simpleCurrency(locale: 'en_AU').format(calculateTotalFee(milestones)),
+                                          textAlign: TextAlign.start,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white
+                                          )
+                                        );
+                                      },
+                                      loading: (){
+                                        return Text(
+                                          NumberFormat.simpleCurrency(locale: 'en_AU').format(0),
+                                          textAlign: TextAlign.start,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.white
+                                          )
+                                        );
+                                      },
+                                      error: (_, __) => SizedBox()
                                     ),
                                     Text(
-                                      widget.serviceModel.description.length >= 30
-                                      ? widget.serviceModel.description.substring(0, 26) + "..."
-                                      : widget.serviceModel.description,
+                                      widget.projectModel.description.length >= 30
+                                      ? widget.projectModel.description.substring(0, 26) + "..."
+                                      : widget.projectModel.description,
                                       textAlign: TextAlign.start,
                                       style: TextStyle(
                                         fontSize: 12,
@@ -143,7 +170,7 @@ class _ServiceChatState extends State<ServiceChat> {
                         ),
                       ),
                       SizedBox(height: MQuery.height(0.01, context)),
-                      widget.serviceModel.paymentStatus == ProjectPaymentStatus.paid
+                      widget.projectModel.paymentStatus == ProjectPaymentStatus.paid
                       ? Button(
                           height: MQuery.height(0.045, context),
                           width: double.infinity,
@@ -152,7 +179,7 @@ class _ServiceChatState extends State<ServiceChat> {
                           textColor: Colors.white,
                           title: "Service Has Been Paid",
                         )
-                      : widget.serviceModel.paymentStatus == ProjectPaymentStatus.unpaid
+                      : widget.projectModel.paymentStatus == ProjectPaymentStatus.unpaid
                       ? Button(
                           height: MQuery.height(0.045, context),
                           width: double.infinity,
@@ -255,7 +282,6 @@ class _ServiceChatState extends State<ServiceChat> {
                               text: TextSpan(
                                 text: "${this.widget.sender} ",
                                 style: TextStyle(
-                                  //TODO: DYNAMIC COLOR CREATION
                                   color: Palette.primary,
                                   fontWeight: FontWeight.w500,
                                   fontSize: 15
@@ -285,8 +311,8 @@ class _ServiceChatState extends State<ServiceChat> {
                       GestureDetector(
                         onTap: (){
                           Get.to(() => ProjectDetailedPage(
-                            serviceModel: this.widget.serviceModel,
-                            senderUID: this.widget.sender
+                            projectModel: this.widget.projectModel,
+                            currentUserID: this.widget.userID
                           ), transition: Transition.cupertino);
                         },
                         child: Row(
@@ -298,8 +324,7 @@ class _ServiceChatState extends State<ServiceChat> {
                                 color: Palette.handlesBackground,
                                 borderRadius: BorderRadius.all(Radius.circular(5)),
                               ),
-                              child: //TODO: GET SERVICE PHOTO =X DISPLAY SAMPLE
-                              AdaptiveIcon(
+                              child: AdaptiveIcon(
                                 android: Icons.shopping_cart,
                                 iOS: CupertinoIcons.cart_fill,
                                 color: Palette.primary,
@@ -320,24 +345,39 @@ class _ServiceChatState extends State<ServiceChat> {
                                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                   children: [
                                     Text(
-                                      widget.serviceModel.serviceName,
+                                      widget.projectModel.serviceName,
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w500
                                       )
                                     ),
-                                    Text(
-                                      NumberFormat.simpleCurrency(locale: 'en_AU').format(calculateTotalFee()),
-                                      textAlign: TextAlign.start,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600
-                                      )
+                                    _projectChatMilestonesProvider.when(
+                                      data: (milestones){
+                                        return Text(
+                                          NumberFormat.simpleCurrency(locale: 'en_AU').format(calculateTotalFee(milestones)),
+                                          textAlign: TextAlign.start,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          )
+                                        );
+                                      },
+                                      loading: (){
+                                        return Text(
+                                          NumberFormat.simpleCurrency(locale: 'en_AU').format(0),
+                                          textAlign: TextAlign.start,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          )
+                                        );
+                                      },
+                                      error: (_, __) => SizedBox()
                                     ),
                                     Text(
-                                      widget.serviceModel.description.length >= 30
-                                      ? widget.serviceModel.description.substring(0, 26) + "..."
-                                      : widget.serviceModel.description,
+                                      widget.projectModel.description.length >= 30
+                                      ? widget.projectModel.description.substring(0, 26) + "..."
+                                      : widget.projectModel.description,
                                       textAlign: TextAlign.start,
                                       style: TextStyle(
                                         fontSize: 12,
@@ -353,7 +393,7 @@ class _ServiceChatState extends State<ServiceChat> {
                       ),
                       SizedBox(height: MQuery.height(0.01, context)),
                       //TODO: CHECK IF CURRENT USER ROLE == CLIENT =x DISPLAY DETAIL
-                      widget.serviceModel.paymentStatus == ProjectPaymentStatus.paid
+                      widget.projectModel.paymentStatus == ProjectPaymentStatus.paid
                       ? Button(
                           height: MQuery.height(0.045, context),
                           width: double.infinity,
@@ -362,7 +402,7 @@ class _ServiceChatState extends State<ServiceChat> {
                           textColor: Colors.white,
                           title: "SERVICE HAS BEEN PAID",
                         )
-                      : widget.serviceModel.paymentStatus == ProjectPaymentStatus.unpaid
+                      : widget.projectModel.paymentStatus == ProjectPaymentStatus.unpaid
                       ? Button(
                           height: MQuery.height(0.045, context),
                           width: double.infinity,
@@ -401,5 +441,7 @@ class _ServiceChatState extends State<ServiceChat> {
             ],
           )
         );
+      },
+    );
   }
 }

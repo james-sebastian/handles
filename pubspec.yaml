@@ -41,6 +41,7 @@ dependencies:
   flutter_linkify: ^5.0.2
   flutter_native_splash: ^1.1.8+4
   flutter_riverpod: ^0.14.0+3
+  flutter_sound: ^8.1.9
   flutter_svg: ^0.22.0
   get: ^4.1.4
   http: ^0.13.3
@@ -52,7 +53,6 @@ dependencies:
   permission_handler: ^8.1.2
   pinch_zoom: ^0.1.0
   pinput: ^1.2.0
-  record: ^3.0.0
   riverpod: ^0.14.0+3
   shared_preferences: ^2.0.6
   timeline_tile: ^2.0.0
