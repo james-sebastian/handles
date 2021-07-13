@@ -1,6 +1,10 @@
 part of "widgets.dart";
 
-class MilestoneDialog extends StatelessWidget {
+class MilestoneDialog extends ConsumerWidget {
+  final String handlesID;
+  final String userID;
+  final String projectID;
+  final String milestoneID;
   final String milestoneName;
   final String description;
   final bool isCompleted;
@@ -12,6 +16,10 @@ class MilestoneDialog extends StatelessWidget {
   const MilestoneDialog({
     this.fee,
     this.dueDate,
+    required this.milestoneID,
+    required this.handlesID,
+    required this.userID,
+    required this.projectID,
     required this.milestoneName,
     required this.description,
     required this.isCompleted,
@@ -21,7 +29,10 @@ class MilestoneDialog extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, watch) {
+
+    final _chatProvider = watch(chatProvider);
+
     return ConstrainedBox(
       constraints: BoxConstraints(
         maxHeight: MQuery.height(0.75, context)
@@ -120,51 +131,70 @@ class MilestoneDialog extends StatelessWidget {
                   fontWeight: FontWeight.w400
                 ),
               ),
-              //TODO: CHECK IF CURRENT USER ROLE == ADMIN
-              Column(
-                children: [
-                  SizedBox(height: MQuery.height(0.025, context)),
-                  this.status == ProjectStatus.pending
-                  ? Button(
-                      width: double.infinity,
-                      height: MQuery.height(0.05, context),
-                      title: "Mark as Working",
-                      textColor: Colors.white,
-                      color: Palette.primary,
-                      method: (){}
+              
+              StreamBuilder<HandlesModel>(
+                stream: watch(handlesProvider).handlesModelGetter(this.handlesID),
+                builder: (context, snapshot) {
+                  return snapshot.hasData && snapshot.data!.members[this.userID] == "Admin"
+                  ? Column(
+                      children: [
+                        SizedBox(height: MQuery.height(0.025, context)),
+                        this.status == ProjectStatus.pending
+                        ? Button(
+                            width: double.infinity,
+                            height: MQuery.height(0.05, context),
+                            title: "Mark as Working",
+                            textColor: Colors.white,
+                            color: Palette.primary,
+                            method: (){
+                              _chatProvider.markMilestoneAsWorking(this.projectID, this.milestoneID);
+                              Get.back();
+                            }
+                          )
+                        : this.status == ProjectStatus.in_progress
+                          ? Button(
+                              width: double.infinity,
+                              height: MQuery.height(0.05, context),
+                              title: "Mark as Done",
+                              textColor: Colors.white,
+                              color: Palette.primary,
+                              method: (){
+                                _chatProvider.markMilestoneAsCompleted(this.projectID, this.milestoneID);
+                                Get.back();
+                              }
+                            )
+                          : SizedBox(),
+                        SizedBox(height: MQuery.height(0.01, context)),
+                        this.paymentStatus == ProjectPaymentStatus.unpaid
+                        ? Button(
+                            width: double.infinity,
+                            height: MQuery.height(0.05, context),
+                            title: "Mark as Paid",
+                            textColor: Colors.white,
+                            color: Palette.secondary,
+                            method: (){
+                              _chatProvider.markMilestoneAsPaid(this.projectID, this.milestoneID);
+                              Get.back();
+                            }
+                          )
+                        : SizedBox(),
+                        SizedBox(height: MQuery.height(0.01, context)),
+                        Button(
+                          width: double.infinity,
+                          height: MQuery.height(0.05, context),
+                          title: "Delete Milestone",
+                          textColor: Palette.warning,
+                          color: Colors.white,
+                          borderColor: Palette.warning,
+                          method: (){
+                            _chatProvider.deleteMilestone(this.projectID, this.milestoneID);
+                            Get.back();
+                          }
+                        ),
+                      ],
                     )
-                  : this.status == ProjectStatus.in_progress
-                    ? Button(
-                        width: double.infinity,
-                        height: MQuery.height(0.05, context),
-                        title: "Mark as Done",
-                        textColor: Colors.white,
-                        color: Palette.primary,
-                        method: (){}
-                      )
-                    : SizedBox(),
-                  SizedBox(height: MQuery.height(0.01, context)),
-                  this.paymentStatus == ProjectPaymentStatus.unpaid
-                  ? Button(
-                      width: double.infinity,
-                      height: MQuery.height(0.05, context),
-                      title: "Mark as Paid",
-                      textColor: Colors.white,
-                      color: Palette.secondary,
-                      method: (){}
-                    )
-                  : SizedBox(),
-                  SizedBox(height: MQuery.height(0.01, context)),
-                  Button(
-                    width: double.infinity,
-                    height: MQuery.height(0.05, context),
-                    title: "Delete Milestone",
-                    textColor: Palette.warning,
-                    color: Colors.white,
-                    borderColor: Palette.warning,
-                    method: (){}
-                  ),
-                ],
+                  : SizedBox();
+                }
               )
             ],
           )

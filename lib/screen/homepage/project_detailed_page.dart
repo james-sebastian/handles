@@ -4,11 +4,13 @@ class ProjectDetailedPage extends StatefulWidget {
 
   final ProjectModel projectModel;
   final String currentUserID;
+  final String handlesID;
 
   const ProjectDetailedPage({
     Key? key,
     required this.projectModel,
-    required this.currentUserID
+    required this.currentUserID,
+    required this.handlesID
   }) : super(key: key);
 
   @override
@@ -59,12 +61,16 @@ class _ProjectDetailedPageState extends State<ProjectDetailedPage> {
             actions: [
               widget.currentUserID == widget.projectModel.sender
               ? IconButton(
-                  tooltip: "Settings",
                   icon: AdaptiveIcon(
-                    android: Icons.more_vert_rounded,
-                    iOS: CupertinoIcons.ellipsis,
+                    android: Icons.edit,
+                    iOS: CupertinoIcons.pencil,
                   ),
-                  onPressed: (){}
+                  onPressed: (){
+                    Get.to(() => ProjectCreator(
+                      handlesID: widget.handlesID,
+                      projectModel: widget.projectModel,
+                    ));
+                  }
                 )
               : SizedBox()
             ]
@@ -243,6 +249,10 @@ class _ProjectDetailedPageState extends State<ProjectDetailedPage> {
                                               Get.dialog(
                                                 Dialog(
                                                   child: MilestoneDialog(
+                                                    milestoneID: target.id,
+                                                    handlesID: widget.handlesID,
+                                                    userID: widget.currentUserID,
+                                                    projectID: widget.projectModel.id,
                                                     fee: target.fee,
                                                     milestoneName: target.milestoneName,
                                                     description: target.description,
@@ -382,7 +392,8 @@ class _ProjectDetailedPageState extends State<ProjectDetailedPage> {
                               loading: (){
                                 return CircularProgressIndicator(color: Palette.primary);
                               },
-                              error: (_,__){
+                              error: (object, error){
+                                print(object);
                                 return SizedBox();
                               }
                             ),
