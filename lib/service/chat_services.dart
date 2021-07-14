@@ -478,7 +478,7 @@ class ChatServices with ChangeNotifier{
       .collection("project_chat")
       .doc(projectModel.id)
       .collection("milestones")
-      .doc()
+      .doc(milestone.id)
       .set({
         "milestoneName": milestone.milestoneName,
         "description": milestone.description,

@@ -49,6 +49,8 @@ class _ProjectCreatorState extends State<ProjectCreator> {
           });
         }
 
+        print(milestones);
+
         return Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
@@ -113,7 +115,7 @@ class _ProjectCreatorState extends State<ProjectCreator> {
                               ),
                               onPressed: (){
                                 _chatProvider.deleteProjectChat(widget.handlesID, widget.projectModel!);
-                                Get.off(HandlesPage(handlesID: widget.handlesID));
+                                Get.offAll(HandlesPage(handlesID: widget.handlesID));
                               },
                             )
                           ],
@@ -749,7 +751,7 @@ class _MilestoneCreatorDialogState extends State<MilestoneCreatorDialog> {
                   } else {
                     widget.addMilestoneFunction(
                       MilestoneModel(
-                        id: "",
+                        id: Uuid().v4(),
                         milestoneName: titleController.text,
                         description: descriptionController.text,
                         status: ProjectStatus.pending,

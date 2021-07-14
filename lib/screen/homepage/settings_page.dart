@@ -60,11 +60,6 @@ class _SettingsPageState extends State<SettingsPage> {
           stream: _userProvider.getCurrentUser,
           builder: (context, snapshot){
 
-            // print(snapshot);
-            if(snapshot.hasData){
-              paymentAddressController.text = snapshot.data!.creditCard ?? "";
-            }
-
             getFontSize();
             getNotification();
 
@@ -221,7 +216,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                 Get.dialog(
                                   PhoneNumberUpdateDialog(
                                     isDeleting: false,
-                                  ));
+                                  )
+                                );
                               }
                             ),
                             Divider(height: 1,),
@@ -379,6 +375,13 @@ class _SettingsPageState extends State<SettingsPage> {
                             ),
                             Divider(height: 1,),
                             ListTile(
+                              onTap: (){
+                                Get.dialog(
+                                  PhoneNumberUpdateDialog(
+                                    isDeleting: true,
+                                  )
+                                );
+                              },
                               shape: Border.symmetric(
                                 vertical: BorderSide(color: Colors.grey.withOpacity(0.5))
                               ),
@@ -443,7 +446,7 @@ class _PhoneNumberUpdateDialogState extends State<PhoneNumberUpdateDialog> {
   Widget build(BuildContext context) {
     return SimpleDialog(
       title: new Text(
-        widget.isDeleting
+        !widget.isDeleting
         ? "Change your phone number"
         : "Delete your account?"
       ),
@@ -516,10 +519,7 @@ class _PhoneNumberUpdateDialogState extends State<PhoneNumberUpdateDialog> {
                           isDownIcon: true,
                           showEnglishName: true,
                         ),
-                        // Set default value
                         initialSelection: '+61',
-                        // or
-                        // initialSelection: 'US'
                         onChanged: (CountryCode? code) {
                           setState(() {
                             countryCode = code!.dialCode ?? "";

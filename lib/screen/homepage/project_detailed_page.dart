@@ -78,7 +78,7 @@ class _ProjectDetailedPageState extends State<ProjectDetailedPage> {
           body: SafeArea(
             child: SingleChildScrollView(
               child: Container(
-                height: MQuery.height(1.2, context),
+                height: MQuery.height(1.1, context),
                 child: Column(
                   children: [
                     Expanded(
@@ -159,7 +159,7 @@ class _ProjectDetailedPageState extends State<ProjectDetailedPage> {
                                       NumberFormat.simpleCurrency(locale: 'en_AU').format(calculateTotalFee(milestones)),
                                       textAlign: TextAlign.start,
                                       style: TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.w600,
                                       )
                                     );
@@ -169,7 +169,7 @@ class _ProjectDetailedPageState extends State<ProjectDetailedPage> {
                                       NumberFormat.simpleCurrency(locale: 'en_AU').format(0),
                                       textAlign: TextAlign.start,
                                       style: TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.w600,
                                       )
                                     );
@@ -228,19 +228,19 @@ class _ProjectDetailedPageState extends State<ProjectDetailedPage> {
                                         height: MQuery.height(0.2, context),
                                         child: TimelineTile(
                                           beforeLineStyle: LineStyle(
-                                            color: milestones[index].isCompleted ? Palette.secondary : Palette.tertiary
+                                            color: milestones[index].status == ProjectStatus.completed ? Palette.secondary : Palette.tertiary
                                           ),
                                           afterLineStyle: LineStyle(
                                             color: index == milestones.length - 1
                                             ? milestones.last.isCompleted 
                                               ? Palette.secondary
                                               : Palette.tertiary
-                                            : milestones[index + 1].isCompleted ? Palette.secondary : Palette.tertiary
+                                            : milestones[index + 1].status == ProjectStatus.completed  ? Palette.secondary : Palette.tertiary
                                           ),
                                           indicatorStyle: IndicatorStyle(
                                             height: 15,
                                             width: 15,
-                                            color: milestones[index].isCompleted ? Palette.secondary : Palette.tertiary
+                                            color: milestones[index].status == ProjectStatus.completed  ? Palette.secondary : Palette.tertiary
                                           ),
                                           axis: TimelineAxis.vertical,
                                           alignment: TimelineAlign.start,
@@ -414,13 +414,25 @@ class _ProjectDetailedPageState extends State<ProjectDetailedPage> {
                                 textColor: Colors.white,
                                 title: "PAY SERVICE",
                               )
-                            : Button(
+                            : SizedBox(),
+                            SizedBox(height: MQuery.height(0.01,  context)),
+                            widget.projectModel.status == ProjectStatus.pending
+                            ? Button(
                                 width: double.infinity - MQuery.width(0.075, context),
-                                color: Palette.warning,
+                                color: Palette.primary,
                                 method: (){},
                                 textColor: Colors.white,
-                                title: "SERVICE HAS BEEN CANCELLED",
-                              ),
+                                title: "MARK AS WORKING",
+                              )
+                            : widget.projectModel.status == ProjectStatus.in_progress
+                            ? Button(
+                                width: double.infinity,
+                                color: Palette.primary,
+                                method: (){},
+                                textColor: Colors.white,
+                                title: "MARK AS COMPLETED",
+                              )
+                            : SizedBox(),
                           ]
                         )
                       ),

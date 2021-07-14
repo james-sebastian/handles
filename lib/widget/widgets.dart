@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:favicon/favicon.dart' as Favicon;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +29,6 @@ part 'handles_status_block.dart';
 part 'general_status_tag.dart';
 part 'image_chat.dart';
 part 'video_chat.dart';
-part 'audio_chat.dart';
 part 'document_chat.dart';
 part 'meeting_chat.dart';
 part 'project_chat.dart';

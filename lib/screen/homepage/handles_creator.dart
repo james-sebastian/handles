@@ -126,7 +126,7 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
               },
             ),
             title: Text(
-              "Create a Handles",
+              "Create a Handle",
               textAlign: TextAlign.start,
               style: TextStyle(
                 fontSize: 18,
@@ -174,7 +174,7 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
                           left: 8.0
                         ),
                         child: Font.out(
-                          "Handles's title",
+                          "Handle's title",
                           fontSize: 14,
                           fontWeight: FontWeight.w400
                         ),
@@ -216,7 +216,7 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
                           left: 8.0
                         ),
                         child: Font.out(
-                          "Handles' description (optional)",
+                          "Handle's description (optional)",
                           fontSize: 14,
                           fontWeight: FontWeight.w400
                         ),
@@ -350,7 +350,7 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
                       SizedBox(height: MQuery.height(0.05, context)),
                       Button(
                         width: double.infinity,
-                        title: "Create Handles",
+                        title: "Create Handle",
                         textColor: Colors.white,
                         color: Palette.primary,
                         method: () async {

@@ -50,7 +50,6 @@ class _HandlesPageState extends State<HandlesPage> {
       "Docs",
       "Meetings",
       "Services",
-      "Audio"
     ];
 
     void selectChat(int index){
@@ -216,9 +215,14 @@ class _HandlesPageState extends State<HandlesPage> {
                               ),
                               subtitle: Row(
                                 children: List.generate(snapshot.data!.length > 4 ? 4 : snapshot.data!.length, (index){
+
+                                  print(snapshot.data![index].name);
+
                                   return index < 4
                                   ? Font.out(
-                                      snapshot.data![index].name.split(" ")[0] + ", ",
+                                      snapshot.data![index].name.split(" ")[0] == currentUser.name.split(" ")[0]
+                                      ? "You, "
+                                      : snapshot.data![index].name.split(" ")[0] + ", ",
                                       fontSize: 12,
                                       fontWeight: FontWeight.w400,
                                       textAlign: TextAlign.start,
@@ -681,7 +685,9 @@ class _HandlesPageState extends State<HandlesPage> {
                                               )
                                             );
                                           });
-                                          print(chatController.text);
+                                          setState(() {
+                                            chatController.text = "";
+                                          });
                                         },
                                         child: CircleAvatar(
                                           radius: MQuery.height(0.2, context),
@@ -921,26 +927,15 @@ class _HandlesPageState extends State<HandlesPage> {
                                                         Container(
                                                           height: MQuery.height(0.1, context),
                                                           child: ElevatedButton(
-                                                            onPressed: () async {
-                                                              await player.openAudioSession();
-
-                                                              Directory appDocDir = await getApplicationDocumentsDirectory();
-
-                                                              await player.startRecorder(
-                                                                codec: Codec.aacMP4,
-                                                                toFile: appDocDir.path
-                                                              );
+                                                            onPressed: () {
                                                             },
-                                                            onLongPress: () async {
-                                                              await player.stopRecorder();
-                                                              await player.closeAudioSession();
-                                                            },
-                                                            child: Constants.mediaAvatar[keys[5]],
+                                                            child: Constants.mediaAvatar[keys[4]],
                                                             style: ElevatedButton.styleFrom(
+                                                              elevation: 0,
                                                               shape: CircleBorder(),
                                                               padding: EdgeInsets.all(20),
-                                                              primary: Palette.primary, // <-- Button color
-                                                              onPrimary: Palette.primary,// <-- Button color
+                                                              primary: Colors.transparent, // <-- Button color
+                                                              onPrimary: Palette.primary, // <-- Splash color
                                                             ),
                                                           ),
                                                         ),

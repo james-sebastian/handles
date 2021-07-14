@@ -38,11 +38,60 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
       });
     }
 
+    Future<bool?> askNotificationPermission() async {
+      final bool? result = await FlutterLocalNotificationsPlugin().resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      
+      return result;
+    }
+
     return Consumer(
       builder: (context, watch, _){
 
         final _currentUserProvider = watch(currentUserProvider);
         final _handlesProvider = watch(handlesProvider);
+
+        askNotificationPermission().then((value) async {
+            // tzDatabase.initializeTimeZones();
+
+            // const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+            //   'your channel id', 'your channel name', 'your channel description',
+            //   importance: Importance.max,
+            //   priority: Priority.high,
+            //   showWhen: false
+            // );
+
+            // var iOSPlatformChannelSpecifics = IOSNotificationDetails(
+            //     presentAlert: true,
+            //     presentBadge: true,
+            //     presentSound: true
+            // );
+
+            // var platformChannelSpecifics = NotificationDetails(
+            //     android: androidPlatformChannelSpecifics,
+            //     iOS: iOSPlatformChannelSpecifics);
+            // await FlutterLocalNotificationsPlugin().show(
+            //     0, 'plain title', 'plain body', platformChannelSpecifics,
+            //     payload: 'item x'
+            // );
+            // await FlutterLocalNotificationsPlugin().zonedSchedule(
+            //   0,
+            //   'scheduled title',
+            //   'scheduled body',
+              
+            //   //TODO: SHAREDPREFERENCES LOCATIONS
+            //   tz.TZDateTime.now(tz.getLocation('Asia/Jakarta')).add(Duration(seconds: 5)),
+            //   platformChannelSpecifics,
+            //   androidAllowWhileIdle: true,
+            //   uiLocalNotificationDateInterpretation:
+            //       UILocalNotificationDateInterpretation.absoluteTime
+            //   );
+            // FlutterAppBadger.updateBadgeCount(1);
+            
+        });
 
         return MaterialApp(
           debugShowCheckedModeBanner: false,
@@ -418,10 +467,6 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
             ),
             body: _currentUserProvider.when(
               data: (user){
-
-                print("$selectedHandles (normal)");
-                print("$selectedPinnedHandles (pinned)");
-
                 return TabBarView(
                   controller: _tabController,
                   children: [
@@ -498,9 +543,6 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
 
                                 return _singleHandlesProvider.when(
                                   data: (handles){
-
-                                    print(handles.cover);
-
                                     return handles.archivedBy!.indexOf(user.id) >= 0
                                     ? SizedBox()
                                     : ListTile(
@@ -523,7 +565,6 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                                                 });
                                               } else {
                                                 setState(() {
-                                                  print("a");
                                                   selectedPinnedHandles.remove(user.handlesList![index + 1]);
                                                 });
                                               }
@@ -606,16 +647,6 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                                                 mainAxisAlignment: MainAxisAlignment.end,
                                                 crossAxisAlignment: CrossAxisAlignment.center,
                                                 children: [
-                                                  // CircleAvatar(
-                                                  //   backgroundColor: Palette.primary,
-                                                  //   radius: 10,
-                                                  //   child: Center(
-                                                  //     child: Font.out(
-                                                  //       "1",
-                                                  //       fontSize: 12
-                                                  //     ),
-                                                  //   ),
-                                                  // ),
                                                   handles.pinnedBy!.indexOf(user.id) >= 0
                                                   ? AdaptiveIcon(
                                                       android: Icons.push_pin,
