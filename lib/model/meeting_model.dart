@@ -8,8 +8,8 @@ class MeetingModel{
   List<String> attendees;
   DateTime meetingStartTime;
   DateTime meetingEndTime;
-  bool? isPinned;
   DateTime timestamp;
+  bool? isPinned;
   String? sender;
 
   MeetingModel({

@@ -150,7 +150,6 @@ class AuthenticationService with ChangeNotifier{
         .update({
           "phoneNumber": phoneNumber,
         });
-        // either this occurs or the user needs to manually enter the SMS code
       },
       verificationFailed: (FirebaseAuthException e) {
         print(e.message);
