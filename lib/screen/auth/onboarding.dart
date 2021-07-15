@@ -13,6 +13,7 @@ class OnboardingPage extends StatelessWidget {
     });
 
     return Scaffold(
+      backgroundColor: Palette.primary,
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.only(
@@ -30,14 +31,14 @@ class OnboardingPage extends StatelessWidget {
                       "Handles",
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
-                      color: Palette.secondaryText
+                      color: Colors.white
                     ),
                     Font.out(
                       "A simple and simple group-chat \nmessenger for businesses",
                       textAlign: TextAlign.center,
                       fontSize: 18,
                       fontWeight: FontWeight.w300,
-                      color: Palette.primaryText,
+                      color: Colors.white,
                     ),
                   ],
                 ),
@@ -49,7 +50,7 @@ class OnboardingPage extends StatelessWidget {
                 Spacer(flex: 2),
                 Button(
                   title: "GET STARTED",
-                  color: Palette.primary,
+                  color: Palette.secondary,
                   method: (){
                     Get.offAll(() => PhoneAuthPage(), transition: Transition.cupertino);
                   },

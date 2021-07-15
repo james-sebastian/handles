@@ -175,15 +175,52 @@ class _DocumentChatState extends State<DocumentChat> {
                               ),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  SizedBox(
-                                      height: MQuery.height(0.005, context)),
+                                  ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxHeight: MQuery.height(0.15, context),
+                                      minWidth: MQuery.width(0.35, context)
+                                    ),
+                                    child: Container(
+                                      margin: EdgeInsets.symmetric(
+                                        vertical: MQuery.height(0.005, context),
+                                        horizontal: MQuery.height(0.001, context)
+                                      ),
+                                      padding: EdgeInsets.all(MQuery.height(0.01, context)),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(Radius.circular(7)),
+                                        color: Colors.grey[200]!.withOpacity(0.35)
+                                      ),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Andreas", 
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 13,
+                                            )
+                                          ),
+                                          SizedBox(height: MQuery.height(0.005, context)),
+                                          Text(
+                                            "Fantasies11!!", 
+                                            style: TextStyle(
+                                              color: Colors.white.withOpacity(0.8),
+                                              fontSize: 12,
+                                              height: 1.25
+                                            )
+                                          )
+                                        ]
+                                      )
+                                    )
+                                  ),
+                                  SizedBox(height: MQuery.height(0.005, context)),
                                   Row(
                                     children: [
-                                      SizedBox(
-                                          width: MQuery.width(0.003, context)),
+                                      SizedBox(width: MQuery.width(0.003, context)),
                                       Container(
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.all(
@@ -445,6 +482,47 @@ class _DocumentChatState extends State<DocumentChat> {
                                         SizedBox(
                                             height:
                                                 MQuery.height(0.01, context)),
+                                        ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            maxHeight: MQuery.height(0.15, context),
+                                            minWidth: double.infinity,
+                                          ),
+                                          child: Container(
+                                            margin: EdgeInsets.symmetric(
+                                              vertical: MQuery.height(0.005, context),
+                                              horizontal: MQuery.height(0.001, context)
+                                            ),
+                                            padding: EdgeInsets.all(MQuery.height(0.01, context)),
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(Radius.circular(7)),
+                                              color: Colors.grey[200]
+                                            ),
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Andreas", 
+                                                  style: TextStyle(
+                                                    color: Palette.primary,
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 13,
+                                                  )
+                                                ),
+                                                SizedBox(height: MQuery.height(0.005, context)),
+                                                Text(
+                                                  "Fantasies11!!", 
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 12,
+                                                    height: 1.25
+                                                  )
+                                                )
+                                              ]
+                                            )
+                                          )
+                                        ),
+                                        SizedBox(height: MQuery.height(0.005, context)),
                                         Row(
                                           children: [
                                             SizedBox(

@@ -38,7 +38,7 @@ class _ContactPickerState extends State<ContactPicker> {
           }
         ),
         title: Text(
-          "Invite members from contact",
+          "Invite collaborators from contact",
           style: TextStyle(
             fontSize: 18
           )
