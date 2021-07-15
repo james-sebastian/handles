@@ -20,6 +20,7 @@ class _HandlesPageState extends State<HandlesPage> {
   int lineCount = 4;
   int pinnedMinus = 1;
   Set<int> selectedChatIndex = Set();
+  bool isScrolled = false;
 
   void scrollToBottom(int bottomIndex) {
     _scrollController.jumpTo(
@@ -373,8 +374,13 @@ class _HandlesPageState extends State<HandlesPage> {
                   body: _chatListProvider.when(
                     data: (chatList){
 
-                      if(!isChatSelected){
-                        WidgetsBinding.instance!.addPostFrameCallback((_) => scrollToBottom(chatList.length));
+                      if(!isChatSelected && isScrolled == false){
+                        WidgetsBinding.instance!.addPostFrameCallback((_){
+                          scrollToBottom(chatList.length);
+                          setState(() {
+                            isScrolled = true;
+                          });
+                        });
                       }
 
                       return Column(

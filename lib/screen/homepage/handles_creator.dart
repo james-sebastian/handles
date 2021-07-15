@@ -261,7 +261,7 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Font.out(
-                            "Invite members:",
+                            "Invite collaborators:",
                             fontSize: 16,
                             fontWeight: FontWeight.w500
                           ),
@@ -457,7 +457,7 @@ class _AddMemberViaNumberDialogState extends State<AddMemberViaNumberDialog> {
                   children: [
                     SizedBox(height: MQuery.height(0.02, context)),
                     Text(
-                      "Add Member",
+                      "Add Collaborator",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 18,
