@@ -567,4 +567,38 @@ class ChatServices with ChangeNotifier{
     .doc(milestoneID)
     .delete();
   }
+
+  Future<void> deleteChat(String handlesID, String targetChatID, List<String> newDeletedBy) async{
+    return firestore
+    .collection('handles')
+    .doc(handlesID)
+    .collection('messages')
+    .doc(targetChatID)
+    .update({
+      "deletedBy": newDeletedBy
+    });
+  }
+
+  Future<void> pinChat(String handlesID, String targetChatID, bool pinValue) async{
+    return firestore
+    .collection('handles')
+    .doc(handlesID)
+    .collection('messages')
+    .doc(targetChatID)
+    .update({
+      "isPinned": pinValue
+    });
+  }
+
+  Stream<List<ChatModel>> getPinnedChats(String handlesID){
+    return firestore
+    .collection("handles")
+    .doc(handlesID)
+    .collection('messages')
+    .where('isPinned', isEqualTo: true)
+    .orderBy('timestamp', descending: false)
+    .snapshots()
+    .map(handlesChatsMapper);
+  }
+
 }
