@@ -8,6 +8,14 @@ final chatListProvider = StreamProvider.family<List<ChatModel>, String>(
   ).handlesChats(handlesID)
 );
 
+final pinnedChatListProvider = StreamProvider.family<List<ChatModel>, String>(
+  (ref, handlesID)  => ChatServices(
+    auth: ref.watch(firebaseAuthProvider),
+    firestore: ref.watch(firebaseFirestoreProvider),
+    storage: ref.watch(firebaseStorageProvider)
+  ).getPinnedChats(handlesID)
+);
+
 final meetChatProvider = StreamProvider.family<MeetingModel, String>(
   (ref, meetID)  => ChatServices(
     auth: ref.watch(firebaseAuthProvider),

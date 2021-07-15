@@ -11,32 +11,30 @@ class HandlesPage extends StatefulWidget {
 
 class _HandlesPageState extends State<HandlesPage> {
 
-  late ScrollController _scrollController;
+  late ItemScrollController _scrollController;
   TextEditingController chatController = TextEditingController();
   bool isSearchActive = false;
   bool isChatSelected = false;
   bool isChatting = false;
   int isFilterChipSelected = -1;
   int lineCount = 4;
-  final player = flutterSound.FlutterSoundRecorder();
-  Set<int> selectedChats = Set();
+  int pinnedMinus = 1;
+  Set<int> selectedChatIndex = Set();
 
-  void scrollToBottom() {
-    final bottomOffset = _scrollController.position.maxScrollExtent;
+  void scrollToBottom(int bottomIndex) {
     _scrollController.jumpTo(
-      bottomOffset
+      index: bottomIndex
     );
   }
 
   @override
   void initState() {
-    _scrollController = ScrollController();
+    _scrollController = ItemScrollController();
     super.initState();
   }
 
   @override
   void dispose() {
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -55,25 +53,25 @@ class _HandlesPageState extends State<HandlesPage> {
     void selectChat(int index){
       setState(() {
         isChatSelected = true;
-        selectedChats.add(index);
+        selectedChatIndex.add(index);
       });
     }
 
     void chatOnTap(int index){
       if(isChatSelected){
-        if(selectedChats.toList().indexOf(index) >= 0){
+        if(selectedChatIndex.toList().indexOf(index) >= 0){
           setState(() {
-            selectedChats.remove(index);
+            selectedChatIndex.remove(index);
           });
         } else {
           setState(() {
-            selectedChats.add(index);
+            selectedChatIndex.add(index);
           });
         }
       }
     }
 
-    if(selectedChats.isEmpty){
+    if(selectedChatIndex.isEmpty){
       setState(() {
         isChatSelected = false;
       });
@@ -92,11 +90,12 @@ class _HandlesPageState extends State<HandlesPage> {
     return Consumer(
       builder: (ctx, watch,child) {
 
+        final _chatProvider = watch(chatProvider);
         final _currentUserProvider = watch(currentUserProvider);
         final _chatListProvider = watch(chatListProvider(widget.handlesID));
+        final _userProvider = watch(userProvider);
         final _singleHandlesProvider = watch(singleHandlesProvider(widget.handlesID));
-        final _chatProvider = watch(chatProvider);
-        
+
         Future<List<UserModel>> getUserModelFromList(List<String> usersID) async{
           List<UserModel> userModel = [];
           
@@ -181,11 +180,9 @@ class _HandlesPageState extends State<HandlesPage> {
                       )
                     : isChatSelected
                     ? ListTile(
-                        contentPadding: EdgeInsets.only(
-                          right: MQuery.width(0.1, context)
-                        ),
+                        contentPadding: EdgeInsets.zero,
                         title: Font.out(
-                          "${selectedChats.length} chat(s) selected",
+                          "${selectedChatIndex.length} chat(s) selected",
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
                           textAlign: TextAlign.start,
@@ -215,9 +212,6 @@ class _HandlesPageState extends State<HandlesPage> {
                               ),
                               subtitle: Row(
                                 children: List.generate(snapshot.data!.length > 4 ? 4 : snapshot.data!.length, (index){
-
-                                  print(snapshot.data![index].name);
-
                                   return index < 4
                                   ? Font.out(
                                       snapshot.data![index].name.split(" ")[0] == currentUser.name.split(" ")[0]
@@ -261,33 +255,92 @@ class _HandlesPageState extends State<HandlesPage> {
                         )
                       else
                         if(isChatSelected)
-                          Row(
-                            children: [
-                              IconButton(
-                                padding: EdgeInsets.zero,
-                                tooltip: "Forward Message",
-                                icon: AdaptiveIcon(
-                                  android: Icons.subdirectory_arrow_right_sharp,
-                                  iOS: CupertinoIcons.forward,
-                                ),
-                                onPressed: (){}
-                              ),
-                              selectedChats.length == 1 //TODO: && CURRENT USER == SENDER
-                              ? IconButton(
-                                  tooltip: "Message Info",
-                                  icon: AdaptiveIcon(
-                                    android: Icons.info_outline_rounded,
-                                    iOS: CupertinoIcons.info_circle
+                          _chatListProvider.when(
+                            data: (chats){
+                              return Row(
+                                children: [
+                                  IconButton(
+                                    padding: EdgeInsets.zero,
+                                    tooltip: "Forward Message",
+                                    icon: AdaptiveIcon(
+                                      android: Icons.arrow_right_alt,
+                                      iOS: CupertinoIcons.arrow_turn_up_right,
+                                    ),
+                                    onPressed: (){}
                                   ),
-                                  onPressed: (){
-                                    Get.bottomSheet(
-                                      MessageInfoBottomSheet(index: selectedChats.first)
-                                    );
-                                  }
-                                )
-                              : SizedBox()
-                              //TODO: IF CURRENT USER == SENDER => DELETE ICON
-                            ]
+                                  IconButton(
+                                    tooltip: "Delete Message",
+                                    icon: AdaptiveIcon(
+                                      android: Icons.delete,
+                                      iOS: CupertinoIcons.trash,
+                                    ),
+                                    onPressed: (){
+                                      selectedChatIndex.forEach((element) {
+                                        List<String> newDeletedBy = chats[element].deletedBy;
+                                        newDeletedBy.add(currentUser.id);
+                                        _chatProvider.deleteChat(handles.id, chats[element].id, newDeletedBy).then((value){
+                                          setState(() {
+                                            isChatSelected = false;
+                                            selectedChatIndex = Set();
+                                          });
+                                        });
+                                      });
+                                    }
+                                  ),
+                                  handles.members[currentUser.id] == "Admin"
+                                  ? IconButton(
+                                      icon: AdaptiveIcon(
+                                        android: Icons.push_pin,
+                                        iOS: CupertinoIcons.pin_fill,
+                                        size: 20
+                                      ),
+                                      onPressed: (){
+                                        selectedChatIndex.forEach((element) {
+                                          bool newIsPinned = !(chats[element].isPinned);
+                                          _chatProvider.pinChat(handles.id, chats[element].id, newIsPinned).then((value){
+                                            setState(() {
+                                              isChatSelected = false;
+                                              selectedChatIndex = Set();
+                                            });
+                                          });
+                                        });
+                                      }
+                                    )
+                                  : SizedBox(),
+                                  selectedChatIndex.length == 1
+                                  ? IconButton(
+                                      padding: EdgeInsets.zero,
+                                      tooltip: "Reply Message",
+                                      icon: AdaptiveIcon(
+                                        android: Icons.reply,
+                                        iOS: CupertinoIcons.reply_thick_solid,
+                                      ),
+                                      onPressed: (){}
+                                    )
+                                  : SizedBox(),
+                                  selectedChatIndex.length == 1 && chats[selectedChatIndex.first].sender == currentUser.id
+                                  ? IconButton(
+                                      tooltip: "Message Info",
+                                      icon: AdaptiveIcon(
+                                        android: Icons.info_outline_rounded,
+                                        iOS: CupertinoIcons.info_circle
+                                      ),
+                                      onPressed: (){
+                                        Get.bottomSheet(
+                                          MessageInfoBottomSheet(index: selectedChatIndex.first)
+                                        );
+                                      }
+                                    )
+                                  : SizedBox()
+                                ]
+                              );
+                            },
+                            loading: (){
+                              return SizedBox();
+                            },
+                            error: (object , error){
+                              return SizedBox();
+                            }
                           )
                         else
                           Row(
@@ -321,7 +374,7 @@ class _HandlesPageState extends State<HandlesPage> {
                     data: (chatList){
 
                       if(!isChatSelected){
-                        WidgetsBinding.instance!.addPostFrameCallback((_) => scrollToBottom());
+                        WidgetsBinding.instance!.addPostFrameCallback((_) => scrollToBottom(chatList.length));
                       }
 
                       return Column(
@@ -382,71 +435,125 @@ class _HandlesPageState extends State<HandlesPage> {
                           SizedBox(),
                           isKeyboardOpen
                           ? SizedBox()
-                          : Expanded(
-                              flex: 4,
-                              child: InkWell(
-                                onTap: (){
-                                  //TODO: LOGIC: CALCULATE TARGET POSITION BY LIST'S INDEX
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.only(
-                                    left: MQuery.width(0.01, context),
-                                    right: MQuery.width(0.01, context)
-                                  ),
-                                  width: MQuery.width(1, context),
-                                  color: Colors.white,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "Pinned Message #5",
-                                            textAlign: TextAlign.start,
-                                            style: TextStyle(
-                                              color: Palette.primary,
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 13
+                          : Builder(
+                            builder: (context){
+
+                              List<ChatModel> pinnedChats = [];
+                              List<int> pinnedChatsIndex = [];
+
+                              for (var i = 0; i < chatList.length; i++) {
+                                if(chatList[i].isPinned == true){
+                                  pinnedChats.add(chatList[i]);
+                                  pinnedChatsIndex.add(i);
+                                } 
+                              }
+
+                              return pinnedChats.isEmpty
+                              ? SizedBox()
+                              : Expanded(
+                                flex: 4,
+                                child: InkWell(
+                                  onTap: (){
+
+                                    _scrollController.jumpTo(index: pinnedChatsIndex[pinnedChats.length - pinnedMinus]);
+
+                                    if(pinnedMinus == pinnedChats.length){
+                                      setState(() {
+                                        pinnedMinus = 1;
+                                      });
+                                    } else {
+                                      setState(() {
+                                        pinnedMinus++;
+                                      });
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.only(
+                                      left: MQuery.width(0.01, context),
+                                      right: MQuery.width(0.01, context)
+                                    ),
+                                    width: MQuery.width(1, context),
+                                    color: Colors.white,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              "Pinned Message #${(pinnedChats.length - pinnedMinus) + 1}",
+                                              textAlign: TextAlign.start,
+                                              style: TextStyle(
+                                                color: Palette.primary,
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 13
+                                              ),
                                             ),
-                                          ),
-                                          SizedBox(height: 2),
-                                          Text(
-                                            "Andy: Hello everyone, welcome to the Handles DevTeam! ...",
-                                            textAlign: TextAlign.start,
-                                            style: TextStyle(
-                                              color: Colors.black.withOpacity(0.5),
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 12
+                                            SizedBox(height: 2),
+                                            FutureBuilder<UserModel>(
+                                              future: _userProvider.getUserByID(pinnedChats[pinnedChats.length - pinnedMinus].sender),
+                                              builder: (context, snapshot) {
+
+                                                String name = "";
+                                                if(snapshot.hasData){
+                                                  name = snapshot.data!.name.split(" ")[0] == currentUser.name.split(" ")[0]
+                                                  ? "You"
+                                                  : snapshot.data!.name.split(" ")[0];
+                                                }
+
+                                                int targetIndex = pinnedChats.length - pinnedMinus;
+
+                                                return snapshot.hasData
+                                                ? Text(
+                                                    pinnedChats[targetIndex].content!.length > 40 && pinnedChats[targetIndex].type == ChatType.plain && pinnedChats[targetIndex].content != ""
+                                                    ? "$name: ${pinnedChats[targetIndex].content!.substring(0, 40)}..."
+                                                    : pinnedChats[targetIndex].type != ChatType.plain 
+                                                      ? "$name: ${
+                                                          pinnedChats[targetIndex].type == ChatType.image
+                                                          ? "Image"
+                                                          : pinnedChats[targetIndex].type == ChatType.image
+                                                            ? "Video"
+                                                            : "Docs"
+                                                        }"
+                                                      : "$name: ${pinnedChats[targetIndex].content}",
+                                                    textAlign: TextAlign.start,
+                                                    style: TextStyle(
+                                                      color: Colors.black.withOpacity(0.5),
+                                                      fontWeight: FontWeight.w400,
+                                                      fontSize: 12
+                                                    ),
+                                                  )
+                                                : SizedBox();
+                                              }
                                             ),
-                                          ),
-                                        ] 
-                                      ),
-                                      AdaptiveIcon(
-                                        android: Icons.push_pin,
-                                        iOS: CupertinoIcons.pin_fill,
-                                        size: 16
-                                      ),
-                                    ],
+                                          ] 
+                                        ),
+                                        AdaptiveIcon(
+                                          android: Icons.push_pin,
+                                          iOS: CupertinoIcons.pin_fill,
+                                          size: 16
+                                        ),
+                                      ],
+                                    )
                                   )
-                                ),
-                              )
-                            ),
+                                )
+                              );
+                            }
+                          ),
                           Expanded(
                             flex: isKeyboardOpen
                               ? 23
                               : isSearchActive
                                 ? 45
                                 : 50,
-                            child: ListView.builder(
-                              controller: _scrollController,
+                            child: ScrollablePositionedList.builder(
+                              itemScrollController: _scrollController,
                               reverse: false,
                               itemCount: chatList.length,
                               itemBuilder: (context, index){
                                 return Column(
-                                  children: [
-                                    
+                                  children: [    
                                     chatList[index].id == chatList.first.id
                                     ? SizedBox()
                                     : chatList[index].id == chatList[1].id
@@ -494,7 +601,8 @@ class _HandlesPageState extends State<HandlesPage> {
                                           isPinned: chatList[index].isPinned,
                                           selectChatMethod: selectChat,
                                           chatOnTap: chatOnTap,
-                                          selectedChats: selectedChats
+                                          selectedChats: selectedChatIndex,
+                                          deletedBy: chatList[index].deletedBy
                                         )
                                       : chatList[index].type == ChatType.image
                                       ? ImageChat(
@@ -515,7 +623,7 @@ class _HandlesPageState extends State<HandlesPage> {
                                           imageURL: chatList[index].mediaURL ?? "",
                                           selectChatMethod: selectChat,
                                           chatOnTap: chatOnTap,
-                                          selectedChats: selectedChats
+                                          selectedChats: selectedChatIndex
                                         )
                                       : chatList[index].type == ChatType.video
                                       ? VideoChat(
@@ -536,7 +644,7 @@ class _HandlesPageState extends State<HandlesPage> {
                                           videoURL: chatList[index].mediaURL ?? "",
                                           selectChatMethod: selectChat,
                                           chatOnTap: chatOnTap,
-                                          selectedChats: selectedChats
+                                          selectedChats: selectedChatIndex
                                         )
                                       : chatList[index].type == ChatType.docs 
                                       ? DocumentChat(
@@ -554,7 +662,7 @@ class _HandlesPageState extends State<HandlesPage> {
                                           documentURL: chatList[index].mediaURL ?? "",
                                           selectChatMethod: selectChat,
                                           chatOnTap: chatOnTap,
-                                          selectedChats: selectedChats
+                                          selectedChats: selectedChatIndex
                                         )
                                       : chatList[index].type == ChatType.meets
                                       ? watch(meetChatProvider(chatList[index].id)).when(
