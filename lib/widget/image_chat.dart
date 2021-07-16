@@ -13,6 +13,9 @@ class ImageChat extends ConsumerWidget {
   final Set<int> selectedChats;
   final void Function(int) chatOnTap;
   final void Function(int) selectChatMethod;
+  final void Function(int) scrollToTarget;
+  final int scrollLocation;
+  final ChatModel? replyTo;
 
   const ImageChat(
       {Key? key,
@@ -27,12 +30,17 @@ class ImageChat extends ConsumerWidget {
       required this.content,
       required this.selectChatMethod,
       required this.chatOnTap,
+      this.replyTo,
+      required this.scrollToTarget,
+      required this.scrollLocation,
       required this.selectedChats})
       : super(key: key);
 
   @override
   Widget build(BuildContext context, watch) {
     final _userProvider = watch(userProvider);
+
+    print(this.replyTo);
 
     return sender == this.userID
         ? FutureBuilder<UserModel>(
@@ -83,47 +91,83 @@ class ImageChat extends ConsumerWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  ConstrainedBox(
-                                      constraints: BoxConstraints(
-                                          maxHeight:
-                                              MQuery.height(0.15, context),
-                                          minWidth:
-                                              MQuery.width(0.35, context)),
-                                      child: Container(
-                                          margin: EdgeInsets.symmetric(
-                                              vertical:
-                                                  MQuery.height(0.005, context),
-                                              horizontal: MQuery.height(
-                                                  0.001, context)),
-                                          padding: EdgeInsets.all(
-                                              MQuery.height(0.01, context)),
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(7)),
-                                              color: Colors.grey[200]!
-                                                  .withOpacity(0.35)),
-                                          child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text("Andreas",
+                                  this.replyTo != null
+                                  ? GestureDetector(
+                                    onTap: (){
+                                      scrollToTarget(this.scrollLocation);
+                                    },
+                                    child: ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                            maxHeight:
+                                                MQuery.height(0.15, context),
+                                            minWidth:
+                                                MQuery.width(0.35, context)),
+                                        child: Container(
+                                            margin: EdgeInsets.symmetric(
+                                                vertical:
+                                                    MQuery.height(0.005, context),
+                                                horizontal: MQuery.height(
+                                                    0.001, context)),
+                                            padding: EdgeInsets.all(
+                                                MQuery.height(0.01, context)),
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(7)),
+                                                color: Colors.grey[200]!
+                                                    .withOpacity(0.35)),
+                                            child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  FutureBuilder<UserModel>(
+                                                    future: _userProvider.getUserByID(replyTo!.sender),
+                                                    builder: (context, snapshot) {
+                                                      return snapshot.hasData
+                                                      ? Text(
+                                                          snapshot.data!.name, 
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontWeight: FontWeight.w500,
+                                                            fontSize: 13,
+                                                          )
+                                                        )
+                                                      : SizedBox();
+                                                    }
+                                                  ),
+                                                  SizedBox(height: MQuery.height(0.005, context)),
+                                                  Text(
+                                                    replyTo!.type == ChatType.image
+                                                    ? "[Image] ${
+                                                          replyTo!.content!.length >= 35
+                                                          ? replyTo!.content!.substring(0, 32) + "..."
+                                                          : replyTo!.content!
+                                                        }"
+                                                    : replyTo!.type == ChatType.video
+                                                    ? "[Video] ${
+                                                          replyTo!.content!.length >= 35
+                                                          ? replyTo!.content!.substring(0, 32) + "..."
+                                                          : replyTo!.content!
+                                                        }"
+                                                    : replyTo!.type == ChatType.docs
+                                                    ? "[Docs] ${
+                                                          replyTo!.content!.length >= 35
+                                                          ? replyTo!.content!.substring(0, 32) + "..."
+                                                          : replyTo!.content!
+                                                        }"
+                                                    : replyTo!.content!.length >= 35
+                                                      ? replyTo!.content!.substring(0, 32) + "..."
+                                                      : replyTo!.content!, 
                                                     style: TextStyle(
                                                       color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontSize: 13,
-                                                    )),
-                                                SizedBox(
-                                                    height: MQuery.height(
-                                                        0.005, context)),
-                                                Text("Fantasies11!!",
-                                                    style: TextStyle(
-                                                        color: Colors.white
-                                                            .withOpacity(0.8),
-                                                        fontSize: 12,
-                                                        height: 1.25))
-                                              ]))),
+                                                      fontSize: 12,
+                                                      height: 1.25
+                                                    )
+                                                  )
+                                                ]))),
+                                  )
+                                  : SizedBox(
+                                      height: MQuery.height(0, context)),
                                   SizedBox(
                                       height: MQuery.height(0.005, context)),
                                   Stack(
@@ -318,46 +362,80 @@ class ImageChat extends ConsumerWidget {
                                   ],
                                 ),
                                 SizedBox(height: MQuery.height(0.005, context)),
-                                ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                    maxHeight: MQuery.height(0.15, context),
-                                    minWidth: double.infinity,
-                                  ),
-                                  child: Container(
-                                    margin: EdgeInsets.symmetric(
-                                      vertical: MQuery.height(0.005, context),
-                                      horizontal: MQuery.height(0.001, context)
-                                    ),
-                                    padding: EdgeInsets.all(MQuery.height(0.01, context)),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.all(Radius.circular(7)),
-                                      color: Colors.grey[200]
-                                    ),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Andreas", 
-                                          style: TextStyle(
-                                            color: Palette.primary,
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 13,
-                                          )
+                                this.replyTo != null
+                                ? GestureDetector(
+                                  onTap: (){
+                                    scrollToTarget(this.scrollLocation);
+                                  },
+                                  child: ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                        maxHeight: MQuery.height(0.15, context),
+                                        minWidth: double.infinity,
+                                      ),
+                                      child: Container(
+                                        margin: EdgeInsets.symmetric(
+                                          vertical: MQuery.height(0.005, context),
+                                          horizontal: MQuery.height(0.001, context)
                                         ),
-                                        SizedBox(height: MQuery.height(0.005, context)),
-                                        Text(
-                                          "Fantasies11!!", 
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 12,
-                                            height: 1.25
-                                          )
+                                        padding: EdgeInsets.all(MQuery.height(0.01, context)),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(Radius.circular(7)),
+                                          color: Colors.grey[200]
+                                        ),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            FutureBuilder<UserModel>(
+                                              future: _userProvider.getUserByID(replyTo!.sender),
+                                              builder: (context, snapshot) {
+                                                return snapshot.hasData
+                                                ? Text(
+                                                    snapshot.data!.name, 
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight: FontWeight.w500,
+                                                      fontSize: 13,
+                                                    )
+                                                  )
+                                                : SizedBox();
+                                              }
+                                            ),
+                                            SizedBox(height: MQuery.height(0.005, context)),
+                                            Text(
+                                              replyTo!.type == ChatType.image
+                                              ? "[Image] ${
+                                                    replyTo!.content!.length >= 35
+                                                    ? replyTo!.content!.substring(0, 32) + "..."
+                                                    : replyTo!.content!
+                                                  }"
+                                              : replyTo!.type == ChatType.video
+                                              ? "[Video] ${
+                                                    replyTo!.content!.length >= 35
+                                                    ? replyTo!.content!.substring(0, 32) + "..."
+                                                    : replyTo!.content!
+                                                  }"
+                                              : replyTo!.type == ChatType.docs
+                                              ? "[Docs] ${
+                                                    replyTo!.content!.length >= 35
+                                                    ? replyTo!.content!.substring(0, 32) + "..."
+                                                    : replyTo!.content!
+                                                  }"
+                                              : replyTo!.content!.length >= 35
+                                                ? replyTo!.content!.substring(0, 32) + "..."
+                                                : replyTo!.content!, 
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12,
+                                                height: 1.25
+                                              )
+                                            )
+                                          ]
                                         )
-                                      ]
-                                    )
-                                  )
-                                ),
+                                      )
+                                    ),
+                                )
+                                : SizedBox(),
                                 GestureDetector(
                                   onTap: () {
                                     Get.to(() => ImagePreviewer(

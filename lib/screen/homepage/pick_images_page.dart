@@ -2,8 +2,9 @@ part of "../pages.dart";
 
 class PickImagesPage extends StatefulWidget {
 
+  final String replyTo;
   final String handlesID;
-  const PickImagesPage({ Key? key, required this.handlesID }) : super(key: key);
+  const PickImagesPage({ Key? key, required this.handlesID, required this.replyTo }) : super(key: key);
 
   @override
   _PickImagesPageState createState() => _PickImagesPageState();
@@ -125,6 +126,7 @@ class _PickImagesPageState extends State<PickImagesPage> {
                   );
                 } else {
                   Get.to(() => PreviewImagesPage(
+                    replyTo: widget.replyTo,
                     handlesID: widget.handlesID,
                     selectedEntities: selectedEntities,
                   ), transition: Transition.cupertino);

@@ -4,8 +4,9 @@ class PreviewVideosPage extends StatefulWidget {
 
   final Set<AssetEntity> selectedEntities;
   final String handlesID;
+  final String replyTo;
 
-  const PreviewVideosPage({ Key? key, required this.selectedEntities, required this.handlesID}) : super(key: key);
+  const PreviewVideosPage({ Key? key, required this.selectedEntities, required this.handlesID, required this.replyTo}) : super(key: key);
 
   @override
   _PreviewVideosPageState createState() => _PreviewVideosPageState();
@@ -83,6 +84,7 @@ class _PreviewVideosPageState extends State<PreviewVideosPage> {
                             _chatProvider.sendVideoChat(
                               widget.handlesID,
                               ChatModel(
+                                replyTo: widget.replyTo,
                                 id: Uuid().v4(),
                                 type: ChatType.image,
                                 content: chatController.text,

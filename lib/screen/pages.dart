@@ -15,7 +15,6 @@ import 'package:flutter_hex_color/flutter_hex_color.dart';
 import 'package:flutter_linkify/flutter_linkify.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_sound/public/flutter_sound_recorder.dart' as flutterSound;
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:handles/config/config.dart';

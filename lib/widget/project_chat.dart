@@ -394,7 +394,6 @@ class _ProjectChatState extends State<ProjectChat> {
                         ),
                       ),
                       SizedBox(height: MQuery.height(0.01, context)),
-                      //TODO: CHECK IF CURRENT USER ROLE == CLIENT =x DISPLAY DETAIL
                       widget.projectModel.paymentStatus == ProjectPaymentStatus.paid
                       ? Button(
                           height: MQuery.height(0.045, context),
