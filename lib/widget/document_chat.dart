@@ -15,6 +15,7 @@ class DocumentChat extends StatefulWidget {
   final void Function(int) selectChatMethod;
   final int scrollLocation;
   final void Function(int) scrollToTarget;
+  final List<String> deletedBy;
 
   const DocumentChat({
     Key? key,
@@ -31,7 +32,8 @@ class DocumentChat extends StatefulWidget {
     required this.chatOnTap,
     required this.selectedChats,
     required this.scrollToTarget,
-    required this.scrollLocation
+    required this.scrollLocation,
+    required this.deletedBy
   }) : super(key: key);
 
   @override
@@ -67,7 +69,9 @@ class _DocumentChatState extends State<DocumentChat> {
       return name.substring(location + 1, name.length);
     }
 
-    return Consumer(
+    return widget.deletedBy.indexOf(widget.userID) >= 0
+    ? SizedBox()
+    : Consumer(
       builder: (ctx, watch, child) {
         final _userProvider = watch(userProvider);
 

@@ -273,7 +273,16 @@ class _HandlesPageState extends State<HandlesPage> {
                                       android: Icons.arrow_right_alt,
                                       iOS: CupertinoIcons.arrow_turn_up_right,
                                     ),
-                                    onPressed: (){}
+                                    onPressed: (){
+                                      List<ChatModel> selectedChat = [];
+                                      selectedChatIndex.forEach((element) {
+                                        selectedChat.add(chats[element]);
+                                      });
+                                      Get.to(() => ForwardMessagePage(
+                                        originHandlesID: handles.id,
+                                        selectedMessages: selectedChat,
+                                      ), transition: Transition.cupertino);
+                                    }
                                   ),
                                   IconButton(
                                     tooltip: "Delete Message",
@@ -642,6 +651,7 @@ class _HandlesPageState extends State<HandlesPage> {
                                         )
                                       : chatList[index].type == ChatType.image
                                       ? ImageChat(
+                                          deletedBy: chatList[index].deletedBy,
                                           replyTo: replyToModel,
                                           userID: currentUser.id,
                                           index: index,
@@ -668,6 +678,7 @@ class _HandlesPageState extends State<HandlesPage> {
                                         )
                                       : chatList[index].type == ChatType.video
                                       ? VideoChat(
+                                          deletedBy: chatList[index].deletedBy,
                                           replyTo: replyToModel,
                                           userID: currentUser.id,
                                           index: index,
@@ -694,6 +705,7 @@ class _HandlesPageState extends State<HandlesPage> {
                                         )
                                       : chatList[index].type == ChatType.docs 
                                       ? DocumentChat(
+                                          deletedBy: chatList[index].deletedBy,
                                           replyTo: replyToModel,
                                           index: index,
                                           userID: currentUser.id,

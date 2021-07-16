@@ -16,6 +16,7 @@ class VideoChat extends StatefulWidget {
   final void Function(int) selectChatMethod;
   final int scrollLocation;
   final void Function(int) scrollToTarget;
+  final List<String> deletedBy;
 
   const VideoChat({
     Key? key,
@@ -33,6 +34,7 @@ class VideoChat extends StatefulWidget {
     required this.selectedChats,
     required this.scrollToTarget,
     required this.scrollLocation,
+    required this.deletedBy,
     this.replyTo,
   }) : super(key: key);
 
@@ -58,7 +60,9 @@ class _VideoChatState extends State<VideoChat> {
       return fileName;
     }
 
-    return Consumer(
+    return widget.deletedBy.indexOf(widget.userID) >= 0
+    ? SizedBox()
+    : Consumer(
       builder: (ctx, watch,child) {
 
         final _userProvider = watch(userProvider);

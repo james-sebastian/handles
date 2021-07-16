@@ -65,3 +65,4 @@ part 'homepage/handles_medias_page.dart';
 part 'homepage/active_subscription_page.dart';
 part 'homepage/handles_creator.dart';
 part 'homepage/contact_picker.dart';
+part 'homepage/forward_message_page.dart';
