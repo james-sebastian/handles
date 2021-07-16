@@ -16,10 +16,12 @@ class ImageChat extends ConsumerWidget {
   final void Function(int) scrollToTarget;
   final int scrollLocation;
   final ChatModel? replyTo;
+  final List<String> deletedBy;
 
   const ImageChat(
       {Key? key,
       required this.userID,
+      required this.deletedBy,
       required this.index,
       required this.timestamp,
       required this.sender,
@@ -42,7 +44,9 @@ class ImageChat extends ConsumerWidget {
 
     print(this.replyTo);
 
-    return sender == this.userID
+    return deletedBy.indexOf(userID) >= 0
+    ? SizedBox()
+    : sender == this.userID
         ? FutureBuilder<UserModel>(
             future: _userProvider.getUserByID(this.sender),
             builder: (context, snapshot) {
