@@ -3,9 +3,10 @@ part of "../pages.dart";
 class PreviewImagesPage extends StatefulWidget {
 
   final String handlesID;
+  final String replyTo;
   final Set<AssetEntity> selectedEntities;
 
-  const PreviewImagesPage({ Key? key, required this.selectedEntities, required this.handlesID}) : super(key: key);
+  const PreviewImagesPage({ Key? key, required this.selectedEntities, required this.handlesID,  required this.replyTo}) : super(key: key);
 
   @override
   _PreviewImagesPageState createState() => _PreviewImagesPageState();
@@ -72,6 +73,7 @@ class _PreviewImagesPageState extends State<PreviewImagesPage> {
                             _chatProvider.sendImageChat(
                               widget.handlesID,
                               ChatModel(
+                                replyTo: widget.replyTo,
                                 id: Uuid().v4(),
                                 type: ChatType.image,
                                 content: chatController.text,

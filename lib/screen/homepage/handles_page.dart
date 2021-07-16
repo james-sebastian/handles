@@ -16,15 +16,23 @@ class _HandlesPageState extends State<HandlesPage> {
   bool isSearchActive = false;
   bool isChatSelected = false;
   bool isChatting = false;
+  bool isScrolled = false;
+  ChatModel? isReplying;
   int isFilterChipSelected = -1;
   int lineCount = 4;
   int pinnedMinus = 1;
   Set<int> selectedChatIndex = Set();
-  bool isScrolled = false;
 
   void scrollToBottom(int bottomIndex) {
     _scrollController.jumpTo(
       index: bottomIndex
+    );
+  }
+
+  void scrollToTargetFromChild(int targetIndex){
+    _scrollController.scrollTo(
+      index: targetIndex,
+      duration: Duration(milliseconds: 250)
     );
   }
 
@@ -99,13 +107,11 @@ class _HandlesPageState extends State<HandlesPage> {
 
         Future<List<UserModel>> getUserModelFromList(List<String> usersID) async{
           List<UserModel> userModel = [];
-          
           usersID.forEach((id) {
             watch(userProvider).getUserByID(id).then((value){
               userModel.add(value);
             });
           });
-
           return userModel;
         }
 
@@ -183,7 +189,7 @@ class _HandlesPageState extends State<HandlesPage> {
                     ? ListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Font.out(
-                          "${selectedChatIndex.length} chat(s) selected",
+                          "${selectedChatIndex.length} selected",
                           fontSize: 18,
                           fontWeight: FontWeight.w500,
                           textAlign: TextAlign.start,
@@ -316,7 +322,14 @@ class _HandlesPageState extends State<HandlesPage> {
                                         android: Icons.reply,
                                         iOS: CupertinoIcons.reply_thick_solid,
                                       ),
-                                      onPressed: (){}
+                                      onPressed: (){
+                                        // print(chats[selectedChatIndex.first].content);
+                                        setState(() {
+                                          isReplying = chats[selectedChatIndex.first];
+                                          isChatSelected = false;
+                                          selectedChatIndex = Set();
+                                        });
+                                      }
                                     )
                                   : SizedBox(),
                                   selectedChatIndex.length == 1 && chats[selectedChatIndex.first].sender == currentUser.id
@@ -461,7 +474,10 @@ class _HandlesPageState extends State<HandlesPage> {
                                 child: InkWell(
                                   onTap: (){
 
-                                    _scrollController.jumpTo(index: pinnedChatsIndex[pinnedChats.length - pinnedMinus]);
+                                    _scrollController.scrollTo(
+                                      index: pinnedChatsIndex[pinnedChats.length - pinnedMinus],
+                                      duration: Duration(milliseconds: 250)
+                                    );
 
                                     if(pinnedMinus == pinnedChats.length){
                                       setState(() {
@@ -548,16 +564,25 @@ class _HandlesPageState extends State<HandlesPage> {
                             }
                           ),
                           Expanded(
-                            flex: isKeyboardOpen
+                            flex: isKeyboardOpen && isReplying != null
+                              ? 20
+                              : isKeyboardOpen
                               ? 23
                               : isSearchActive
                                 ? 45
-                                : 50,
+                                : 48,
                             child: ScrollablePositionedList.builder(
                               itemScrollController: _scrollController,
                               reverse: false,
                               itemCount: chatList.length,
                               itemBuilder: (context, index){
+
+                                ChatModel? replyToModel = chatList[index].replyTo != ""
+                                ? chatList.firstWhere((element) => element.id == chatList[index].replyTo)
+                                : null;
+
+                                print(replyToModel);
+
                                 return Column(
                                   children: [    
                                     chatList[index].id == chatList.first.id
@@ -608,10 +633,16 @@ class _HandlesPageState extends State<HandlesPage> {
                                           selectChatMethod: selectChat,
                                           chatOnTap: chatOnTap,
                                           selectedChats: selectedChatIndex,
-                                          deletedBy: chatList[index].deletedBy
+                                          deletedBy: chatList[index].deletedBy,
+                                          replyTo: replyToModel,
+                                          scrollToTarget: scrollToTargetFromChild,
+                                          scrollLocation: replyToModel == null
+                                          ? 0
+                                          : chatList.indexWhere((element) => element.id == replyToModel.id),
                                         )
                                       : chatList[index].type == ChatType.image
                                       ? ImageChat(
+                                          replyTo: replyToModel,
                                           userID: currentUser.id,
                                           index: index,
                                           timestamp: chatList[index].timestamp,
@@ -629,10 +660,15 @@ class _HandlesPageState extends State<HandlesPage> {
                                           imageURL: chatList[index].mediaURL ?? "",
                                           selectChatMethod: selectChat,
                                           chatOnTap: chatOnTap,
-                                          selectedChats: selectedChatIndex
+                                          selectedChats: selectedChatIndex,
+                                          scrollToTarget: scrollToTargetFromChild,
+                                          scrollLocation: replyToModel == null
+                                          ? 0
+                                          : chatList.indexWhere((element) => element.id == replyToModel.id),
                                         )
                                       : chatList[index].type == ChatType.video
                                       ? VideoChat(
+                                          replyTo: replyToModel,
                                           userID: currentUser.id,
                                           index: index,
                                           timestamp: chatList[index].timestamp,
@@ -650,10 +686,15 @@ class _HandlesPageState extends State<HandlesPage> {
                                           videoURL: chatList[index].mediaURL ?? "",
                                           selectChatMethod: selectChat,
                                           chatOnTap: chatOnTap,
-                                          selectedChats: selectedChatIndex
+                                          selectedChats: selectedChatIndex,
+                                          scrollToTarget: scrollToTargetFromChild,
+                                          scrollLocation: replyToModel == null
+                                          ? 0
+                                          : chatList.indexWhere((element) => element.id == replyToModel.id),
                                         )
                                       : chatList[index].type == ChatType.docs 
                                       ? DocumentChat(
+                                          replyTo: replyToModel,
                                           index: index,
                                           userID: currentUser.id,
                                           timestamp: chatList[index].timestamp,
@@ -668,7 +709,11 @@ class _HandlesPageState extends State<HandlesPage> {
                                           documentURL: chatList[index].mediaURL ?? "",
                                           selectChatMethod: selectChat,
                                           chatOnTap: chatOnTap,
-                                          selectedChats: selectedChatIndex
+                                          selectedChats: selectedChatIndex,
+                                          scrollToTarget: scrollToTargetFromChild,
+                                          scrollLocation: replyToModel == null
+                                          ? 0
+                                          : chatList.indexWhere((element) => element.id == replyToModel.id),
                                         )
                                       : chatList[index].type == ChatType.meets
                                       ? watch(meetChatProvider(chatList[index].id)).when(
@@ -730,7 +775,13 @@ class _HandlesPageState extends State<HandlesPage> {
                             ),
                           ),
                           Expanded(
-                            flex: isKeyboardOpen ? lineCount : 5,
+                            flex: isKeyboardOpen && isReplying != null
+                              ? lineCount + 8
+                              : isKeyboardOpen
+                              ? lineCount
+                              : isReplying != null
+                              ? 11
+                              : 5,
                             child: Container(
                               padding: EdgeInsets.only(
                                 left: MQuery.height(0.015, context),
@@ -739,42 +790,156 @@ class _HandlesPageState extends State<HandlesPage> {
                               ),
                               color: Palette.handlesBackground,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Expanded(
                                     flex: 6,
                                     child: Container(
-                                      height: 200,
                                       padding: EdgeInsets.only(
-                                        left: MQuery.width(0.02, context),
-                                        right: MQuery.width(0.02, context),
-                                        top:  MQuery.width(0.004, context)
+                                        left: MQuery.width(0.01, context),
+                                        right: MQuery.width(0.01, context),
+                                        top: isKeyboardOpen && isReplying != null ? MQuery.width(0.015, context) : MQuery.width(0, context),
+                                        bottom: MQuery.width(0.005, context),
                                       ),
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius: BorderRadius.all(Radius.circular(50 - (lineCount * 4)))
+                                        borderRadius: BorderRadius.all(
+                                          isReplying != null
+                                          ? Radius.circular(15)
+                                          : Radius.circular(50 - (lineCount * 4))
+                                        )
                                       ),
                                       child: Align(
                                         alignment: Alignment.centerLeft,
-                                        child: TextFormField(
-                                          keyboardType: TextInputType.multiline,
-                                          controller: chatController,
-                                          maxLines: 6,
-                                          decoration: InputDecoration(
-                                            hintText: "Type a message",
-                                            border: InputBorder.none
-                                          ),
-                                          onChanged: (String value){
-                                            if(value.indexOf("\n") >= 0){
-                                              if(lineCount <= 8){
-                                                setState(() {
-                                                  lineCount++;
-                                                });
+                                        child: isReplying != null
+                                        ? Column(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            children: [
+                                              ConstrainedBox(
+                                                constraints: BoxConstraints(
+                                                  maxHeight: MQuery.height(0.15, context),
+                                                  minWidth: MQuery.width(0.35, context)
+                                                ),
+                                                child: Container(
+                                                  margin: EdgeInsets.symmetric(
+                                                    vertical: MQuery.height(0.005, context),
+                                                    horizontal: MQuery.height(0.001, context)
+                                                  ),
+                                                  padding: EdgeInsets.all(MQuery.height(0.01, context)),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.all(Radius.circular(7)),
+                                                    color: Colors.grey[200]
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Column(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          FutureBuilder<UserModel>(
+                                                            future: _userProvider.getUserByID(isReplying!.sender),
+                                                            builder: (context, snapshot) {
+                                                              return snapshot.hasData
+                                                              ? Text(
+                                                                  snapshot.data!.name, 
+                                                                  style: TextStyle(
+                                                                    color: Palette.primary,
+                                                                    fontWeight: FontWeight.w500,
+                                                                    fontSize: 13,
+                                                                  )
+                                                                )
+                                                              : SizedBox();
+                                                            }
+                                                          ),
+                                                          SizedBox(height: MQuery.height(0.005, context)),
+                                                          Text(
+                                                            isReplying!.type == ChatType.image
+                                                            ? "[Image] ${
+                                                                  isReplying!.content!.length >= 35
+                                                                  ? isReplying!.content!.substring(0, 32) + "..."
+                                                                  : isReplying!.content!
+                                                                }"
+                                                            : isReplying!.type == ChatType.video
+                                                            ? "[Video] ${
+                                                                  isReplying!.content!.length >= 35
+                                                                  ? isReplying!.content!.substring(0, 32) + "..."
+                                                                  : isReplying!.content!
+                                                                }"
+                                                            : isReplying!.type == ChatType.docs
+                                                            ? "[Docs] ${
+                                                                  isReplying!.content!.length >= 35
+                                                                  ? isReplying!.content!.substring(0, 32) + "..."
+                                                                  : isReplying!.content!
+                                                                }"
+                                                            : isReplying!.content!.length >= 35
+                                                              ? isReplying!.content!.substring(0, 32) + "..."
+                                                              : isReplying!.content!, 
+                                                            style: TextStyle(
+                                                              color: Colors.black,
+                                                              fontSize: 12,
+                                                              height: 1.25
+                                                            )
+                                                          )
+                                                        ]
+                                                      ),
+                                                      GestureDetector(
+                                                        onTap: (){
+                                                          setState(() {
+                                                            isReplying = null;
+                                                          });
+                                                        },
+                                                        child: Icon(
+                                                          Icons.close,
+                                                          size: 16
+                                                        ),
+                                                      )
+                                                    ],
+                                                  )
+                                                )
+                                              ),
+                                              SizedBox(height: MQuery.height(0, context)),
+                                              TextFormField(
+                                                keyboardType: TextInputType.multiline,
+                                                controller: chatController,
+                                                maxLines: isKeyboardOpen && isReplying != null
+                                                ? 2
+                                                : isChatting ? 6 : 1,
+                                                decoration: InputDecoration(
+                                                  hintText: "Type a message",
+                                                  border: InputBorder.none
+                                                ),
+                                                onChanged: (String value){
+                                                  if(value.indexOf("\n") >= 0){
+                                                    if(lineCount <= 8){
+                                                      setState(() {
+                                                        lineCount++;
+                                                      });
+                                                    }
+                                                  }
+                                                },
+                                              ),
+                                            ],
+                                          )
+                                        : TextFormField(
+                                            keyboardType: TextInputType.multiline,
+                                            controller: chatController,
+                                            maxLines: isChatting ? 6 : 1,
+                                            decoration: InputDecoration(
+                                              hintText: "Type a message",
+                                              border: InputBorder.none
+                                            ),
+                                            onChanged: (String value){
+                                              if(value.indexOf("\n") >= 0){
+                                                if(lineCount <= 8){
+                                                  setState(() {
+                                                    lineCount++;
+                                                  });
+                                                }
                                               }
-                                            }
-                                          },
-                                        ),
+                                            },
+                                          ),
                                       )
                                     ),
                                   ),
@@ -791,6 +956,7 @@ class _HandlesPageState extends State<HandlesPage> {
                                                 id: Uuid().v4(),
                                                 type: ChatType.plain,
                                                 content: chatController.text,
+                                                replyTo: isReplying != null ? isReplying!.id : "",
                                                 readBy: [],
                                                 deletedBy: [],
                                                 timestamp: DateTime.now(),
@@ -842,6 +1008,7 @@ class _HandlesPageState extends State<HandlesPage> {
                                                             onPressed: () {
                                                               Get.back();
                                                               Get.to(() => PickImagesPage(
+                                                                replyTo: isReplying != null ? isReplying!.id : "",
                                                                 handlesID: widget.handlesID
                                                               ), transition: Transition.cupertino);
                                                             },
@@ -860,6 +1027,7 @@ class _HandlesPageState extends State<HandlesPage> {
                                                             onPressed: () {
                                                               Get.back();
                                                               Get.to(() => PickVideosPage(
+                                                                replyTo: isReplying != null ? isReplying!.id : "",
                                                                 handlesID: widget.handlesID,
                                                               ), transition: Transition.cupertino);
                                                             },
@@ -919,6 +1087,7 @@ class _HandlesPageState extends State<HandlesPage> {
                                                                                     id: Uuid().v4(),
                                                                                     type: ChatType.docs,
                                                                                     content: chatController.text,
+                                                                                    replyTo: isReplying != null ? isReplying!.id : "",
                                                                                     mediaURL: mediaURL,
                                                                                     readBy: [],
                                                                                     deletedBy: [],
@@ -968,6 +1137,7 @@ class _HandlesPageState extends State<HandlesPage> {
                                                                                     id: Uuid().v4(),
                                                                                     type: ChatType.docs,
                                                                                     content: chatController.text,
+                                                                                    replyTo: isReplying != null ? isReplying!.id : "",
                                                                                     mediaURL: mediaURL,
                                                                                     readBy: [],
                                                                                     deletedBy: [],

@@ -98,6 +98,7 @@ class ChatServices with ChangeNotifier{
         content: chat['content'] ?? "",
         mediaURL: chat['mediaURL'] ?? "",
         isPinned: chat['isPinned'],
+        replyTo: chat['replyTo'] ?? "",
         readBy: (chat['readBy'] as List<dynamic>).cast<String>(),
         deletedBy: (chat['deletedBy'] as List<dynamic>).cast<String>(),
         timestamp: DateTime.parse(chat['timestamp'])
@@ -121,7 +122,8 @@ class ChatServices with ChangeNotifier{
       "timestamp": DateTime.now().toString(),
       "isPinned": false,
       "deletedBy": [],
-      "readBy": []
+      "readBy": [],
+      "replyTo": chat.replyTo
     });
   }
 
@@ -160,7 +162,8 @@ class ChatServices with ChangeNotifier{
       "timestamp": DateTime.now().toString(),
       "isPinned": false,
       "deletedBy": [],
-      "readBy": []
+      "readBy": [],
+      "replyTo": chat.replyTo
     });
   }
 
@@ -206,7 +209,8 @@ class ChatServices with ChangeNotifier{
       "timestamp": DateTime.now().toString(),
       "isPinned": false,
       "deletedBy": [],
-      "readBy": []
+      "readBy": [],
+      "replyTo": chat.replyTo
     });
   }
 
@@ -245,7 +249,8 @@ class ChatServices with ChangeNotifier{
       "timestamp": DateTime.now().toString(),
       "isPinned": false,
       "deletedBy": [],
-      "readBy": []
+      "readBy": [],
+      "replyTo": chat.replyTo
     });
   }
 
