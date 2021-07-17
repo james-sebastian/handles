@@ -2,8 +2,9 @@ part of "widgets.dart";
 
 class MessageInfoBottomSheet extends ConsumerWidget {
 
-  final int index; //TODO: MESSAGE UID FOR EVEN MORE FLEXIBILITY
-  const MessageInfoBottomSheet({ Key? key, required this.index }) : super(key: key);
+  final int index;
+  final ChatModel chatModel;
+  const MessageInfoBottomSheet({ Key? key, required this.index, required this.chatModel }) : super(key: key);
 
   @override
   Widget build(BuildContext context, watch) {
@@ -44,23 +45,33 @@ class MessageInfoBottomSheet extends ConsumerWidget {
                             textAlign: TextAlign.start,
                             color: Colors.black.withOpacity(0.75)
                           ),
-                          ListTile(
-                            contentPadding: EdgeInsets.fromLTRB(
-                              MQuery.width(0, context),
-                              MQuery.height(0.01, context),
-                              MQuery.width(0, context),
-                              0,
-                            ),
-                            leading: CircleAvatar(
-                              backgroundColor: Palette.primary,
-                              radius: MQuery.height(0.025, context),
-                            ),
-                            title: Font.out(
-                              "${snapshot.data!.name} (You)",
-                              fontSize: 16,
-                              fontWeight: FontWeight.normal,
-                              textAlign: TextAlign.start
-                            ),
+                          FutureBuilder<UserModel>(
+                            future: watch(userProvider).getUserByID(this.chatModel.sender),
+                            builder: (context, snapshot) {
+                              return snapshot.hasData
+                              ? ListTile(
+                                  contentPadding: EdgeInsets.fromLTRB(
+                                    MQuery.width(0, context),
+                                    MQuery.height(0.01, context),
+                                    MQuery.width(0, context),
+                                    0,
+                                  ),
+                                  leading: CircleAvatar(
+                                    backgroundColor: Palette.primary,
+                                    radius: MQuery.height(0.025, context),
+                                    backgroundImage: snapshot.data!.profilePicture != ""
+                                    ? NetworkImage(snapshot.data!.profilePicture!) as ImageProvider
+                                    : AssetImage("assets/sample_profile.png"),
+                                  ),
+                                  title: Font.out(
+                                    "${snapshot.data!.name} (You)",
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.normal,
+                                    textAlign: TextAlign.start
+                                  ),
+                                )
+                              : SizedBox();
+                            }
                           ),
                         ],
                       ),
@@ -77,25 +88,35 @@ class MessageInfoBottomSheet extends ConsumerWidget {
                       flex: 7,
                       child: Container(
                         child: ListView.builder(
-                          itemCount: 5,
+                          itemCount: this.chatModel.readBy.length,
                           itemBuilder: (context, index){
-                            return ListTile(
-                              contentPadding: EdgeInsets.fromLTRB(
-                                MQuery.width(0, context),
-                                MQuery.height(0.01, context),
-                                MQuery.width(0, context),
-                                0,
-                              ),
-                              leading: CircleAvatar(
-                                backgroundColor: Palette.primary,
-                                radius: MQuery.height(0.025, context),
-                              ),
-                              title: Font.out(
-                                "Clark Kent",
-                                fontSize: 16,
-                                fontWeight: FontWeight.normal,
-                                textAlign: TextAlign.start
-                              ),
+                            return FutureBuilder<UserModel>(
+                              future: watch(userProvider).getUserByID(this.chatModel.readBy[index]),
+                              builder: (context, snapshot) {
+                                return snapshot.hasData
+                                ? ListTile(
+                                    contentPadding: EdgeInsets.fromLTRB(
+                                      MQuery.width(0, context),
+                                      MQuery.height(0.01, context),
+                                      MQuery.width(0, context),
+                                      0,
+                                    ),
+                                    leading: CircleAvatar(
+                                      backgroundColor: Palette.primary,
+                                      radius: MQuery.height(0.025, context),
+                                      backgroundImage: snapshot.data!.profilePicture != ""
+                                      ? NetworkImage(snapshot.data!.profilePicture!) as ImageProvider
+                                      : AssetImage("assets/sample_profile.png"),
+                                    ),
+                                    title: Font.out(
+                                      "${snapshot.data!.name} (You)",
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.normal,
+                                      textAlign: TextAlign.start
+                                    ),
+                                  )
+                                : SizedBox();
+                              }
                             );
                           },
                         ),

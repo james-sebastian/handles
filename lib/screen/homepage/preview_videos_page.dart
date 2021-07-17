@@ -100,7 +100,7 @@ class _PreviewVideosPageState extends State<PreviewVideosPage> {
                         });
                       });
         
-                      Get.offAll(() => HandlesPage(handlesID: widget.handlesID), transition: Transition.cupertino);
+                      Get.offAll(() => Homepage(), transition: Transition.cupertino);
                     },
                   )
                 ]
