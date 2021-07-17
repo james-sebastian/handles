@@ -606,4 +606,14 @@ class ChatServices with ChangeNotifier{
     .map(handlesChatsMapper);
   }
 
+  Future<void> readChat(String handlesID, String chatID, List<String> newReadBy){
+    return firestore
+    .collection("handles")
+    .doc(handlesID)
+    .collection('messages')
+    .doc(chatID)
+    .update({
+      "readBy": newReadBy
+    });
+  }
 }

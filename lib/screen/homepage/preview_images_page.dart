@@ -89,7 +89,7 @@ class _PreviewImagesPageState extends State<PreviewImagesPage> {
                         });
                       });
 
-                      Get.offAll(() => HandlesPage(handlesID: widget.handlesID), transition: Transition.cupertino);
+                      Get.offAll(() => Homepage(), transition: Transition.cupertino);
                     },
                   )
                 ]

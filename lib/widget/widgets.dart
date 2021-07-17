@@ -19,6 +19,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:http/http.dart' as http;
+import 'package:visibility_detector/visibility_detector.dart';
 
 part 'plain_chat.dart';
 part 'button.dart';

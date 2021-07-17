@@ -350,7 +350,10 @@ class _HandlesPageState extends State<HandlesPage> {
                                       ),
                                       onPressed: (){
                                         Get.bottomSheet(
-                                          MessageInfoBottomSheet(index: selectedChatIndex.first)
+                                          MessageInfoBottomSheet(
+                                            index: selectedChatIndex.first,
+                                            chatModel: chats[selectedChatIndex.first]
+                                          )
                                         );
                                       }
                                     )
@@ -627,6 +630,8 @@ class _HandlesPageState extends State<HandlesPage> {
                                         )
                                       : chatList[index].type == ChatType.plain
                                       ? PlainChat(
+                                          handlesID: handles.id,
+                                          chatID: chatList[index].id,
                                           userID: currentUser.id,
                                           index: index,
                                           timestamp: chatList[index].timestamp,
@@ -643,6 +648,7 @@ class _HandlesPageState extends State<HandlesPage> {
                                           chatOnTap: chatOnTap,
                                           selectedChats: selectedChatIndex,
                                           deletedBy: chatList[index].deletedBy,
+                                          readBy: chatList[index].readBy,
                                           replyTo: replyToModel,
                                           scrollToTarget: scrollToTargetFromChild,
                                           scrollLocation: replyToModel == null
@@ -651,7 +657,10 @@ class _HandlesPageState extends State<HandlesPage> {
                                         )
                                       : chatList[index].type == ChatType.image
                                       ? ImageChat(
+                                          handlesID: handles.id,
+                                          chatID: chatList[index].id,
                                           deletedBy: chatList[index].deletedBy,
+                                          readBy: chatList[index].readBy,
                                           replyTo: replyToModel,
                                           userID: currentUser.id,
                                           index: index,
@@ -678,7 +687,10 @@ class _HandlesPageState extends State<HandlesPage> {
                                         )
                                       : chatList[index].type == ChatType.video
                                       ? VideoChat(
+                                          handlesID: handles.id,
+                                          chatID: chatList[index].id,
                                           deletedBy: chatList[index].deletedBy,
+                                          readBy: chatList[index].readBy,
                                           replyTo: replyToModel,
                                           userID: currentUser.id,
                                           index: index,
@@ -705,8 +717,10 @@ class _HandlesPageState extends State<HandlesPage> {
                                         )
                                       : chatList[index].type == ChatType.docs 
                                       ? DocumentChat(
+                                          handlesID: handles.id,
+                                          chatID: chatList[index].id,
                                           deletedBy: chatList[index].deletedBy,
-                                          replyTo: replyToModel,
+                                          readBy: chatList[index].readBy,
                                           index: index,
                                           userID: currentUser.id,
                                           timestamp: chatList[index].timestamp,
