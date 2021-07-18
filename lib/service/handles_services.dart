@@ -66,7 +66,8 @@ class HandlesServices with ChangeNotifier{
         "timestamp": DateTime.now().toString(),
         "isPinned": false,
         "deletedBy": [],
-        "readBy": []
+        "readBy": [],
+        "replyTo": ""
       });
 
       handlesModel.members.forEach((uid, role) {
@@ -228,7 +229,7 @@ class HandlesServices with ChangeNotifier{
       .map(_eventModelListMapper);
   }
 
- HandlesModel _eventModelListMapper(DocumentSnapshot snapshot){
+  HandlesModel _eventModelListMapper(DocumentSnapshot snapshot){
     HandlesModel out = HandlesModel(
       id: snapshot.id,
       description: snapshot['description'],
@@ -239,5 +240,71 @@ class HandlesServices with ChangeNotifier{
       archivedBy: (snapshot['archivedBy'] as List<dynamic>).cast<String>(),
     );
     return out;
+  }
+
+  Future<void> updateHandleDescription(String handlesID, String newDescription, String handlesName) async{
+    return firestore
+    .collection("handles")
+    .doc(handlesID)
+    .update({
+      "description": newDescription
+    }).then((value){
+      firestore
+      .collection('handles')
+      .doc(handlesID)
+      .collection('messages')
+      .doc()
+      .set({
+        "sender": auth.currentUser!.uid,
+        "content": "${auth.currentUser!.displayName} updated $handlesName's description",
+        "mediaURL": null,
+        "type": "status",
+        "timestamp": DateTime.now().toString(),
+        "isPinned": false,
+        "deletedBy": [],
+        "readBy": [],
+        "replyTo": ""
+      });
+    });
+  }
+
+  Future<void> updateHandleCover(String coverPath, String handlesName, String handlesID) async {
+    File file = File(coverPath);
+    try {
+      await storage
+      .ref('handles_cover/$handlesName.png')
+      .putFile(file);
+
+      String _downloadURL = await storage
+        .ref('handles_cover/$handlesName.png')
+        .getDownloadURL();
+
+      await firestore
+      .collection('handles')
+      .doc(handlesID)
+      .update({
+        "cover": _downloadURL
+      }).then((value){
+        firestore
+        .collection('handles')
+        .doc(handlesID)
+        .collection('messages')
+        .doc()
+        .set({
+          "sender": auth.currentUser!.uid,
+          "content": "${auth.currentUser!.displayName} updated $handlesName's cover",
+          "mediaURL": null,
+          "type": "status",
+          "timestamp": DateTime.now().toString(),
+          "isPinned": false,
+          "deletedBy": [],
+          "readBy": [],
+          "replyTo": ""
+        });
+      });
+
+    } on FirebaseException catch (e) {
+      print(e.toString());
+    }
   }
 }
