@@ -560,10 +560,8 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                                               }
                                             });
                                           }
-
-                                          print(newMessages);
                                           
-                                          return chatList.hasData
+                                          return chatList.hasData && chatList.data!.isNotEmpty
                                           ? ListTile(
                                               onLongPress: (){
                                                 setState(() {
@@ -659,7 +657,11 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                                                         ? "[Docs]"
                                                         : chatList.data!.last.type == ChatType.meets
                                                         ? "[Meets]"
-                                                        : "[Project]"
+                                                        : chatList.data!.last.type == ChatType.project
+                                                        ? "[Project]"
+                                                        : chatList.data!.last.content!.length >= 24
+                                                          ? chatList.data!.last.content!.substring(0, 24) + "..."
+                                                          : chatList.data!.last.content
                                                       }",
                                                       fontSize: 14,
                                                       fontWeight: chatList.data!.last.readBy.indexOf(user.id) >= 0
@@ -674,7 +676,7 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                                                 }
                                               ),
                                               trailing: Container(
-                                                width: MQuery.width(0.06, context),
+                                                width: MQuery.width(0.08, context),
                                                 child: Column(
                                                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                   crossAxisAlignment: CrossAxisAlignment.end,
@@ -757,7 +759,10 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                                       );
                                   },
                                   loading: () => SizedBox(),
-                                  error: (_,__) => SizedBox()
+                                  error: (object, error){
+                                    print(error);
+                                    return SizedBox();
+                                  }
                                 );
                               }
                             )

@@ -202,7 +202,10 @@ class _HandlesPageState extends State<HandlesPage> {
                           return snapshot.hasData
                           ? ListTile(
                               onTap: (){
-                                Get.to(() => HandlesDetailedPage());
+                                Get.to(() => HandlesDetailedPage(
+                                  handlesID: handles.id,
+                                  currentUserID: currentUser.id
+                                ));
                               },
                               contentPadding: EdgeInsets.fromLTRB(
                                 MQuery.width(0, context),
@@ -601,11 +604,23 @@ class _HandlesPageState extends State<HandlesPage> {
                                     ? SizedBox()
                                     : chatList[index].id == chatList[1].id
                                       ? HandlesStatusBlock(
+                                          handlesID: handles.id,
+                                          chatID: chatList[index].id,
+                                          sender: chatList[index].sender,
+                                          userID: currentUser.id,
+                                          index: index,
+                                          readBy: chatList[index].readBy,
                                           isDateBlock: false,
                                           content: DateFormat.yMMMMd('en_US').format(chatList[index].timestamp).toUpperCase()
                                         )
                                       : chatList[index].timestamp.day == DateTime.now().day && !(chatList[index].timestamp.day == chatList[index - 1].timestamp.day)
                                         ? HandlesStatusBlock(
+                                            handlesID: handles.id,
+                                            chatID: chatList[index].id,
+                                            sender: chatList[index].sender,
+                                            userID: currentUser.id,
+                                            index: index,
+                                            readBy: chatList[index].readBy,
                                             isDateBlock: false,
                                             content: "TODAY"
                                           )
@@ -613,11 +628,23 @@ class _HandlesPageState extends State<HandlesPage> {
                                           ? SizedBox()
                                           : chatList[index].timestamp.day == DateTime.now().subtract(Duration(days: 1)).day && chatList[index].timestamp.day != chatList[index - 1].timestamp.day
                                             ? HandlesStatusBlock(
+                                                handlesID: handles.id,
+                                                chatID: chatList[index].id,
+                                                sender: chatList[index].sender,
+                                                userID: currentUser.id,
+                                                index: index,
+                                                readBy: chatList[index].readBy,
                                                 isDateBlock: false,
                                                 content: "YESTERDAY"
                                               )
                                             : chatList[index].timestamp.day >= DateTime.now().subtract(Duration(days: 2)).day && chatList[index].timestamp.day != chatList[index - 1].timestamp.day
                                               ? HandlesStatusBlock(
+                                                  handlesID: handles.id,
+                                                  chatID: chatList[index].id,
+                                                  sender: chatList[index].sender,
+                                                  userID: currentUser.id,
+                                                  index: index,
+                                                  readBy: chatList[index].readBy,
                                                   isDateBlock: false,
                                                   content: DateFormat.yMMMMd('en_US').format(chatList[index].timestamp).toUpperCase()
                                                 )
@@ -625,6 +652,12 @@ class _HandlesPageState extends State<HandlesPage> {
 
                                     chatList[index].type == ChatType.status
                                       ? HandlesStatusBlock(
+                                          handlesID: handles.id,
+                                          chatID: chatList[index].id,
+                                          sender: chatList[index].sender,
+                                          userID: currentUser.id,
+                                          index: index,
+                                          readBy: chatList[index].readBy,
                                           isDateBlock: true,
                                           content: chatList[index].content ?? ""
                                         )
