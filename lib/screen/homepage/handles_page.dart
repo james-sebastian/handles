@@ -967,7 +967,10 @@ class _HandlesPageState extends State<HandlesPage> {
                                                 : isChatting ? 6 : 1,
                                                 decoration: InputDecoration(
                                                   hintText: "Type a message",
-                                                  border: InputBorder.none
+                                                  border: InputBorder.none,
+                                                  contentPadding: EdgeInsets.all(
+                                                    10
+                                                  )
                                                 ),
                                                 onChanged: (String value){
                                                   if(value.indexOf("\n") >= 0){
@@ -987,7 +990,10 @@ class _HandlesPageState extends State<HandlesPage> {
                                             maxLines: isChatting ? 6 : 1,
                                             decoration: InputDecoration(
                                               hintText: "Type a message",
-                                              border: InputBorder.none
+                                              border: InputBorder.none,
+                                              contentPadding: EdgeInsets.all(
+                                                10
+                                              )
                                             ),
                                             onChanged: (String value){
                                               if(value.indexOf("\n") >= 0){

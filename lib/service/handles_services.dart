@@ -307,4 +307,111 @@ class HandlesServices with ChangeNotifier{
       print(e.toString());
     }
   }
+
+  Future<void> addHandleCollaborators(UserModel userModel, Map<String, String> newHandlesMembers, String handlesID, bool isEditing) async{
+
+    List<String> newHandlesList = userModel.handlesList!;
+    newHandlesList.add(handlesID);
+
+    print(newHandlesList);
+    print(newHandlesMembers);
+
+    return firestore
+    .collection('handles')
+    .doc(handlesID)
+    .update({
+      "members": newHandlesMembers
+    }).then((value){
+      return firestore
+      .collection('users')
+      .doc(userModel.id)
+      .update({
+        "handlesList": newHandlesList
+      });
+    }).then((value){
+      firestore
+      .collection('handles')
+      .doc(handlesID)
+      .collection('messages')
+      .doc()
+      .set({
+        "sender": auth.currentUser!.uid,
+        "content": "${auth.currentUser!.displayName} ${isEditing ? "edited ${userModel.name}'s role" : "added ${userModel.name}"}",
+        "mediaURL": null,
+        "type": "status",
+        "timestamp": DateTime.now().toString(),
+        "isPinned": false,
+        "deletedBy": [],
+        "readBy": [],
+        "replyTo": ""
+      });
+    });
+  }
+
+  Future<void> deleteHandleCollaborator(UserModel userModel, Map<String, String> newHandlesMembers, String handlesID, {bool? isLeft}) async{
+
+    List<String> newHandlesList = userModel.handlesList!;
+    newHandlesList.remove(handlesID);
+
+    print(newHandlesList);
+    print(newHandlesMembers);
+
+    return firestore
+    .collection('handles')
+    .doc(handlesID)
+    .update({
+      "members": newHandlesMembers
+    }).then((value){
+      return firestore
+      .collection('users')
+      .doc(userModel.id)
+      .update({
+        "handlesList": newHandlesList
+      });
+    }).then((value){
+      firestore
+      .collection('handles')
+      .doc(handlesID)
+      .collection('messages')
+      .doc()
+      .set({
+        "sender": auth.currentUser!.uid,
+        "content": isLeft == null ? "${auth.currentUser!.displayName} removed ${userModel.name}" : "${userModel.name} left",
+        "mediaURL": null,
+        "type": "status",
+        "timestamp": DateTime.now().toString(),
+        "isPinned": false,
+        "deletedBy": [],
+        "readBy": [],
+        "replyTo": ""
+      });
+    });
+  }
+
+  Future<void> hardDeleteHandle(UserModel userModel, HandlesModel handlesModel) async {
+    firestore
+    .collection('handles')
+    .doc(handlesModel.id)
+    .delete()
+    .then((value){
+      handlesModel.members.entries.forEach((element) {
+        firestore
+        .collection('users')
+        .doc(element.value)
+        .get().then((value){
+          List<dynamic> oldHandlesList = (value["handlesList"] as List<dynamic>);
+          oldHandlesList.remove(handlesModel.id);
+          
+          print(oldHandlesList);
+
+          firestore
+          .collection('users')
+          .doc(element.value)
+          .update({
+            "handlesList": oldHandlesList
+          });
+        });
+      });
+    });
+  }
 }
