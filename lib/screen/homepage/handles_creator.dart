@@ -369,7 +369,7 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
 
                             _handlesProvider.createHandles(
                               HandlesModel(
-                                id: "1",
+                                id: Uuid().v4(),
                                 cover: "",
                                 members: membersMap,
                                 description: descriptionController.text,
@@ -377,6 +377,9 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
                                 pinnedBy: [""]
                               )
                             );
+
+                            Get.back();
+
                           } else if (_image != null && membersList.length >= 2){
 
                             Map<String, String> membersMap = {};
@@ -388,6 +391,19 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
 
                             _handlesProvider.uploadHandlesCover(_image!.path, titleController.text).then((value){
                               if(value != null){
+
+                                HandlesModel model = HandlesModel(
+                                  id: Uuid().v4(),
+                                  cover: value,
+                                  members: membersMap,
+                                  description: descriptionController.text,
+                                  name: titleController.text,
+                                  pinnedBy: [""],
+                                  archivedBy: [""]
+                                );
+
+                                print(model.id);
+
                                 _handlesProvider.createHandles(
                                   HandlesModel(
                                     id: Uuid().v4(),
@@ -399,6 +415,7 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
                                     archivedBy: [""]
                                   )
                                 );
+                                Get.back();
                               }
                             });
                           } else {

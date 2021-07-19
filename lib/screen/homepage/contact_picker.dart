@@ -1,7 +1,11 @@
 part of "../pages.dart";
 
 class ContactPicker extends StatefulWidget {
-  const ContactPicker({ Key? key }) : super(key: key);
+
+  final void Function(UserModel, String)? addMember;
+  final Map<String, String>? handlesMembers;
+  final String? handlesID;
+  const ContactPicker({ Key? key, this.handlesMembers, this.handlesID, this.addMember }) : super(key: key);
 
   @override
   _ContactPickerState createState() => _ContactPickerState();
@@ -10,7 +14,9 @@ class ContactPicker extends StatefulWidget {
 class _ContactPickerState extends State<ContactPicker> {
 
   late ByteData imageData;
+  String searchQuery = "";
   TextEditingController searchController = TextEditingController();
+  Set<int> selectedContactsIndex = Set();
   Set<String> selectedContacts = Set();
 
   @override
@@ -22,90 +28,159 @@ class _ContactPickerState extends State<ContactPicker> {
   @override
   Widget build(BuildContext context) {
 
-    print(selectedContacts);
+    Future<void> askPermission() async {
+      var status = await Permission.camera.status;
+      if (status.isDenied) {
+        Permission.contacts.request();
+      }
+    }
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        leading: IconButton(
-          icon:  AdaptiveIcon(
-            android: Icons.close,
-            iOS: CupertinoIcons.xmark,
-            color: Colors.white
-          ),
-          onPressed: (){
-            Get.back();
-          }
-        ),
-        title: Text(
-          "Invite collaborators from contact",
-          style: TextStyle(
-            fontSize: 18
-          )
-        ),
-        actions: [
-          IconButton(
-            icon: AdaptiveIcon(
-              android: Icons.arrow_right_alt,
-              iOS: CupertinoIcons.chevron_right,
-              color: Colors.white
+    askPermission();
+
+    return Consumer(
+      builder: (ctx, watch,child) {
+
+        final _handlesProvider = watch(handlesProvider);
+
+        return Scaffold(
+          resizeToAvoidBottomInset: false,
+          appBar: AppBar(
+            leading: IconButton(
+              icon:  AdaptiveIcon(
+                android: Icons.close,
+                iOS: CupertinoIcons.xmark,
+                color: Colors.white
+              ),
+              onPressed: (){
+                Get.back();
+              }
             ),
-            onPressed: (){
-            }
-          )
-        ],
-      ),
-      body: Container(
-        height: MQuery.height(0.9, context),
-        child: FutureBuilder<List<Contact>>(
-          future: Contacts.streamContacts(withHiResPhoto: false).toList(),
-          builder: (context, snapshot){
-            return snapshot.hasData
-            ? Column(
+            title: Text(
+              "Invite collaborators from contact",
+              style: TextStyle(
+                fontSize: 18
+              )
+            ),
+            actions: [
+              IconButton(
+                icon: AdaptiveIcon(
+                  android: Icons.arrow_right_alt,
+                  iOS: CupertinoIcons.chevron_right,
+                  color: Colors.white
+                ),
+                onPressed: (){
+
+                  int errorCount = 0;
+
+                  selectedContacts.toList().forEach((element) {
+                    print(element.trim().replaceAll(new RegExp(r"\s+\b|\b\s"), ""));
+                    _handlesProvider.addMember(element.trim().replaceAll(new RegExp(r"\s+\b|\b\s"), "")).then((value){
+                      if(value == null){
+                        errorCount++;
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$errorCount user with that phone number cannot be found.')));
+                      } else {
+                        if(widget.handlesID == null || widget.handlesMembers == ""){
+                          widget.addMember!(
+                            value,
+                            "Member"
+                          );
+                        } else {
+                          Map<String, String> newHandleMembers = widget.handlesMembers!;
+                          newHandleMembers[value.id] = "Member";
+                          _handlesProvider.addHandleCollaborators(value, newHandleMembers, widget.handlesID!, false);
+                        }
+                      }
+                    });
+                  });
+                }
+              )
+            ],
+          ),
+          body: Container(
+            height: MQuery.height(0.9, context),
+            child: Column(
               children: [
-                Expanded(
-                  flex: 2,
-                  child: Padding(
-                    padding: EdgeInsets.all(MQuery.height(0.02, context)),
-                    child: Container(
-                      height: MQuery.height(0.065, context),
-                      width: MQuery.width(0.9, context),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        color: Palette.formColor,
-                      ),
-                      child: Center(
-                        child: TextFormField(
-                          keyboardType: TextInputType.text,
-                          controller: searchController,
-                          cursorColor: Palette.primary,
-                          style: TextStyle(
-                            fontSize: 18
-                          ),
-                          decoration: InputDecoration(
-                            suffixIcon: AdaptiveIcon(
-                              android: Icons.search,
-                              iOS: CupertinoIcons.search,
-                              color: Palette.primary
+                  Expanded(
+                    flex: 2,
+                    child: Padding(
+                      padding: EdgeInsets.all(MQuery.height(0.02, context)),
+                      child: Container(
+                        height: MQuery.height(0.065, context),
+                        width: MQuery.width(0.9, context),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          color: Palette.formColor,
+                        ),
+                        child: Center(
+                          child: TextFormField(
+                            keyboardType: TextInputType.url,
+                            controller: searchController,
+                            cursorColor: Palette.primary,
+                            style: TextStyle(
+                              fontSize: 18
                             ),
-                            hintStyle: TextStyle(
-                              fontSize: 18,
-                              color: Colors.black.withOpacity(0.4)
+                            decoration: InputDecoration(
+                              suffixIcon: IconButton(
+                                onPressed: (){
+                                  setState(() {
+                                    searchQuery = searchController.text;
+                                  });
+                                },
+                                icon: AdaptiveIcon(
+                                  android: Icons.search,
+                                  iOS: CupertinoIcons.search,
+                                  color: Palette.primary
+                                ),
+                              ),
+                              hintStyle: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black.withOpacity(0.4)
+                              ),
+                              hintText: "Search contact",
+                              contentPadding: EdgeInsets.only(left: 20, top: 12.5),
+                              border: InputBorder.none
                             ),
-                            hintText: "Search contact",
-                            contentPadding: EdgeInsets.only(left: 20, top: 12.5),
-                            border: InputBorder.none
+                            onEditingComplete: (){
+                              setState(() {
+                                searchQuery = searchController.text;
+                                selectedContacts = Set();
+                                selectedContactsIndex = Set();
+                              });
+                            },
+                            onFieldSubmitted: (String value){
+                              setState(() {
+                                searchQuery = searchController.text;
+                                selectedContacts = Set();
+                                selectedContactsIndex = Set();
+                              });
+                            }
                           ),
                         ),
                       ),
-                    ),
-                  )
-                ),
-                Expanded(
-                  flex: 15,
-                  child: ListView.builder(
+                    )
+                  ),
+                  FutureBuilder<Iterable<Contact>>(
+                    future: ContactsService.getContacts(withThumbnails: false, query: "$searchQuery"),
+                    builder: (context, snapshot){
+
+                      List<Contact> contacts = [];
+
+                      if(snapshot.hasData){
+                        contacts = snapshot.data!.toList();
+                      }
+
+                      print(selectedContacts);
+
+                      return snapshot.hasData
+                      ? Expanded(
+                    flex: 15,
+                    child: ListView.builder(
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index){
+
+                        print(selectedContactsIndex.toList().indexOf(index));
+
                         return Padding(
                           padding: EdgeInsets.symmetric(
                             vertical: 5.0,
@@ -113,24 +188,27 @@ class _ContactPickerState extends State<ContactPicker> {
                           ),
                           child: ListTile(
                             onTap: (){
-                              if(selectedContacts.toList().indexOf(snapshot.data![index].phones.first.value ?? "") >= 0){
+                              print(contacts[index].phones!.first.value);
+                              if(selectedContactsIndex.toList().indexOf(index) >= 0){
                                 setState(() {
-                                  selectedContacts.remove(snapshot.data![index].phones.first.value ?? "");
+                                  selectedContactsIndex.remove(index);
+                                  selectedContacts.remove(contacts[index].phones!.first.value);
                                 });
                               } else {
                                 setState(() {
-                                  selectedContacts.add(snapshot.data![index].phones.first.value ?? "");
+                                  selectedContactsIndex.add(index);
+                                  selectedContacts.add(contacts[index].phones!.first.value!);
                                 });
                               }
                             },
                             contentPadding: EdgeInsets.zero,
                             title: Font.out(
-                              snapshot.data![index].displayName ?? "",
+                              contacts[index].displayName ?? "",
                               fontSize: 16,
                               fontWeight: FontWeight.normal,
                               textAlign: TextAlign.start
                             ),
-                            trailing: selectedContacts.toList().indexOf(snapshot.data![index].phones.first.value ?? "") >= 0
+                            trailing: selectedContactsIndex.toList().indexOf(index) >= 0
                             ? ZoomIn(
                                 duration: Duration(milliseconds: 100),
                                 child: Positioned(
@@ -146,15 +224,17 @@ class _ContactPickerState extends State<ContactPicker> {
                         );
                       }
                     ),
-                )
-                ]
-              )
-              : Center(
-                child: CircularProgressIndicator(color: Palette.primary)
-              );
-          }
+                  )
+                : Center(
+                  child: CircularProgressIndicator(color: Palette.primary)
+                );
+              }
+            )
+          ]
         )
-      )
+          )
+        );
+      },
     );
   }
 }

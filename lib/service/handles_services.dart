@@ -40,6 +40,9 @@ class HandlesServices with ChangeNotifier{
   }
 
   Future<void> createHandles(HandlesModel handlesModel) async {
+
+    print(handlesModel.id);
+
     await firestore
       .collection('handles')
       .doc(handlesModel.id)
@@ -392,7 +395,17 @@ class HandlesServices with ChangeNotifier{
     firestore
     .collection('handles')
     .doc(handlesModel.id)
-    .delete()
+    .collection('messages')
+    .get().then((value) async {
+      for (var doc in value.docs){
+        await doc.reference.delete();
+      }
+    }).then((value){
+      firestore
+      .collection('handles')
+      .doc(handlesModel.id)
+      .delete();
+    })
     .then((value){
       handlesModel.members.entries.forEach((element) {
         firestore
@@ -401,8 +414,6 @@ class HandlesServices with ChangeNotifier{
         .get().then((value){
           List<dynamic> oldHandlesList = (value["handlesList"] as List<dynamic>);
           oldHandlesList.remove(handlesModel.id);
-          
-          print(oldHandlesList);
 
           firestore
           .collection('users')

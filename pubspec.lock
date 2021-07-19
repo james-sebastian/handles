@@ -106,6 +106,13 @@ packages:
       url: "https://pub.dev/"
     source: hosted
     version: "1.15.0"
+  contacts_service:
+    dependency: "direct main"
+    description:
+      name: contacts_service
+      url: "https://pub.dev/"
+    source: hosted
+    version: "0.6.1"
   country_list_pick:
     dependency: "direct main"
     description:
@@ -134,27 +141,6 @@ packages:
       url: "https://pub.dev/"
     source: hosted
     version: "1.0.3"
-  dartx:
-    dependency: transitive
-    description:
-      name: dartx
-      url: "https://pub.dev/"
-    source: hosted
-    version: "0.6.0"
-  dartxx:
-    dependency: transitive
-    description:
-      name: dartxx
-      url: "https://pub.dev/"
-    source: hosted
-    version: "0.4.4+6"
-  equatable:
-    dependency: transitive
-    description:
-      name: equatable
-      url: "https://pub.dev/"
-    source: hosted
-    version: "2.0.3"
   extended_image:
     dependency: transitive
     description:
@@ -288,13 +274,6 @@ packages:
       url: "https://pub.dev/"
     source: hosted
     version: "1.1.2"
-  flexidate:
-    dependency: transitive
-    description:
-      name: flexidate
-      url: "https://pub.dev/"
-    source: hosted
-    version: "0.4.4+5"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -307,13 +286,6 @@ packages:
       url: "https://pub.dev/"
     source: hosted
     version: "1.2.0"
-  flutter_contact:
-    dependency: "direct main"
-    description:
-      name: flutter_contact
-      url: "https://pub.dev/"
-    source: hosted
-    version: "0.8.1+2"
   flutter_hex_color:
     dependency: "direct main"
     description:
@@ -485,13 +457,6 @@ packages:
       url: "https://pub.dev/"
     source: hosted
     version: "2.1.0"
-  inflection3:
-    dependency: transitive
-    description:
-      name: inflection3
-      url: "https://pub.dev/"
-    source: hosted
-    version: "0.5.3+2"
   intl:
     dependency: "direct main"
     description:
@@ -548,20 +513,6 @@ packages:
       url: "https://pub.dev/"
     source: hosted
     version: "1.0.0"
-  logging:
-    dependency: transitive
-    description:
-      name: logging
-      url: "https://pub.dev/"
-    source: hosted
-    version: "1.0.1"
-  logging_config:
-    dependency: transitive
-    description:
-      name: logging_config
-      url: "https://pub.dev/"
-    source: hosted
-    version: "0.6.7+6"
   matcher:
     dependency: transitive
     description:
@@ -854,13 +805,6 @@ packages:
       url: "https://pub.dev/"
     source: hosted
     version: "0.3.0"
-  time:
-    dependency: transitive
-    description:
-      name: time
-      url: "https://pub.dev/"
-    source: hosted
-    version: "1.5.0-nullsafety.1"
   timeline_tile:
     dependency: "direct main"
     description:
