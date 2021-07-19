@@ -92,7 +92,90 @@ class _HandlesDetailedPageState extends State<HandlesDetailedPage> {
                                   iOS: CupertinoIcons.trash,
                                 ),
                                 onPressed: (){
-                                  
+                                  Get.dialog(
+                                    Platform.isAndroid
+                                    ? AlertDialog(
+                                        title: Text(
+                                          "Are you sure you want to delete ${handles.name}?",
+                                        ),
+                                        content: Text(
+                                          "This irreversible action will affect whole collaborators and will delete all sent messages and medias."
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            child: Text("CANCEL"),
+                                            style: TextButton.styleFrom(
+                                              textStyle: TextStyle(
+                                                color: Palette.warning,
+                                                fontWeight: FontWeight.w500
+                                              )
+                                            ),
+                                            onPressed: (){
+                                              Get.back();
+                                            },
+                                          ),
+                                          TextButton(
+                                            child: Text("DELETE"),
+                                            style: TextButton.styleFrom(
+                                              textStyle: TextStyle(
+                                                color: Palette.primary,
+                                                fontWeight: FontWeight.w500
+                                              )
+                                            ),
+                                            onPressed: (){
+                                              _userProvider.getUserByID(widget.currentUserID).then((value){
+                                                // ignore: unnecessary_null_comparison
+                                                print(value);
+                                                if(value != null){
+                                                  _handlesProvider.hardDeleteHandle(value, handles);
+                                                }
+                                              });
+                                              Get.offAll(() => Homepage());
+                                            },
+                                          )
+                                        ],
+                                      )
+                                    : CupertinoAlertDialog(
+                                        title: Text(
+                                          "Are you sure you want to delete ${handles.name}?",
+                                        ),
+                                        content: Text(
+                                          "This irreversible action will affect whole collaborators and will delete all sent messages and medias."
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            child: Text("Cancel"),
+                                            style: TextButton.styleFrom(
+                                              textStyle: TextStyle(
+                                                color: Palette.warning,
+                                                fontWeight: FontWeight.w500
+                                              )
+                                            ),
+                                            onPressed: (){
+                                              Get.back();
+                                            },
+                                          ),
+                                          TextButton(
+                                            child: Text("Delete"),
+                                            style: TextButton.styleFrom(
+                                              textStyle: TextStyle(
+                                                color: Palette.primary,
+                                                fontWeight: FontWeight.w500
+                                              )
+                                            ),
+                                            onPressed: (){
+                                              _userProvider.getUserByID(widget.currentUserID).then((value){
+                                                // ignore: unnecessary_null_comparison
+                                                if(value != null){
+                                                  _handlesProvider.hardDeleteHandle(value, handles);
+                                                }
+                                              });
+                                              Get.offAll(() => Homepage());
+                                            },
+                                          )
+                                        ],
+                                      )
+                                  );
                                 }
                               ),
                             ],
@@ -250,9 +333,6 @@ class _HandlesDetailedPageState extends State<HandlesDetailedPage> {
                             inactiveTrackColor: Colors.grey.withOpacity(0.5),
                             value: isNotificationActive,
                             onChanged: (bool val){
-
-                              //TODO: NOTIFICATION TOGGLE
-
                               setState(() {
                                 isNotificationActive = !isNotificationActive;
                               });
@@ -363,16 +443,55 @@ class _HandlesDetailedPageState extends State<HandlesDetailedPage> {
                           padding: EdgeInsets.symmetric(
                             horizontal: MQuery.height(0.02, context)
                           ),
-                          child: Font.out(
-                            "Collaborators (5)",
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            textAlign: TextAlign.start,
-                            color: Colors.black.withOpacity(0.75)
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Font.out(
+                                "Collaborators (${handles.members.length})",
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                textAlign: TextAlign.start,
+                                color: Colors.black.withOpacity(0.75)
+                              ),
+                              isReadOnly == false
+                              ? FadeIn(
+                                  child: Row(
+                                    children: [
+                                      IconButton(
+                                        onPressed: (){
+                                          Get.to(() => ContactPicker(), transition: Transition.cupertino);
+                                        },
+                                        icon: AdaptiveIcon(
+                                          android: Icons.contact_page,
+                                          iOS: CupertinoIcons.person_2_square_stack_fill,
+                                          color: Palette.primaryText,
+                                          size: 24
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: (){
+                                          Get.dialog(AddMemberViaNumberDialog(
+                                            handlesID: handles.id,
+                                            handlesMembers: handles.members
+                                          ));
+                                        },
+                                        icon: AdaptiveIcon(
+                                          android: Icons.add,
+                                          iOS: CupertinoIcons.add,
+                                          color: Palette.primaryText,
+                                          size: 24
+                                        ),
+                                      )
+                                    ]
+                                  ),
+                                )
+                              : SizedBox()
+                            ],
                           ),
                         ),
                         Container(
-                          height: MQuery.height(5 * 0.1, context),
+                          padding: EdgeInsets.zero,
+                          height: MQuery.height((handles.members.length + 1) * 0.1, context),
                           child: ListView.builder(
                             itemCount: handles.members.length,
                             itemBuilder: (context, index){
@@ -381,6 +500,15 @@ class _HandlesDetailedPageState extends State<HandlesDetailedPage> {
                                 builder: (context, snapshot) {
                                   return snapshot.hasData
                                   ? ListTile(
+                                      onLongPress: (){
+                                        isReadOnly == false && handles.members.entries.toList()[index].value != "Admin"
+                                        ? Get.dialog(AddMemberViaNumberDialog(
+                                            userModel: snapshot.data,
+                                            handlesID: handles.id,
+                                            handlesMembers: handles.members
+                                          ))
+                                        : print("");
+                                      },
                                       contentPadding: EdgeInsets.fromLTRB(
                                         MQuery.width(0.02, context),
                                         0,
@@ -400,12 +528,127 @@ class _HandlesDetailedPageState extends State<HandlesDetailedPage> {
                                         fontWeight: FontWeight.w500,
                                         textAlign: TextAlign.start
                                       ),
-                                      trailing: Font.out(
-                                        handles.members.entries.toList()[index].value,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.normal,
-                                        textAlign: TextAlign.start,
-                                        color: Palette.primary
+                                      trailing: Container(
+                                        width: MQuery.width(0.14, context),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            Font.out(
+                                              handles.members.entries.toList()[index].value,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.normal,
+                                              textAlign: TextAlign.start,
+                                              color: Palette.primary
+                                            ),
+                                            isReadOnly == false && handles.members.entries.toList()[index].value != "Admin"
+                                            ? FadeIn(
+                                                child: IconButton(
+                                                  onPressed: (){
+                                                    Get.dialog(
+                                                      Platform.isAndroid
+                                                      ? AlertDialog(
+                                                          title: Text(
+                                                            "Are you sure you want to kick ${snapshot.data!.name}?",
+                                                          ),
+                                                          content: Text(
+                                                            "This action will kick ${snapshot.data!.name} out of ${handles.name}"
+                                                          ),
+                                                          actions: [
+                                                            TextButton(
+                                                              child: Text("CANCEL"),
+                                                              style: TextButton.styleFrom(
+                                                                textStyle: TextStyle(
+                                                                  color: Palette.warning,
+                                                                  fontWeight: FontWeight.w500
+                                                                )
+                                                              ),
+                                                              onPressed: (){
+                                                                Get.back();
+                                                              },
+                                                            ),
+                                                            TextButton(
+                                                              child: Text("REMOVE"),
+                                                              style: TextButton.styleFrom(
+                                                                textStyle: TextStyle(
+                                                                  color: Palette.primary,
+                                                                  fontWeight: FontWeight.w500
+                                                                )
+                                                              ),
+                                                              onPressed: (){
+                                                                handles.members.remove(snapshot.data!.id);
+                                                                Map<String, String> newHandlesMembers = handles.members;
+
+                                                                print(newHandlesMembers);
+
+                                                                _handlesProvider.deleteHandleCollaborator(
+                                                                  snapshot.data!,
+                                                                  newHandlesMembers,
+                                                                  handles.id
+                                                                );
+                                                                Get.back();
+                                                              },
+                                                            )
+                                                          ],
+                                                        )
+                                                      : CupertinoAlertDialog(
+                                                          title: Text(
+                                                            "Are you sure you want to kick ${snapshot.data!.name}",
+                                                          ),
+                                                          content: Text(
+                                                            "This action will kick ${snapshot.data!.name} out of ${handles.name}"
+                                                          ),
+                                                          actions: [
+                                                            TextButton(
+                                                              child: Text("Cancel"),
+                                                              style: TextButton.styleFrom(
+                                                                textStyle: TextStyle(
+                                                                  color: Palette.warning,
+                                                                  fontWeight: FontWeight.w500
+                                                                )
+                                                              ),
+                                                              onPressed: (){
+                                                                Get.back();
+                                                              },
+                                                            ),
+                                                            TextButton(
+                                                              child: Text("Remove"),
+                                                              style: TextButton.styleFrom(
+                                                                textStyle: TextStyle(
+                                                                  color: Palette.primary,
+                                                                  fontWeight: FontWeight.w500
+                                                                )
+                                                              ),
+                                                              onPressed: (){
+                                                                handles.members.remove(snapshot.data!.id);
+                                                                Map<String, String> newHandlesMembers = handles.members;
+
+                                                                print(newHandlesMembers);
+
+                                                                _handlesProvider.deleteHandleCollaborator(
+                                                                  snapshot.data!,
+                                                                  newHandlesMembers,
+                                                                  handles.id
+                                                                );
+
+                                                                Get.back();
+                                                              },
+                                                            )
+                                                          ],
+                                                        )
+                                                    );
+                                                  },
+                                                  icon: AdaptiveIcon(
+                                                    android: Icons.close,
+                                                    iOS: CupertinoIcons.xmark,
+                                                    color: Palette.primaryText,
+                                                    size: 20
+                                                  ),
+                                                ),
+                                              )
+                                            : SizedBox()
+                                          ],
+                                        ),
                                       ),
                                     )
                                   : SizedBox();
@@ -413,7 +656,150 @@ class _HandlesDetailedPageState extends State<HandlesDetailedPage> {
                               );
                             },
                           ),
-                        )
+                        ),
+                        Container(
+                          margin: EdgeInsets.all(MQuery.width(0.025, context)),
+                          child: Button(
+                            width: double.infinity,
+                            title: "Left ${handles.name}",
+                            textColor: Palette.warning,
+                            color: Colors.white,
+                            borderColor: Palette.warning,
+                            method: (){
+
+                              int adminCount = 0;
+                              handles.members.entries.forEach((element) {
+                                if(element.value == "Admin"){
+                                  adminCount++;
+                                }
+                              });
+
+                              if(handles.members[widget.currentUserID] == "Admin" && adminCount <= 1){
+                                Get.dialog(
+                                  Platform.isAndroid
+                                  ? AlertDialog(
+                                      title: Text(
+                                        "Action permitted",
+                                      ),
+                                      content: Text(
+                                        "You cannot leave this handle when you are an Admin and there are no other Admin collaborators. Please assign an Admin role to other collaborator before you leave."
+                                      )
+                                    )
+                                  : CupertinoAlertDialog(
+                                      title: Text(
+                                        "Action permitted",
+                                      ),
+                                      content: Text(
+                                        "You cannot leave this handle when you are an Admin and there are no other Admin collaborators. Please assign an Admin role to other collaborator before you leave."
+                                      )
+                                    )
+                                );
+                              } else {
+                                Get.dialog(
+                                  Platform.isAndroid
+                                  ? AlertDialog(
+                                      title: Text(
+                                        "Are you sure you want to left ${handles.name}?",
+                                      ),
+                                      content: Text(
+                                        "This action will make you leave ${handles.name} and you need an invitation to rejoin this handle."
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          child: Text("CANCEL"),
+                                          style: TextButton.styleFrom(
+                                            textStyle: TextStyle(
+                                              color: Palette.warning,
+                                              fontWeight: FontWeight.w500
+                                            )
+                                          ),
+                                          onPressed: (){
+                                            Get.back();
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: Text("LEAVE"),
+                                          style: TextButton.styleFrom(
+                                            textStyle: TextStyle(
+                                              color: Palette.primary,
+                                              fontWeight: FontWeight.w500
+                                            )
+                                          ),
+                                          onPressed: (){
+                                            handles.members.remove(widget.currentUserID);
+                                            Map<String, String> newHandlesMembers = handles.members;
+
+                                            print(newHandlesMembers);
+
+                                            _userProvider.getUserByID(widget.currentUserID).then((value){
+                                              // ignore: unnecessary_null_comparison
+                                              if(value != null){
+                                                _handlesProvider.deleteHandleCollaborator(
+                                                  value,
+                                                  newHandlesMembers,
+                                                  handles.id
+                                                );
+                                              }
+                                            });
+                                            Get.back();
+                                          },
+                                        )
+                                      ],
+                                    )
+                                  : CupertinoAlertDialog(
+                                      title: Text(
+                                        "Are you sure you want to left ${handles.name}?",
+                                      ),
+                                      content: Text(
+                                        "This action will make you leave ${handles.name} and you need an invitation to rejoin this handle."
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          child: Text("Cancel"),
+                                          style: TextButton.styleFrom(
+                                            textStyle: TextStyle(
+                                              color: Palette.warning,
+                                              fontWeight: FontWeight.w500
+                                            )
+                                          ),
+                                          onPressed: (){
+                                            Get.back();
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: Text("Leave"),
+                                          style: TextButton.styleFrom(
+                                            textStyle: TextStyle(
+                                              color: Palette.primary,
+                                              fontWeight: FontWeight.w500
+                                            )
+                                          ),
+                                          onPressed: (){
+                                            handles.members.remove(widget.currentUserID);
+                                            Map<String, String> newHandlesMembers = handles.members;
+
+                                            print(newHandlesMembers);
+
+                                            _userProvider.getUserByID(widget.currentUserID).then((value){
+                                              // ignore: unnecessary_null_comparison
+                                              if(value != null){
+                                                _handlesProvider.deleteHandleCollaborator(
+                                                  value,
+                                                  newHandlesMembers,
+                                                  handles.id
+                                                );
+                                              }
+                                            });
+                                            Get.back();
+                                          },
+                                        )
+                                      ],
+                                    )
+                                );
+                              }
+                            }
+                          ),
+                        ),
                       ]
                     )
                   )
