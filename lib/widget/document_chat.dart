@@ -47,6 +47,73 @@ class DocumentChat extends StatefulWidget {
 }
 
 class _DocumentChatState extends State<DocumentChat> {
+
+  Future<bool> saveFile(String url, String fileName) async {
+    Directory? directory;
+    try {
+      if (Platform.isAndroid) {
+        if (await _requestPermission(Permission.manageExternalStorage)) {
+          directory = await getExternalStorageDirectory();
+          String newPath = "";
+          print(directory);
+          List<String> paths = directory!.path.split("/");
+          for (int x = 1; x < paths.length; x++) {
+            String folder = paths[x];
+            if (folder != "Android") {
+              newPath += "/" + folder;
+            } else {
+              break;
+            }
+          }
+          newPath = newPath + "/Handles/Docs";
+          directory = Directory(newPath);
+        } else {
+          return false;
+        }
+      } else {
+        if (await _requestPermission(Permission.manageExternalStorage)) {
+          directory = await getTemporaryDirectory();
+        } else {
+          return false;
+        }
+      }
+
+      File saveFile = File(directory.path + "/$fileName");
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+      if (await directory.exists()) {
+        await Dio().download(
+          url,
+          saveFile.path,
+          onReceiveProgress: (value1, value2) {
+            print("$value1 - $value2");
+          });
+        if (Platform.isIOS) {
+          //TODO:
+          // await saveFile.writeAsString(contents)
+        }
+        return true;
+      }
+      return false;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
+  Future<bool> _requestPermission(Permission permission) async {
+    if (await permission.isGranted) {
+      return true;
+    } else {
+      var result = await permission.request();
+      if (result == PermissionStatus.granted) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
     Future<String> getFileSize(String filepath, int decimals) async {
@@ -64,6 +131,7 @@ class _DocumentChatState extends State<DocumentChat> {
 
     Future<String> getFileExtension(String filePath) async {
       http.Response r = await http.get(Uri.parse(filePath));
+
       String? extension = r.headers["content-type"];
 
       return extension!.substring(12, extension.length);
@@ -72,7 +140,7 @@ class _DocumentChatState extends State<DocumentChat> {
     Future<String?> getFileName(String filePath) async {
       String name = Uri.decodeFull(basenameWithoutExtension(filePath));
       int location = name.lastIndexOf("/");
-      return name.substring(location + 1, name.length);
+      return name.substring(location + 1, name.length - 1);
     }
 
     return widget.deletedBy.indexOf(widget.userID) >= 0
@@ -342,13 +410,22 @@ class _DocumentChatState extends State<DocumentChat> {
                                                 ],
                                               ),
                                               IconButton(
-                                                onPressed: () {},
+                                                onPressed: () {
+                                                  getFileName(widget.documentURL).then((name){
+                                                    getFileExtension(widget.documentURL).then((ext){
+                                                      if(name != null){
+                                                        saveFile(widget.documentURL, "$name.$ext");
+                                                      }
+                                                    });
+                                                  });
+                                                },
                                                 icon: AdaptiveIcon(
-                                                    android: Icons.download,
-                                                    iOS: CupertinoIcons
-                                                        .cloud_download_fill,
-                                                    size: 18,
-                                                    color: Palette.primary),
+                                                  android: Icons.download,
+                                                  iOS: CupertinoIcons
+                                                      .cloud_download_fill,
+                                                  size: 18,
+                                                  color: Palette.primary
+                                                ),
                                               )
                                             ],
                                           ),
@@ -706,7 +783,15 @@ class _DocumentChatState extends State<DocumentChat> {
                                                       ],
                                                     ),
                                                     IconButton(
-                                                      onPressed: () {},
+                                                      onPressed: () {
+                                                        getFileName(widget.documentURL).then((name){
+                                                          getFileExtension(widget.documentURL).then((ext){
+                                                            if(name != null){
+                                                              saveFile(widget.documentURL, "$name.$ext");
+                                                            }
+                                                          });
+                                                        });
+                                                      },
                                                       icon: AdaptiveIcon(
                                                           android: Icons.download,
                                                           iOS: CupertinoIcons

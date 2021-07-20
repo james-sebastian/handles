@@ -30,6 +30,7 @@ dependencies:
   contacts_service: ^0.6.1
   country_list_pick: ^1.0.1+4
   cupertino_icons: ^1.0.2
+  dio: ^4.0.0
   favicon: ^1.0.15
   file_picker: ^3.0.3
   firebase_auth: ^1.4.1
