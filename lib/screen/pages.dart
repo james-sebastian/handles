@@ -31,9 +31,10 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 import 'package:video_player/video_player.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
-import 'package:contacts_service/contacts_service.dart'; 
+import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 // import 'package:timezone/timezone.dart' as tz;
 // import 'package:timezone/data/latest.dart' as tzDatabase;
 
@@ -66,3 +67,4 @@ part 'homepage/handles_creator.dart';
 part 'homepage/contact_picker.dart';
 part 'homepage/forward_message_page.dart';
 part 'homepage/handles_cover_page.dart';
+part 'homepage/collaborator_profile_page.dart';

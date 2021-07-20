@@ -126,6 +126,7 @@ class _HandlesDetailedPageState extends State<HandlesDetailedPage> {
                                               _userProvider.getUserByID(widget.currentUserID).then((value){
                                                 // ignore: unnecessary_null_comparison
                                                 print(value);
+                                                // ignore: unnecessary_null_comparison
                                                 if(value != null){
                                                   _handlesProvider.hardDeleteHandle(value, handles);
                                                 }
@@ -438,7 +439,6 @@ class _HandlesDetailedPageState extends State<HandlesDetailedPage> {
                           ),
                         ),
                         Divider(height: 1,),
-                        SizedBox(height: MQuery.height(0.015, context)),
                         Padding(
                           padding: EdgeInsets.symmetric(
                             horizontal: MQuery.height(0.02, context)
@@ -446,12 +446,20 @@ class _HandlesDetailedPageState extends State<HandlesDetailedPage> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Font.out(
-                                "Collaborators (${handles.members.length})",
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                textAlign: TextAlign.start,
-                                color: Colors.black.withOpacity(0.75)
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(
+                                  MQuery.width(0, context),
+                                  MQuery.height(0.015, context),
+                                  MQuery.width(0, context),
+                                  MQuery.height(0.015, context),
+                                ),
+                                child: Font.out(
+                                  "Collaborators (${handles.members.length})",
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  textAlign: TextAlign.start,
+                                  color: Colors.black.withOpacity(0.75)
+                                ),
                               ),
                               isReadOnly == false
                               ? FadeIn(
@@ -490,171 +498,178 @@ class _HandlesDetailedPageState extends State<HandlesDetailedPage> {
                           ),
                         ),
                         Container(
-                          padding: EdgeInsets.zero,
                           height: MQuery.height((handles.members.length + 1) * 0.1, context),
-                          child: ListView.builder(
-                            itemCount: handles.members.length,
-                            itemBuilder: (context, index){
-                              return FutureBuilder<UserModel>(
-                                future: _userProvider.getUserByID(handles.members.keys.toList()[index]),
-                                builder: (context, snapshot) {
-                                  return snapshot.hasData
-                                  ? ListTile(
-                                      onLongPress: (){
-                                        isReadOnly == false && handles.members.entries.toList()[index].value != "Admin"
-                                        ? Get.dialog(AddMemberViaNumberDialog(
-                                            userModel: snapshot.data,
-                                            handlesID: handles.id,
-                                            handlesMembers: handles.members
-                                          ))
-                                        : print("");
-                                      },
-                                      contentPadding: EdgeInsets.fromLTRB(
-                                        MQuery.width(0.02, context),
-                                        0,
-                                        MQuery.width(0.02, context),
-                                        MQuery.height(0.015, context),
-                                      ),
-                                      leading: CircleAvatar(
-                                        backgroundColor: Palette.primary,
-                                        radius: MQuery.height(0.025, context),
-                                        backgroundImage: snapshot.data!.profilePicture != ""
-                                        ? NetworkImage(snapshot.data!.profilePicture!) as ImageProvider
-                                        : AssetImage("assets/sample_profile.png"),
-                                      ),
-                                      title: Font.out(
-                                        snapshot.data!.name,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        textAlign: TextAlign.start
-                                      ),
-                                      trailing: Container(
-                                        width: MQuery.width(0.14, context),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Font.out(
-                                              handles.members.entries.toList()[index].value,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.normal,
-                                              textAlign: TextAlign.start,
-                                              color: Palette.primary
-                                            ),
-                                            isReadOnly == false && handles.members.entries.toList()[index].value != "Admin"
-                                            ? FadeIn(
-                                                child: IconButton(
-                                                  onPressed: (){
-                                                    Get.dialog(
-                                                      Platform.isAndroid
-                                                      ? AlertDialog(
-                                                          title: Text(
-                                                            "Are you sure you want to kick ${snapshot.data!.name}?",
-                                                          ),
-                                                          content: Text(
-                                                            "This action will kick ${snapshot.data!.name} out of ${handles.name}"
-                                                          ),
-                                                          actions: [
-                                                            TextButton(
-                                                              child: Text("CANCEL"),
-                                                              style: TextButton.styleFrom(
-                                                                textStyle: TextStyle(
-                                                                  color: Palette.warning,
-                                                                  fontWeight: FontWeight.w500
-                                                                )
-                                                              ),
-                                                              onPressed: (){
-                                                                Get.back();
-                                                              },
-                                                            ),
-                                                            TextButton(
-                                                              child: Text("REMOVE"),
-                                                              style: TextButton.styleFrom(
-                                                                textStyle: TextStyle(
-                                                                  color: Palette.primary,
-                                                                  fontWeight: FontWeight.w500
-                                                                )
-                                                              ),
-                                                              onPressed: (){
-                                                                handles.members.remove(snapshot.data!.id);
-                                                                Map<String, String> newHandlesMembers = handles.members;
-
-                                                                print(newHandlesMembers);
-
-                                                                _handlesProvider.deleteHandleCollaborator(
-                                                                  snapshot.data!,
-                                                                  newHandlesMembers,
-                                                                  handles.id
-                                                                );
-                                                                Get.back();
-                                                              },
-                                                            )
-                                                          ],
-                                                        )
-                                                      : CupertinoAlertDialog(
-                                                          title: Text(
-                                                            "Are you sure you want to kick ${snapshot.data!.name}",
-                                                          ),
-                                                          content: Text(
-                                                            "This action will kick ${snapshot.data!.name} out of ${handles.name}"
-                                                          ),
-                                                          actions: [
-                                                            TextButton(
-                                                              child: Text("Cancel"),
-                                                              style: TextButton.styleFrom(
-                                                                textStyle: TextStyle(
-                                                                  color: Palette.warning,
-                                                                  fontWeight: FontWeight.w500
-                                                                )
-                                                              ),
-                                                              onPressed: (){
-                                                                Get.back();
-                                                              },
-                                                            ),
-                                                            TextButton(
-                                                              child: Text("Remove"),
-                                                              style: TextButton.styleFrom(
-                                                                textStyle: TextStyle(
-                                                                  color: Palette.primary,
-                                                                  fontWeight: FontWeight.w500
-                                                                )
-                                                              ),
-                                                              onPressed: (){
-                                                                handles.members.remove(snapshot.data!.id);
-                                                                Map<String, String> newHandlesMembers = handles.members;
-
-                                                                print(newHandlesMembers);
-
-                                                                _handlesProvider.deleteHandleCollaborator(
-                                                                  snapshot.data!,
-                                                                  newHandlesMembers,
-                                                                  handles.id
-                                                                );
-
-                                                                Get.back();
-                                                              },
-                                                            )
-                                                          ],
-                                                        )
-                                                    );
-                                                  },
-                                                  icon: AdaptiveIcon(
-                                                    android: Icons.close,
-                                                    iOS: CupertinoIcons.xmark,
-                                                    color: Palette.primaryText,
-                                                    size: 20
-                                                  ),
-                                                ),
-                                              )
-                                            : SizedBox()
-                                          ],
+                          child: MediaQuery.removePadding(
+                            context: context,
+                            removeTop: true,
+                            child: ListView.builder(
+                              itemCount: handles.members.length,
+                              shrinkWrap: true,
+                              itemBuilder: (context, index){
+                                return FutureBuilder<UserModel>(
+                                  future: _userProvider.getUserByID(handles.members.keys.toList()[index]),
+                                  builder: (context, snapshot) {
+                                    return snapshot.hasData
+                                    ? ListTile(
+                                        onTap: (){
+                                          Get.to(() => CollaboratorProfilePage(userID: snapshot.data!.id), transition: Transition.cupertino);
+                                        },
+                                        onLongPress: (){
+                                          isReadOnly == false && handles.members.entries.toList()[index].value != "Admin"
+                                          ? Get.dialog(AddMemberViaNumberDialog(
+                                              userModel: snapshot.data,
+                                              handlesID: handles.id,
+                                              handlesMembers: handles.members
+                                            ))
+                                          : print("");
+                                        },
+                                        contentPadding: EdgeInsets.fromLTRB(
+                                          MQuery.width(0.02, context),
+                                          MQuery.height(0.005, context),
+                                          MQuery.width(0.02, context),
+                                          MQuery.height(0.005, context),
                                         ),
-                                      ),
-                                    )
-                                  : SizedBox();
-                                }
-                              );
-                            },
+                                        leading: CircleAvatar(
+                                          backgroundColor: Palette.primary,
+                                          radius: MQuery.height(0.025, context),
+                                          backgroundImage: snapshot.data!.profilePicture != ""
+                                          ? NetworkImage(snapshot.data!.profilePicture!) as ImageProvider
+                                          : AssetImage("assets/sample_profile.png"),
+                                        ),
+                                        title: Font.out(
+                                          snapshot.data!.name,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          textAlign: TextAlign.start
+                                        ),
+                                        trailing: Container(
+                                          width: MQuery.width(0.14, context),
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              Font.out(
+                                                handles.members.entries.toList()[index].value,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
+                                                textAlign: TextAlign.start,
+                                                color: Palette.primary
+                                              ),
+                                              isReadOnly == false && handles.members.entries.toList()[index].value != "Admin"
+                                              ? FadeIn(
+                                                  child: IconButton(
+                                                    onPressed: (){
+                                                      Get.dialog(
+                                                        Platform.isAndroid
+                                                        ? AlertDialog(
+                                                            title: Text(
+                                                              "Are you sure you want to kick ${snapshot.data!.name}?",
+                                                            ),
+                                                            content: Text(
+                                                              "This action will kick ${snapshot.data!.name} out of ${handles.name}"
+                                                            ),
+                                                            actions: [
+                                                              TextButton(
+                                                                child: Text("CANCEL"),
+                                                                style: TextButton.styleFrom(
+                                                                  textStyle: TextStyle(
+                                                                    color: Palette.warning,
+                                                                    fontWeight: FontWeight.w500
+                                                                  )
+                                                                ),
+                                                                onPressed: (){
+                                                                  Get.back();
+                                                                },
+                                                              ),
+                                                              TextButton(
+                                                                child: Text("REMOVE"),
+                                                                style: TextButton.styleFrom(
+                                                                  textStyle: TextStyle(
+                                                                    color: Palette.primary,
+                                                                    fontWeight: FontWeight.w500
+                                                                  )
+                                                                ),
+                                                                onPressed: (){
+                                                                  handles.members.remove(snapshot.data!.id);
+                                                                  Map<String, String> newHandlesMembers = handles.members;
+
+                                                                  print(newHandlesMembers);
+
+                                                                  _handlesProvider.deleteHandleCollaborator(
+                                                                    snapshot.data!,
+                                                                    newHandlesMembers,
+                                                                    handles.id
+                                                                  );
+                                                                  Get.back();
+                                                                },
+                                                              )
+                                                            ],
+                                                          )
+                                                        : CupertinoAlertDialog(
+                                                            title: Text(
+                                                              "Are you sure you want to kick ${snapshot.data!.name}",
+                                                            ),
+                                                            content: Text(
+                                                              "This action will kick ${snapshot.data!.name} out of ${handles.name}"
+                                                            ),
+                                                            actions: [
+                                                              TextButton(
+                                                                child: Text("Cancel"),
+                                                                style: TextButton.styleFrom(
+                                                                  textStyle: TextStyle(
+                                                                    color: Palette.warning,
+                                                                    fontWeight: FontWeight.w500
+                                                                  )
+                                                                ),
+                                                                onPressed: (){
+                                                                  Get.back();
+                                                                },
+                                                              ),
+                                                              TextButton(
+                                                                child: Text("Remove"),
+                                                                style: TextButton.styleFrom(
+                                                                  textStyle: TextStyle(
+                                                                    color: Palette.primary,
+                                                                    fontWeight: FontWeight.w500
+                                                                  )
+                                                                ),
+                                                                onPressed: (){
+                                                                  handles.members.remove(snapshot.data!.id);
+                                                                  Map<String, String> newHandlesMembers = handles.members;
+
+                                                                  print(newHandlesMembers);
+
+                                                                  _handlesProvider.deleteHandleCollaborator(
+                                                                    snapshot.data!,
+                                                                    newHandlesMembers,
+                                                                    handles.id
+                                                                  );
+
+                                                                  Get.back();
+                                                                },
+                                                              )
+                                                            ],
+                                                          )
+                                                      );
+                                                    },
+                                                    icon: AdaptiveIcon(
+                                                      android: Icons.close,
+                                                      iOS: CupertinoIcons.xmark,
+                                                      color: Palette.primaryText,
+                                                      size: 20
+                                                    ),
+                                                  ),
+                                                )
+                                              : SizedBox()
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    : SizedBox();
+                                  }
+                                );
+                              },
+                            ),
                           ),
                         ),
                         Container(

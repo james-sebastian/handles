@@ -217,6 +217,15 @@ class _MeetingDetailedPageState extends State<MeetingDetailedPage> {
                                       suffixIcon: IconButton(
                                         onPressed: (){
                                           Clipboard.setData(ClipboardData(text: widget.meetingModel.meetingURL));
+                                          Fluttertoast.showToast(
+                                            msg: "Meets join link copied",
+                                            toastLength: Toast.LENGTH_SHORT,
+                                            gravity: ToastGravity.CENTER,
+                                            timeInSecForIosWeb: 1,
+                                            backgroundColor: Colors.red,
+                                            textColor: Colors.white,
+                                            fontSize: 16.0
+                                          );
                                         },
                                         icon: AdaptiveIcon(
                                           android: Icons.copy,
