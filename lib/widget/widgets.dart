@@ -12,15 +12,17 @@ import 'package:handles/config/config.dart';
 import 'package:handles/model/models.dart';
 import 'package:handles/provider/providers.dart';
 import 'package:handles/screen/pages.dart';
-import 'dart:io' show File, Platform;
+import 'dart:io' show Directory, File, Platform;
 import 'dart:math' as math;
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:http/http.dart' as http;
 import 'package:visibility_detector/visibility_detector.dart';
+import 'package:dio/dio.dart';
 
 part 'plain_chat.dart';
 part 'button.dart';
