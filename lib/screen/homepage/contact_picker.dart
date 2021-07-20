@@ -80,6 +80,7 @@ class _ContactPickerState extends State<ContactPicker> {
                         ScaffoldMessenger.of(context).hideCurrentSnackBar();
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$errorCount user with that phone number cannot be found.')));
                       } else {
+                        // ignore: unrelated_type_equality_checks
                         if(widget.handlesID == null || widget.handlesMembers == ""){
                           widget.addMember!(
                             value,

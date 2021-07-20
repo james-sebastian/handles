@@ -62,6 +62,7 @@ class _MeetingCreatorState extends State<MeetingCreator> {
         ? TimeOfDay(hour: baseDate.hour, minute: baseDate.minute)
         : TimeOfDay(hour: endTime.hour, minute: endTime.minute),
       );
+      // ignore: unrelated_type_equality_checks
       if (picked != null && picked != baseDate){
         if(target == DateTarget.start){
           setState(() {
