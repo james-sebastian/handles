@@ -15,6 +15,7 @@ import 'package:handles/screen/pages.dart';
 import 'dart:io' show Directory, File, Platform;
 import 'dart:math' as math;
 import 'package:intl/intl.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';

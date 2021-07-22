@@ -312,6 +312,15 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                               setState(() {
                                 selectedHandles = Set();
                               });
+                              Fluttertoast.showToast(
+                                msg: "${selectedHandles.length} archived",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.CENTER,
+                                timeInSecForIosWeb: 1,
+                                backgroundColor: Colors.red,
+                                textColor: Colors.white,
+                                fontSize: 16.0
+                              );
                             }
                           ),
                         ],
