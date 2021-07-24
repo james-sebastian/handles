@@ -106,6 +106,12 @@ class UserServices with ChangeNotifier{
         .getDownloadURL();
 
       await auth.currentUser!.updatePhotoURL(downloadURL);
+      await firestore
+      .collection('users')
+      .doc(auth.currentUser!.uid)
+      .update({
+        "profilePicture": downloadURL
+      });
 
     } on FirebaseException catch (e) {
       print(e.toString());

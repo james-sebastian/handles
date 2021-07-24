@@ -103,6 +103,14 @@ class AuthenticationService with ChangeNotifier{
               "creditCard": user.creditCard,
               "handlesList": user.handlesList,
             });
+          } else {
+            await firestore
+            .collection("users")
+            .doc(auth.currentUser!.uid)
+            .update({
+              "name": user.name,
+              "profilePicture": user.profilePicture,
+            });
           }
         }
       );

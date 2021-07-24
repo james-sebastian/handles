@@ -1,9 +1,11 @@
+import 'dart:math';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:chewie/chewie.dart';
 import 'package:country_list_pick/country_list_pick.dart';
+import 'package:dio/dio.dart';
 import 'package:favicon/favicon.dart' as Favicon;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,6 +25,9 @@ import 'package:handles/widget/widgets.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pinch_zoom/pinch_zoom.dart';
 import 'package:pinput/pin_put/pin_put.dart';
 import 'package:animate_do/animate_do.dart';
@@ -30,11 +35,13 @@ import 'package:timeline_tile/timeline_tile.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 import 'package:video_player/video_player.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
 // import 'package:timezone/timezone.dart' as tz;
 // import 'package:timezone/data/latest.dart' as tzDatabase;
 

@@ -2,10 +2,10 @@ part of "widgets.dart";
 
 class DocumentChat extends StatefulWidget {
   final int index;
-  final int scrollLocation;
+  final int? scrollLocation;
   final String userID;
   final String sender;
-  final String senderRole;
+  final String? senderRole;
   final String documentURL;
   final String handlesID;
   final String chatID;
@@ -13,12 +13,12 @@ class DocumentChat extends StatefulWidget {
   final bool isPinned;
   final ChatModel? replyTo;
   final DateTime timestamp;
-  final Set<int> selectedChats;
+  final Set<int>? selectedChats;
   final List<String> deletedBy;
   final List<String> readBy;
-  final void Function(int) chatOnTap;
-  final void Function(int) selectChatMethod;
-  final void Function(int) scrollToTarget;
+  final void Function(int)? chatOnTap;
+  final void Function(int)? selectChatMethod;
+  final void Function(int)? scrollToTarget;
 
   const DocumentChat({
     Key? key,
@@ -32,11 +32,11 @@ class DocumentChat extends StatefulWidget {
     required this.documentURL,
     required this.isRecurring,
     required this.isPinned,
-    required this.selectChatMethod,
-    required this.chatOnTap,
-    required this.selectedChats,
-    required this.scrollToTarget,
-    required this.scrollLocation,
+    this.selectChatMethod,
+    this.chatOnTap,
+    this.selectedChats,
+    this.scrollToTarget,
+    this.scrollLocation,
     required this.deletedBy,
     required this.readBy,
     this.replyTo,
@@ -242,15 +242,21 @@ class _DocumentChatState extends State<DocumentChat> {
               padding: EdgeInsets.symmetric(
                 horizontal: MQuery.width(0.01, context)
               ),
-              color: widget.selectedChats.toList().indexOf(widget.index) >= 0
-                ? Palette.primary.withOpacity(0.25)
+              color: widget.selectedChats != null
+                ? widget.selectedChats!.toList().indexOf(widget.index) >= 0
+                  ? Palette.primary.withOpacity(0.25)
+                  : Colors.transparent
                 : Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  widget.chatOnTap(widget.index);
+                  widget.chatOnTap == null
+                  ? print("")
+                  : widget.chatOnTap!(widget.index);
                 },
                 onLongPress: () {
-                  widget.selectChatMethod(widget.index);
+                  widget.selectChatMethod == null
+                  ? print("")
+                  : widget.selectChatMethod!(widget.index);
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -349,7 +355,9 @@ class _DocumentChatState extends State<DocumentChat> {
                                 widget.replyTo != null 
                                 ? GestureDetector(
                                   onTap: (){
-                                    widget.scrollToTarget(widget.scrollLocation);
+                                    widget.scrollToTarget == null
+                                    ? print("")
+                                    : widget.scrollToTarget!(widget.scrollLocation ?? 0);
                                   },
                                   child: ConstrainedBox(
                                       constraints: BoxConstraints(
@@ -554,15 +562,21 @@ class _DocumentChatState extends State<DocumentChat> {
                         EdgeInsets.only(bottom: MQuery.width(0.01, context)),
                     padding: EdgeInsets.symmetric(
                         horizontal: MQuery.width(0.01, context)),
-                    color: widget.selectedChats.toList().indexOf(widget.index) >= 0
-                    ? Palette.primary.withOpacity(0.25)
+                    color: widget.selectedChats != null
+                    ? widget.selectedChats!.toList().indexOf(widget.index) >= 0
+                      ? Palette.primary.withOpacity(0.25)
+                      : Colors.transparent
                     : Colors.transparent,
                     child: InkWell(
                       onTap: () {
-                        widget.chatOnTap(widget.index);
+                        widget.chatOnTap == null
+                        ? print("")
+                        : widget.chatOnTap!(widget.index);
                       },
                       onLongPress: () {
-                        widget.selectChatMethod(widget.index);
+                        widget.selectChatMethod == null
+                        ? print("")
+                        : widget.selectChatMethod!(widget.index);
                       },
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -720,7 +734,11 @@ class _DocumentChatState extends State<DocumentChat> {
                                       widget.replyTo != null
                                       ? GestureDetector(
                                         onTap: (){
-                                          widget.scrollToTarget(widget.scrollLocation);
+                                        
+                                          widget.scrollToTarget == null
+                                          ? print("")
+                                          : widget.scrollToTarget!(widget.scrollLocation ?? 0);
+                                          
                                         },
                                         child: ConstrainedBox(
                                             constraints: BoxConstraints(
