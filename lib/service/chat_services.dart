@@ -220,11 +220,11 @@ class ChatServices with ChangeNotifier{
     String name = flutter_path.basenameWithoutExtension(filePath);
     try {
       await storage
-      .ref('handles_media/$handlesName/docs/${name.substring(0, name.length - 1)}.${flutter_path.extension(filePath)}')
+      .ref('handles_media/$handlesName/docs/$name.${flutter_path.extension(filePath)}')
       .putFile(file);
 
       String downloadURL = await FirebaseStorage.instance
-        .ref('handles_media/$handlesName/docs/${name.substring(0, name.length - 1)}.${flutter_path.extension(filePath)}')
+        .ref('handles_media/$handlesName/docs/$name.${flutter_path.extension(filePath)}')
         .getDownloadURL();
 
       outputURL = downloadURL;
