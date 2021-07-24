@@ -13,7 +13,7 @@ class HandlesCoverPage extends StatefulWidget {
 
 class _HandlesCoverPageState extends State<HandlesCoverPage> {
 
-  PickedFile? _profileImage;
+  XFile? _profileImage;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class _HandlesCoverPageState extends State<HandlesCoverPage> {
         final _handlesProvider = watch(handlesProvider);
 
         _imgFromCamera() async {
-          PickedFile? image = await ImagePicker().getImage(
+          XFile? image = await ImagePicker().pickImage(
             source: ImageSource.camera, imageQuality: 50
           );
           setState(() {
@@ -33,7 +33,7 @@ class _HandlesCoverPageState extends State<HandlesCoverPage> {
         }
 
         _imgFromGallery() async {
-          PickedFile? image = await ImagePicker().getImage(
+          XFile? image = await ImagePicker().pickImage(
               source: ImageSource.gallery, imageQuality: 50
           );
           setState(() {
