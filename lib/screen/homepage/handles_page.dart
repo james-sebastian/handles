@@ -335,7 +335,6 @@ class _HandlesPageState extends State<HandlesPage> {
                                         iOS: CupertinoIcons.reply_thick_solid,
                                       ),
                                       onPressed: (){
-                                        // print(chats[selectedChatIndex.first].content);
                                         setState(() {
                                           isReplying = chats[selectedChatIndex.first];
                                           isChatSelected = false;
@@ -596,8 +595,6 @@ class _HandlesPageState extends State<HandlesPage> {
                                 ? chatList.firstWhere((element) => element.id == chatList[index].replyTo)
                                 : null;
 
-                                print(replyToModel);
-
                                 return Column(
                                   children: [    
                                     chatList[index].id == chatList.first.id
@@ -823,7 +820,6 @@ class _HandlesPageState extends State<HandlesPage> {
                                             return SizedBox();
                                           },
                                           error: (object , error){
-                                            print(object);
                                             return SizedBox();
                                           }
                                         )
@@ -1144,7 +1140,6 @@ class _HandlesPageState extends State<HandlesPage> {
                                                                             onPressed: (){
                                                                               Get.back();
                                                                               _chatProvider.uploadDocument(file.path!, handles.name).then((mediaURL){
-                                                                                print(mediaURL);
         
                                                                                 _chatProvider.sendDocumentChat(
                                                                                   widget.handlesID,
@@ -1194,7 +1189,6 @@ class _HandlesPageState extends State<HandlesPage> {
                                                                             onPressed: (){
                                                                               Get.back();
                                                                               _chatProvider.uploadDocument(file.path!, handles.name).then((mediaURL){
-                                                                                print(mediaURL);
         
                                                                                 _chatProvider.sendDocumentChat(
                                                                                   widget.handlesID,
@@ -1319,8 +1313,6 @@ class _HandlesPageState extends State<HandlesPage> {
                       return SizedBox();
                     },
                     error: (object , error){
-                      print(object);
-                      print(error);
                       return SizedBox();
                     }
                   )

@@ -769,7 +769,6 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                                   },
                                   loading: () => SizedBox(),
                                   error: (object, error){
-                                    print(error);
                                     return SizedBox();
                                   }
                                 );

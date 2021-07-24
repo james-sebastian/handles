@@ -181,7 +181,6 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
                             final String _downloadURL = watch(authenticationProvider).profilePictureDownloadURL;
                             if(_downloadURL != ""){
                               if(_authenticationProvider.auth.currentUser != null){
-                                print(_authenticationProvider.auth.currentUser);
                                 _authenticationProvider.createUserRecord(
                                   UserModel(
                                     id: _authenticationProvider.auth.currentUser!.uid,

@@ -164,7 +164,7 @@ class _DocumentChatState extends State<DocumentChat> {
             });
           } catch (e){
             setState(() {
-              isExist = true;
+              isExist = false;
             });
             return false;
           }
@@ -209,6 +209,12 @@ class _DocumentChatState extends State<DocumentChat> {
     ? SizedBox()
     : Consumer(
       builder: (ctx, watch, child) {
+
+        if(isExist == false){
+          WidgetsBinding.instance!.addPostFrameCallback((_){
+            checkFileExistence();
+          });
+        }
 
         final _userProvider = watch(userProvider);
         final _chatProvider = watch(chatProvider);
@@ -282,21 +288,20 @@ class _DocumentChatState extends State<DocumentChat> {
                                 Row(
                                   children: [
                                     FutureBuilder<String>(
-                                      future: getFileSize(
-                                          widget.documentURL, 2),
+                                      future: getFileSize(widget.documentURL, 2),
                                       builder: (context, snapshot) {
                                         return snapshot.hasData
-                                            ? Text(
-                                                snapshot.data ?? "",
-                                                textAlign: TextAlign.start,
-                                                style: TextStyle(
-                                                    color: Colors.white
-                                                        .withOpacity(0.5),
-                                                    fontWeight:
-                                                        FontWeight.w400,
-                                                    fontSize: 12),
-                                              )
-                                            : SizedBox();
+                                        ? Text(
+                                            snapshot.data ?? "",
+                                            textAlign: TextAlign.start,
+                                            style: TextStyle(
+                                                color: Colors.white
+                                                    .withOpacity(0.5),
+                                                fontWeight:
+                                                    FontWeight.w400,
+                                                fontSize: 12),
+                                          )
+                                        : SizedBox();
                                       }),
                                     SizedBox(width: 5),
                                     Container(
@@ -462,38 +467,33 @@ class _DocumentChatState extends State<DocumentChat> {
                                                   }),
                                             ],
                                           ),
-                                          FutureBuilder<bool?>(
-                                            future: checkFileExistence(),
-                                            builder: (context, snapshot) {
-                                              return IconButton(
-                                                onPressed: () {
-                                                  if(isExist){
-                                                    openFile();
-                                                  } else {
-                                                    getFileName(widget.documentURL).then((name){
-                                                      getFileExtension(widget.documentURL).then((ext){
-                                                        if(name != null){
-                                                          saveFile(widget.documentURL, "$name.$ext");
-                                                        }
-                                                      });
-                                                    });
-                                                  }
-                                                },
-                                                icon: isExist
-                                                ? AdaptiveIcon(
-                                                    android: Icons.folder_open,
-                                                    iOS: CupertinoIcons.folder_fill,
-                                                    size: 18,
-                                                    color: Palette.primary
-                                                  )
-                                                : AdaptiveIcon(
-                                                    android: Icons.download,
-                                                    iOS: CupertinoIcons.cloud_download_fill,
-                                                    size: 18,
-                                                    color: Palette.primary
-                                                  ),
-                                              );
-                                            }
+                                          IconButton(
+                                            onPressed: () {
+                                              if(isExist){
+                                                openFile();
+                                              } else {
+                                                getFileName(widget.documentURL).then((name){
+                                                  getFileExtension(widget.documentURL).then((ext){
+                                                    if(name != null){
+                                                      saveFile(widget.documentURL, "$name.$ext");
+                                                    }
+                                                  });
+                                                });
+                                              }
+                                            },
+                                            icon: isExist
+                                            ? AdaptiveIcon(
+                                                android: Icons.folder_open,
+                                                iOS: CupertinoIcons.folder_fill,
+                                                size: 18,
+                                                color: Palette.primary
+                                              )
+                                            : AdaptiveIcon(
+                                                android: Icons.download,
+                                                iOS: CupertinoIcons.cloud_download_fill,
+                                                size: 18,
+                                                color: Palette.primary
+                                              ),
                                           )
                                         ],
                                       ),
@@ -853,38 +853,33 @@ class _DocumentChatState extends State<DocumentChat> {
                                                         }),
                                                   ],
                                                 ),
-                                                FutureBuilder<bool?>(
-                                                  future: checkFileExistence(),
-                                                  builder: (context, snapshot) {
-                                                    return IconButton(
-                                                      onPressed: () {
-                                                        if(isExist){
-                                                          openFile();
-                                                        } else {
-                                                          getFileName(widget.documentURL).then((name){
-                                                            getFileExtension(widget.documentURL).then((ext){
-                                                              if(name != null){
-                                                                saveFile(widget.documentURL, "$name.$ext");
-                                                              }
-                                                            });
-                                                          });
-                                                        }
-                                                      },
-                                                      icon: isExist
-                                                      ? AdaptiveIcon(
-                                                          android: Icons.folder_open,
-                                                          iOS: CupertinoIcons.folder_fill,
-                                                          size: 18,
-                                                          color: Palette.primary
-                                                        )
-                                                      : AdaptiveIcon(
-                                                          android: Icons.download,
-                                                          iOS: CupertinoIcons.cloud_download_fill,
-                                                          size: 18,
-                                                          color: Palette.primary
-                                                        ),
-                                                    );
-                                                  }
+                                                IconButton(
+                                                  onPressed: () {
+                                                    if(isExist){
+                                                      openFile();
+                                                    } else {
+                                                      getFileName(widget.documentURL).then((name){
+                                                        getFileExtension(widget.documentURL).then((ext){
+                                                          if(name != null){
+                                                            saveFile(widget.documentURL, "$name.$ext");
+                                                          }
+                                                        });
+                                                      });
+                                                    }
+                                                  },
+                                                  icon: isExist
+                                                  ? AdaptiveIcon(
+                                                      android: Icons.folder_open,
+                                                      iOS: CupertinoIcons.folder_fill,
+                                                      size: 18,
+                                                      color: Palette.primary
+                                                    )
+                                                  : AdaptiveIcon(
+                                                      android: Icons.download,
+                                                      iOS: CupertinoIcons.cloud_download_fill,
+                                                      size: 18,
+                                                      color: Palette.primary
+                                                    ),
                                                 )
                                               ],
                                             ),

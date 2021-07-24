@@ -125,8 +125,6 @@ class _HandlesDetailedPageState extends State<HandlesDetailedPage> {
                                             onPressed: (){
                                               _userProvider.getUserByID(widget.currentUserID).then((value){
                                                 // ignore: unnecessary_null_comparison
-                                                print(value);
-                                                // ignore: unnecessary_null_comparison
                                                 if(value != null){
                                                   _handlesProvider.hardDeleteHandle(value, handles);
                                                 }
@@ -283,7 +281,7 @@ class _HandlesDetailedPageState extends State<HandlesDetailedPage> {
                               int mediaCount = 0;
                               if(snapshot.hasData){
                                 snapshot.data!.forEach((element) {
-                                  if(element.mediaURL != "" || element.mediaURL != null){
+                                  if(element.mediaURL != "" && element.deletedBy.indexOf(widget.currentUserID) < 0){
                                     mediaCount++;
                                   }
                                 });
@@ -314,7 +312,10 @@ class _HandlesDetailedPageState extends State<HandlesDetailedPage> {
                               : SizedBox();
                             }
                           ),
-                          onTap: (){Get.to(() => HandlesMediasPage(), transition: Transition.cupertino);}
+                          onTap: (){Get.to(() => HandlesMediasPage(
+                            handlesID: widget.handlesID,
+                            currentUserID: widget.currentUserID,
+                          ), transition: Transition.cupertino);}
                         ),
                         Divider(height: 1,),
                         ListTile(
@@ -592,9 +593,6 @@ class _HandlesDetailedPageState extends State<HandlesDetailedPage> {
                                                                 onPressed: (){
                                                                   handles.members.remove(snapshot.data!.id);
                                                                   Map<String, String> newHandlesMembers = handles.members;
-
-                                                                  print(newHandlesMembers);
-
                                                                   _handlesProvider.deleteHandleCollaborator(
                                                                     snapshot.data!,
                                                                     newHandlesMembers,
@@ -637,7 +635,7 @@ class _HandlesDetailedPageState extends State<HandlesDetailedPage> {
                                                                   handles.members.remove(snapshot.data!.id);
                                                                   Map<String, String> newHandlesMembers = handles.members;
 
-                                                                  print(newHandlesMembers);
+                                                                 
 
                                                                   _handlesProvider.deleteHandleCollaborator(
                                                                     snapshot.data!,
@@ -744,7 +742,7 @@ class _HandlesDetailedPageState extends State<HandlesDetailedPage> {
                                             handles.members.remove(widget.currentUserID);
                                             Map<String, String> newHandlesMembers = handles.members;
 
-                                            print(newHandlesMembers);
+                                           
 
                                             _userProvider.getUserByID(widget.currentUserID).then((value){
                                               // ignore: unnecessary_null_comparison
@@ -793,7 +791,7 @@ class _HandlesDetailedPageState extends State<HandlesDetailedPage> {
                                             handles.members.remove(widget.currentUserID);
                                             Map<String, String> newHandlesMembers = handles.members;
 
-                                            print(newHandlesMembers);
+                                           
 
                                             _userProvider.getUserByID(widget.currentUserID).then((value){
                                               // ignore: unnecessary_null_comparison
