@@ -50,6 +50,14 @@ class _ProjectChatState extends State<ProjectChat> {
           print(value);
         }); 
 
+        Map? localeModel;
+        final _userProvider = watch(currentUserProvider);
+        _userProvider.whenData((user){
+          localeModel = CountryCodeModel.countryCodes.firstWhere((element){
+            return element['dial_code'] == user.countryCode;
+          });
+        });
+
         return widget.sender == widget.userID
       ? Container(
           width: MQuery.width(1, context),
@@ -130,7 +138,11 @@ class _ProjectChatState extends State<ProjectChat> {
                                     _projectChatMilestonesProvider.when(
                                       data: (milestones){
                                         return Text(
-                                          NumberFormat.simpleCurrency(locale: 'en_AU').format(calculateTotalFee(milestones)),
+                                          NumberFormat.simpleCurrency(
+                                            locale: localeModel!['code'] == "US" || localeModel!['code'] == "GB" || localeModel!['code'] == "AU"
+                                            ? 'en_$localeModel!["code"]'
+                                            : localeModel!['code']
+                                          ).format(calculateTotalFee(milestones)),
                                           textAlign: TextAlign.start,
                                           style: TextStyle(
                                             fontSize: 12,
@@ -141,7 +153,11 @@ class _ProjectChatState extends State<ProjectChat> {
                                       },
                                       loading: (){
                                         return Text(
-                                          NumberFormat.simpleCurrency(locale: 'en_AU').format(0),
+                                          NumberFormat.simpleCurrency(
+                                            locale: localeModel!['code'] == "US" || localeModel!['code'] == "GB" || localeModel!['code'] == "AU"
+                                            ? 'en_$localeModel!["code"]'
+                                            : localeModel!['code']
+                                          ).format(0),
                                           textAlign: TextAlign.start,
                                           style: TextStyle(
                                             fontSize: 12,
@@ -356,7 +372,11 @@ class _ProjectChatState extends State<ProjectChat> {
                                     _projectChatMilestonesProvider.when(
                                       data: (milestones){
                                         return Text(
-                                          NumberFormat.simpleCurrency(locale: 'en_AU').format(calculateTotalFee(milestones)),
+                                          NumberFormat.simpleCurrency(
+                                            locale: localeModel!['code'] == "US" || localeModel!['code'] == "GB" || localeModel!['code'] == "AU"
+                                            ? 'en_$localeModel!["code"]'
+                                            : localeModel!['code']
+                                          ).format(calculateTotalFee(milestones)),
                                           textAlign: TextAlign.start,
                                           style: TextStyle(
                                             fontSize: 12,
@@ -366,7 +386,11 @@ class _ProjectChatState extends State<ProjectChat> {
                                       },
                                       loading: (){
                                         return Text(
-                                          NumberFormat.simpleCurrency(locale: 'en_AU').format(0),
+                                          NumberFormat.simpleCurrency(
+                                            locale: localeModel!['code'] == "US" || localeModel!['code'] == "GB" || localeModel!['code'] == "AU"
+                                            ? 'en_$localeModel!["code"]'
+                                            : localeModel!['code']
+                                          ).format(0),
                                           textAlign: TextAlign.start,
                                           style: TextStyle(
                                             fontSize: 12,

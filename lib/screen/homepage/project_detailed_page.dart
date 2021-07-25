@@ -33,6 +33,14 @@ class _ProjectDetailedPageState extends State<ProjectDetailedPage> {
       builder: (ctx, watch,child) {
 
         final _projectChatMilestonesProvider = watch(projectChatMilestonesProvider(widget.projectModel.id));
+        
+        Map? localeModel;
+        final _userProvider = watch(currentUserProvider);
+        _userProvider.whenData((user){
+          localeModel = CountryCodeModel.countryCodes.firstWhere((element){
+            return element['dial_code'] == user.countryCode;
+          });
+        });
 
         return Scaffold(
           backgroundColor: Colors.white,
@@ -156,7 +164,11 @@ class _ProjectDetailedPageState extends State<ProjectDetailedPage> {
                                 _projectChatMilestonesProvider.when(
                                   data: (milestones){
                                     return Text(
-                                      NumberFormat.simpleCurrency(locale: 'en_AU').format(calculateTotalFee(milestones)),
+                                      NumberFormat.simpleCurrency(
+                                        locale: localeModel!['code'] == "US" || localeModel!['code'] == "GB" || localeModel!['code'] == "AU"
+                                        ? 'en_$localeModel!["code"]'
+                                        : localeModel!['code']
+                                      ).format(calculateTotalFee(milestones)),
                                       textAlign: TextAlign.start,
                                       style: TextStyle(
                                         fontSize: 16,
@@ -166,7 +178,11 @@ class _ProjectDetailedPageState extends State<ProjectDetailedPage> {
                                   },
                                   loading: (){
                                     return Text(
-                                      NumberFormat.simpleCurrency(locale: 'en_AU').format(0),
+                                      NumberFormat.simpleCurrency(
+                                        locale: localeModel!['code'] == "US" || localeModel!['code'] == "GB" || localeModel!['code'] == "AU"
+                                        ? 'en_$localeModel!["code"]'
+                                        : localeModel!['code']
+                                      ).format(0),
                                       textAlign: TextAlign.start,
                                       style: TextStyle(
                                         fontSize: 16,
@@ -301,7 +317,11 @@ class _ProjectDetailedPageState extends State<ProjectDetailedPage> {
                                                             ),
                                                           ),
                                                           Text(
-                                                            NumberFormat.simpleCurrency(locale: 'en_AU').format(target.fee),
+                                                            NumberFormat.simpleCurrency(
+                                                              locale: localeModel!['code'] == "US" || localeModel!['code'] == "GB" || localeModel!['code'] == "AU"
+                                                              ? 'en_$localeModel!["code"]'
+                                                              : localeModel!['code']
+                                                            ).format(target.fee),
                                                             style: TextStyle(
                                                               fontSize: 14,
                                                               color: Palette.primaryText,

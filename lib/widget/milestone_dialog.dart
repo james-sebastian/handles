@@ -32,6 +32,13 @@ class MilestoneDialog extends ConsumerWidget {
   Widget build(BuildContext context, watch) {
 
     final _chatProvider = watch(chatProvider);
+    Map? localeModel;
+    final _userProvider = watch(currentUserProvider);
+    _userProvider.whenData((user){
+      localeModel = CountryCodeModel.countryCodes.firstWhere((element){
+        return element['dial_code'] == user.countryCode;
+      });
+    });
 
     return ConstrainedBox(
       constraints: BoxConstraints(
@@ -55,7 +62,11 @@ class MilestoneDialog extends ConsumerWidget {
               ),
               SizedBox(height: MQuery.height(0.005, context)),
               Text(
-                NumberFormat.simpleCurrency(locale: 'en_AU').format(this.fee),
+                NumberFormat.simpleCurrency(
+                  locale: localeModel!['code'] == "US" || localeModel!['code'] == "GB" || localeModel!['code'] == "AU"
+                  ? 'en_$localeModel!["code"]'
+                  : localeModel!['code']
+                ).format(this.fee),
                 style: TextStyle(
                   fontSize: 16,
                   color: Palette.primaryText,

@@ -56,45 +56,6 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
         final _chatProvider = watch(chatProvider);
         final _userProvider = watch(userProvider);
 
-        askNotificationPermission().then((value) async {
-            // tzDatabase.initializeTimeZones();
-
-            // const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-            //   'your channel id', 'your channel name', 'your channel description',
-            //   importance: Importance.max,
-            //   priority: Priority.high,
-            //   showWhen: false
-            // );
-
-            // var iOSPlatformChannelSpecifics = IOSNotificationDetails(
-            //     presentAlert: true,
-            //     presentBadge: true,
-            //     presentSound: true
-            // );
-
-            // var platformChannelSpecifics = NotificationDetails(
-            //     android: androidPlatformChannelSpecifics,
-            //     iOS: iOSPlatformChannelSpecifics);
-            // await FlutterLocalNotificationsPlugin().show(
-            //     0, 'plain title', 'plain body', platformChannelSpecifics,
-            //     payload: 'item x'
-            // );
-            // await FlutterLocalNotificationsPlugin().zonedSchedule(
-            //   0,
-            //   'scheduled title',
-            //   'scheduled body',
-              
-            //   //TODO: SHAREDPREFERENCES LOCATIONS
-            //   tz.TZDateTime.now(tz.getLocation('Asia/Jakarta')).add(Duration(seconds: 5)),
-            //   platformChannelSpecifics,
-            //   androidAllowWhileIdle: true,
-            //   uiLocalNotificationDateInterpretation:
-            //       UILocalNotificationDateInterpretation.absoluteTime
-            //   );
-            // FlutterAppBadger.updateBadgeCount(1);
-            
-        });
-
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           home: Scaffold(
@@ -478,6 +439,17 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
             ),
             body: _currentUserProvider.when(
               data: (user){
+
+                Map test = CountryCodeModel.countryCodes.firstWhere((element){
+                  return element['dial_code'] == user.countryCode;
+                });
+
+                print(NumberFormat.simpleCurrency(
+                  locale: test['code'] == "US" || test['code'] == "GB" || test['code'] == "AU"
+                  ? 'en_$test["code"]'
+                  : test['code']
+                ).format(2000));
+
                 return TabBarView(
                   controller: _tabController,
                   children: [

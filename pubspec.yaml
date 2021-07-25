@@ -28,6 +28,7 @@ dependencies:
   chewie: ^1.2.2
   cloud_firestore: ^2.2.2
   contacts_service: ^0.6.1
+  country_codes: ^2.0.1
   country_list_pick: ^1.0.1+4
   cupertino_icons: ^1.0.2
   dio: ^4.0.0
