@@ -554,12 +554,14 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
 
                                 return _singleHandlesProvider.when(
                                   data: (handles){
+
+                                    print(handles);
+
                                     return handles.archivedBy!.indexOf(user.id) >= 0
                                     ? SizedBox()
                                     : StreamBuilder<List<ChatModel>>(
                                         stream: _chatProvider.handlesChats(handles.id),
                                         builder: (context, chatList) {
-
                                           int newMessages = 0;
 
                                           if(chatList.hasData){
@@ -769,6 +771,7 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                                   },
                                   loading: () => SizedBox(),
                                   error: (object, error){
+                                    print(error);
                                     return SizedBox();
                                   }
                                 );

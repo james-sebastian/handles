@@ -286,7 +286,8 @@ class ChatServices with ChangeNotifier{
       "timestamp": DateTime.now().toString(),
       "isPinned": false,
       "deletedBy": [],
-      "readBy": []
+      "readBy": [],
+      "replyTo": ""
     });
   }
 
@@ -460,7 +461,8 @@ class ChatServices with ChangeNotifier{
       "timestamp": DateTime.now().toString(),
       "isPinned": false,
       "deletedBy": [],
-      "readBy": []
+      "readBy": [],
+      "replyTo": ""
     });
   }
 
