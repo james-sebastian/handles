@@ -13,15 +13,17 @@ class _HandlesPageState extends State<HandlesPage> {
 
   late ItemScrollController _scrollController;
   TextEditingController chatController = TextEditingController();
+  String searchKey = "";
   bool isSearchActive = false;
   bool isChatSelected = false;
   bool isChatting = false;
   bool isScrolled = false;
-  ChatModel? isReplying;
+  int searchIndex = 0;
   int isFilterChipSelected = -1;
   int lineCount = 4;
   int pinnedMinus = 1;
   Set<int> selectedChatIndex = Set();
+  ChatModel? isReplying;
 
   void scrollToBottom(int bottomIndex) {
     _scrollController.jumpTo(
@@ -115,6 +117,8 @@ class _HandlesPageState extends State<HandlesPage> {
           return userModel;
         }
 
+        print(searchKey);
+
         return _singleHandlesProvider.when(
           data: (handles){
             return _currentUserProvider.when(
@@ -125,7 +129,9 @@ class _HandlesPageState extends State<HandlesPage> {
                     elevation: isSearchActive ? 0 : 1,
                     toolbarHeight: MQuery.height(0.075, context),
                     leadingWidth: !isChatSelected 
-                    ? MQuery.width(0.085, context)
+                    ? isSearchActive
+                      ? MQuery.width(0.04, context)
+                      : MQuery.width(0.085, context)
                     : 0,
                     leading: !isChatSelected
                     ? Container(
@@ -140,23 +146,26 @@ class _HandlesPageState extends State<HandlesPage> {
                               android: Icons.arrow_back,
                               iOS: CupertinoIcons.back,
                             ),
-                            SizedBox(width: MQuery.width(0.005, context)),
-                            Hero(
-                              tag: "handles_picture",
-                              child: CircleAvatar(
-                                backgroundColor: Colors.white,
-                                backgroundImage: handles.cover != ""
-                                ? NetworkImage(handles.cover) as ImageProvider
-                                : AssetImage("assets/handles_logo.png"),
-                                radius: MQuery.height(0.0215, context),
-                              ),
-                            )
+                            SizedBox(width: MQuery.width(0, context)),
+                            isSearchActive
+                            ? SizedBox()
+                            : Hero(
+                                tag: "handles_picture",
+                                child: CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  backgroundImage: handles.cover != ""
+                                  ? NetworkImage(handles.cover) as ImageProvider
+                                  : AssetImage("assets/handles_logo.png"),
+                                  radius: MQuery.height(0.0215, context),
+                                ),
+                              )
                           ],
                         ),
                         onTap: (){
                           if(isSearchActive){
                             setState(() {
                               isSearchActive = false;
+                              searchKey = "";
                             }); 
                           } else {
                             Get.back();
@@ -170,6 +179,7 @@ class _HandlesPageState extends State<HandlesPage> {
                         child: Container(
                           width: MQuery.width(0.35, context),
                           child: TextField(
+                            cursorColor: Colors.white,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -182,6 +192,11 @@ class _HandlesPageState extends State<HandlesPage> {
                                 fontSize: 18,
                               )
                             ),
+                            onChanged: (value){
+                              setState(() {
+                                searchKey = value;
+                              });
+                            }
                           )
                         )
                       )
@@ -247,20 +262,93 @@ class _HandlesPageState extends State<HandlesPage> {
                     ),
                     actions: [
                       if (isSearchActive)
-                        IconButton(
-                          tooltip: "Search",
-                          icon: AdaptiveIcon(
-                            android: Icons.search,
-                            iOS: CupertinoIcons.search
-                          ),
-                          onPressed: (){
-                            if(!isSearchActive){
-                              setState(() {
-                                isSearchActive = true;
-                              });
-                            } else {
-                              //TODO: SEARCH MECHANISM HERE
-                            }
+                        StreamBuilder<List<ChatModel>>(
+                          stream: _chatProvider.chatModelSearcher(widget.handlesID, searchKey),
+                          builder: (context, snapshot) {
+
+                            List<int> filteredChatLocations = [];
+
+                           _chatListProvider.whenData((value){
+                              if(snapshot.hasData){
+                                snapshot.data!.forEach((chat) {
+                                  filteredChatLocations.add(value.indexWhere((element){
+                                    return element.id == chat.id;
+                                  }));
+                                });
+                              }
+                            });
+
+                            return Row(
+                              children: [
+                                searchKey != ""
+                                ? IconButton(
+                                    tooltip: "Previous",
+                                    icon: AdaptiveIcon(
+                                      android: Icons.arrow_upward,
+                                      iOS: CupertinoIcons.arrow_up
+                                    ),
+                                    onPressed: (){
+                                      print(filteredChatLocations[searchIndex]);
+                                      if(snapshot.hasData){
+                                        _scrollController.scrollTo(
+                                          index: filteredChatLocations[searchIndex],
+                                          duration: Duration(milliseconds: 250)
+                                        ).then((value){
+                                          setState(() {
+                                            if(searchIndex == 0){
+                                              searchIndex = filteredChatLocations.length;
+                                            } else {
+                                              searchIndex--;
+                                            }
+                                          });
+                                        });
+                                      }
+                                    }
+                                  )
+                                : SizedBox(),
+                                searchKey != ""
+                                ? IconButton(
+                                    tooltip: "Forward",
+                                    icon: AdaptiveIcon(
+                                      android: Icons.arrow_downward,
+                                      iOS: CupertinoIcons.arrow_down
+                                    ),
+                                    onPressed: (){
+
+                                      print(filteredChatLocations[searchIndex]);
+
+                                      if(snapshot.hasData){
+                                        _scrollController.scrollTo(
+                                          index: filteredChatLocations[searchIndex],
+                                          duration: Duration(milliseconds: 250)
+                                        ).then((value){
+                                          setState(() {
+                                            if(searchIndex == filteredChatLocations.length){
+                                              searchIndex = 0;
+                                            } else {
+                                              searchIndex++;
+                                            }
+                                          });
+                                        });
+                                      }
+                                    }
+                                  )
+                                : IconButton(
+                                  tooltip: "Search",
+                                  icon: AdaptiveIcon(
+                                    android: Icons.search,
+                                    iOS: CupertinoIcons.search
+                                  ),
+                                  onPressed: (){
+                                    if(!isSearchActive){
+                                      setState(() {
+                                        isSearchActive = true;
+                                      });
+                                    }
+                                  }
+                                ),
+                              ],
+                            );
                           }
                         )
                       else
@@ -380,7 +468,9 @@ class _HandlesPageState extends State<HandlesPage> {
                                   android: Icons.add_call,
                                   iOS: CupertinoIcons.phone_solid,
                                 ),
-                                onPressed: (){}
+                                onPressed: (){
+                                  Get.to(() => CallPage(), transition: Transition.cupertino);
+                                }
                               ),
                               IconButton(
                                 tooltip: "Search",
@@ -412,60 +502,7 @@ class _HandlesPageState extends State<HandlesPage> {
 
                       return Column(
                         children: [
-                          if (isSearchActive)
-                          Container(
-                            color: Palette.primary,
-                            width: MQuery.width(1, context),
-                            height: MQuery.height(0.075, context),
-                            padding: EdgeInsets.symmetric(
-                              vertical: MQuery.height(0.01 ,context),
-                              horizontal: MQuery.width(0.0225, context)
-                            ),
-                            child: ListView(
-                              scrollDirection: Axis.horizontal,
-                              children: Constants.filterList.map((e){
-                                return Padding(
-                                  padding: EdgeInsets.only(
-                                    left: 8.0
-                                  ),
-                                  child: FilterChip(
-                                    padding: EdgeInsets.only(
-                                      left: 10,
-                                      right: 10,
-                                      top: 5,
-                                      bottom: 5
-                                    ),
-                                    shape: StadiumBorder(side: BorderSide(
-                                      color: Constants.filterList.indexOf(e) == isFilterChipSelected
-                                      ? Palette.filterSelected
-                                      : Palette.filterSelected.withOpacity(0.25)
-                                    )),
-                                    shadowColor: Colors.transparent,
-                                    backgroundColor: Palette.primary,
-                                    selectedColor: Palette.filterSelected,
-                                    elevation: 0,
-                                    showCheckmark: false,
-                                    avatar: Constants.filterAvatar[e],
-                                    label: Text(e),
-                                    labelStyle: TextStyle(
-                                      color: Colors.white
-                                    ),
-                                    selected: Constants.filterList.indexOf(e) == isFilterChipSelected,
-                                    onSelected: (bool selected) {
-                                      Constants.filterList.indexOf(e) != isFilterChipSelected
-                                      ? setState((){
-                                          isFilterChipSelected = Constants.filterList.indexOf(e);
-                                        })
-                                      : setState((){
-                                          isFilterChipSelected = -1;
-                                        });
-                                    },
-                                  ),
-                                );
-                              }).toList().cast<Widget>()        
-                            ),
-                          ) else
-                          SizedBox(),
+
                           isKeyboardOpen
                           ? SizedBox()
                           : Builder(
@@ -854,7 +891,7 @@ class _HandlesPageState extends State<HandlesPage> {
                                       padding: EdgeInsets.only(
                                         left: MQuery.width(0.01, context),
                                         right: MQuery.width(0.01, context),
-                                        top: isKeyboardOpen && isReplying != null ? MQuery.width(0.015, context) : MQuery.width(0, context),
+                                        top: isKeyboardOpen && isReplying != null ? MQuery.width(0.015, context) : MQuery.width(0.003, context),
                                         bottom: MQuery.width(0.005, context),
                                       ),
                                       decoration: BoxDecoration(
@@ -1025,6 +1062,8 @@ class _HandlesPageState extends State<HandlesPage> {
                                                 isPinned: false
                                               )
                                             );
+
+                                            scrollToBottom(chatList.length);
                                           });
                                           setState(() {
                                             chatController.text = "";

@@ -12,8 +12,8 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
 
   bool isReadOnly = true;
-  PickedFile? _profileImage;
-  PickedFile? _companyLogo;
+  XFile? _profileImage;
+  XFile? _companyLogo;
   TextEditingController nameController = TextEditingController();
   TextEditingController jobController = TextEditingController();
   TextEditingController companyController = TextEditingController();
@@ -37,7 +37,7 @@ class _ProfilePageState extends State<ProfilePage> {
         final _userProvider = watch(userProvider);
 
         _imgFromCamera(ImageTarget target) async {
-          PickedFile? image = await ImagePicker().getImage(
+          XFile? image = await ImagePicker().pickImage(
             source: ImageSource.camera, imageQuality: 50
           );
           setState(() {
@@ -52,7 +52,7 @@ class _ProfilePageState extends State<ProfilePage> {
         }
 
         _imgFromGallery(ImageTarget target) async {
-          PickedFile? image = await ImagePicker().getImage(
+          XFile? image = await ImagePicker().pickImage(
               source: ImageSource.gallery, imageQuality: 50
           );
           setState(() {

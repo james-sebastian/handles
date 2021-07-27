@@ -618,4 +618,32 @@ class ChatServices with ChangeNotifier{
       "readBy": newReadBy
     });
   }
+
+  Stream<List<ChatModel>> chatModelSearcher(String handlesID, String searchKey){
+    return firestore
+    .collection('handles')
+    .doc(handlesID)
+    .collection('messages')
+    .where('content', isGreaterThanOrEqualTo: searchKey)
+    .where('content', isLessThan: searchKey +'z')
+    .snapshots()
+    .map((value){
+      List<ChatModel> out = [];
+      value.docs.forEach((chat) {
+        out.add(ChatModel(
+          id: chat.id,
+          sender: chat['sender'],
+          type: chatTypeDeterminer(chat['type']),
+          content: chat['content'] ?? "",
+          mediaURL: chat['mediaURL'] ?? "",
+          isPinned: chat['isPinned'],
+          replyTo: chat['replyTo'] ?? "",
+          readBy: (chat['readBy'] as List<dynamic>).cast<String>(),
+          deletedBy: (chat['deletedBy'] as List<dynamic>).cast<String>(),
+          timestamp: DateTime.parse(chat['timestamp'])
+        ));
+      });
+      return out;
+    });
+  }
 }

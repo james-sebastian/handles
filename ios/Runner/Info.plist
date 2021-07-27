@@ -29,15 +29,11 @@
 		<key>UISupportedInterfaceOrientations</key>
 		<array>
 			<string>UIInterfaceOrientationPortrait</string>
-			<string>UIInterfaceOrientationLandscapeLeft</string>
-			<string>UIInterfaceOrientationLandscapeRight</string>
 		</array>
 		<key>UISupportedInterfaceOrientations~ipad</key>
 		<array>
 			<string>UIInterfaceOrientationPortrait</string>
 			<string>UIInterfaceOrientationPortraitUpsideDown</string>
-			<string>UIInterfaceOrientationLandscapeLeft</string>
-			<string>UIInterfaceOrientationLandscapeRight</string>
 		</array>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
@@ -51,7 +47,7 @@
 		<string>Allow access to photo library</string>
 
 		<key>NSCameraUsageDescription</key>
-		<string>Allow access to camera to capture photos</string>
+		<string>Allow access to camera to capture photos and video calling</string>
 
 		<key>NSMicrophoneUsageDescription</key>
 		<string>Allow access to microphone</string>
@@ -71,7 +67,6 @@
 		<key>NSContactsUsageDescription</key>  
 		<string>We need to access your contacts to invite collaborators of your choice</string>  
 		<key>NSMicrophoneUsageDescription</key>
-		<string>We need to access to the microphone to record audio file</string>
-		
+		<string>We need to access your microphone for video calling, voice calling and video recording</string>
 	</dict>
 </plist>

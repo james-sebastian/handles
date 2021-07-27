@@ -3,7 +3,7 @@ part of "config.dart";
 class Constants{
   static List<String> filterList = [
     "Photos", "Videos",
-    "Docs", "Meetings", "Services"
+    "Docs", "Meets", "Projects"
   ];
 
   static Map<String, Widget> filterAvatar = {

@@ -173,7 +173,10 @@ class _ArchivedHandlesState extends State<ArchivedHandles> {
                                           )
                                         ),
                                         onPressed: (){
-                                          //TODO: DELETION LOGIC...
+                                          _handlesProvider.deleteHandles(selectedHandles.toList());
+                                          setState(() {
+                                            selectedHandles = Set();
+                                          });
                                           Get.back();
                                         },
                                       )
