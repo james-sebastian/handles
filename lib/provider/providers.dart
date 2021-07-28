@@ -11,3 +11,4 @@ part 'storage_provider.dart';
 part 'user_provider.dart';
 part 'handles_provider.dart';
 part 'chat_provider.dart';
+part 'call_provider.dart';

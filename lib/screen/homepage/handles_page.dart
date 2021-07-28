@@ -49,7 +49,6 @@ class _HandlesPageState extends State<HandlesPage> {
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom != 0;
@@ -102,9 +101,10 @@ class _HandlesPageState extends State<HandlesPage> {
       builder: (ctx, watch,child) {
 
         final _chatProvider = watch(chatProvider);
+        final _userProvider = watch(userProvider);
+        final _callProvider = watch(callProvider);
         final _currentUserProvider = watch(currentUserProvider);
         final _chatListProvider = watch(chatListProvider(widget.handlesID));
-        final _userProvider = watch(userProvider);
         final _singleHandlesProvider = watch(singleHandlesProvider(widget.handlesID));
 
         Future<List<UserModel>> getUserModelFromList(List<String> usersID) async{
@@ -116,8 +116,6 @@ class _HandlesPageState extends State<HandlesPage> {
           });
           return userModel;
         }
-
-        print(searchKey);
 
         return _singleHandlesProvider.when(
           data: (handles){
@@ -469,7 +467,141 @@ class _HandlesPageState extends State<HandlesPage> {
                                   iOS: CupertinoIcons.phone_solid,
                                 ),
                                 onPressed: (){
-                                  Get.to(() => CallPage(), transition: Transition.cupertino);
+                                  Get.bottomSheet(
+                                    BottomSheet(
+                                      enableDrag: true,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(20),
+                                          topRight: Radius.circular(20)
+                                        ) 
+                                      ),
+                                      onClosing: (){},
+                                      builder: (context){
+
+                                        Set<String> selectedCaller = Set();
+
+                                        return StatefulBuilder(
+                                          builder: (context, setModalState){
+                                            return Container(
+                                              height: MQuery.height(0.95, context),
+                                              padding: EdgeInsets.all(
+                                                MQuery.height(0.02, context)
+                                              ),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Expanded(
+                                                    flex: 2,
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [          
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          children: [
+                                                            Font.out(
+                                                              "Invite call's participants:",
+                                                              fontSize: 16,
+                                                              fontWeight: FontWeight.normal,
+                                                              textAlign: TextAlign.start,
+                                                              color: Palette.primary
+                                                            ),
+                                                            IconButton(
+                                                              icon: AdaptiveIcon(
+                                                                android: Icons.arrow_right_alt,
+                                                                iOS: CupertinoIcons.chevron_right,
+                                                                color: Palette.primary
+                                                              ),
+                                                              onPressed: (){
+                                                                if(selectedCaller.length >= 1){
+                                                                  _callProvider.createCallChannel(handles.id, DateTime.now());
+                                                                  Get.to(() => CallPage(
+                                                                    client: AgoraClient(
+                                                                      agoraConnectionData: AgoraConnectionData(
+                                                                        appId: "33a7608a9e714097bb913a6e7e6ba3a2",
+                                                                        channelName: handles.id,
+                                                                      ),
+                                                                      enabledPermission: [
+                                                                        Permission.camera,
+                                                                        Permission.microphone,
+                                                                      ],
+                                                                    ),
+                                                                    participants: selectedCaller.toList()
+                                                                  ));
+                                                                }
+                                                              }
+                                                            )
+                                                          ],
+                                                        ),
+                                                        SizedBox(height: MQuery.height(0.01, context)),
+                                                        Expanded(
+                                                          flex: 7,
+                                                          child: Container(
+                                                            child: ListView.builder(
+                                                              itemCount: handles.members.length,
+                                                              shrinkWrap: true,
+                                                              itemBuilder: (context, index){
+                                                                return FutureBuilder<UserModel>(
+                                                                  future: _userProvider.getUserByID(handles.members.keys.toList()[index]),
+                                                                  builder: (context, snapshot) {
+                                                                    return snapshot.hasData
+                                                                    ? ListTile(
+                                                                        onTap: (){
+                                                                          if(selectedCaller.toList().indexOf(snapshot.data!.id) >= 0){
+                                                                            setModalState(() {
+                                                                              selectedCaller.remove(snapshot.data!.id);
+                                                                            });
+                                                                          } else {
+                                                                            setModalState(() {
+                                                                              selectedCaller.add(snapshot.data!.id);
+                                                                            });
+                                                                          }
+                                                                        },
+                                                                        contentPadding: EdgeInsets.all(
+                                                                          MQuery.height(0.005, context),
+                                                                        ),
+                                                                        leading: CircleAvatar(
+                                                                          backgroundColor: Palette.primary,
+                                                                          radius: MQuery.height(0.025, context),
+                                                                          backgroundImage: snapshot.data!.profilePicture != ""
+                                                                          ? NetworkImage(snapshot.data!.profilePicture!) as ImageProvider
+                                                                          : AssetImage("assets/sample_profile.png"),
+                                                                        ),
+                                                                        title: Font.out(
+                                                                          snapshot.data!.name,
+                                                                          fontSize: 16,
+                                                                          textAlign: TextAlign.start
+                                                                        ),      
+                                                                        trailing: selectedCaller.toList().indexOf(snapshot.data!.id) >= 0
+                                                                        ? ZoomIn(
+                                                                            duration: Duration(milliseconds: 100),
+                                                                            child: Positioned(
+                                                                              child: CircleAvatar(
+                                                                                radius: 10,
+                                                                                child: Icon(Icons.check, size: 12, color: Colors.white),
+                                                                                backgroundColor: Palette.secondary
+                                                                              ),
+                                                                            ),
+                                                                          )
+                                                                        : SizedBox(),
+                                                                      )
+                                                                    : SizedBox();
+                                                                  }
+                                                                );
+                                                              },
+                                                            ),
+                                                          ),
+                                                      ),
+                                                    ],
+                                                  )
+                                                )
+                                              ]
+                                            )
+                                          );},
+                                        );
+                                      } 
+                                    )
+                                  );
                                 }
                               ),
                               IconButton(
@@ -584,10 +716,10 @@ class _HandlesPageState extends State<HandlesPage> {
                                                     : pinnedChats[targetIndex].type != ChatType.plain 
                                                       ? "$name: ${
                                                           pinnedChats[targetIndex].type == ChatType.image
-                                                          ? "Image"
-                                                          : pinnedChats[targetIndex].type == ChatType.image
-                                                            ? "Video"
-                                                            : "Docs"
+                                                          ? "[Image]"
+                                                          : pinnedChats[targetIndex].type == ChatType.video
+                                                            ? "[Video]"
+                                                            : "[Docs]"
                                                         }"
                                                       : "$name: ${pinnedChats[targetIndex].content}",
                                                     textAlign: TextAlign.start,
