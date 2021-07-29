@@ -459,149 +459,204 @@ class _HandlesPageState extends State<HandlesPage> {
                         else
                           Row(
                             children: [
-                              IconButton(
-                                padding: EdgeInsets.zero,
-                                tooltip: "Make a Group Call",
-                                icon: AdaptiveIcon(
-                                  android: Icons.add_call,
-                                  iOS: CupertinoIcons.phone_solid,
-                                ),
-                                onPressed: (){
-                                  Get.bottomSheet(
-                                    BottomSheet(
-                                      enableDrag: true,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(20),
-                                          topRight: Radius.circular(20)
-                                        ) 
-                                      ),
-                                      onClosing: (){},
-                                      builder: (context){
+                              watch(callChannelProvider(handles.id)).when(
+                                data: (callChannel){
 
-                                        Set<String> selectedCaller = Set();
+                                  if(callChannel.participants == []){
+                                    print("ready to call");
+                                  } else {
+                                    print("call is used");
+                                  }
 
-                                        return StatefulBuilder(
-                                          builder: (context, setModalState){
-                                            return Container(
-                                              height: MQuery.height(0.95, context),
-                                              padding: EdgeInsets.all(
-                                                MQuery.height(0.02, context)
-                                              ),
-                                              child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Expanded(
-                                                    flex: 2,
-                                                    child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [          
-                                                        Row(
-                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                          children: [
-                                                            Font.out(
-                                                              "Invite call's participants:",
-                                                              fontSize: 16,
-                                                              fontWeight: FontWeight.normal,
-                                                              textAlign: TextAlign.start,
-                                                              color: Palette.primary
-                                                            ),
-                                                            IconButton(
-                                                              icon: AdaptiveIcon(
-                                                                android: Icons.arrow_right_alt,
-                                                                iOS: CupertinoIcons.chevron_right,
-                                                                color: Palette.primary
-                                                              ),
-                                                              onPressed: (){
-                                                                if(selectedCaller.length >= 1){
-                                                                  _callProvider.createCallChannel(handles.id, DateTime.now());
-                                                                  Get.to(() => CallPage(
-                                                                    client: AgoraClient(
-                                                                      agoraConnectionData: AgoraConnectionData(
-                                                                        appId: "33a7608a9e714097bb913a6e7e6ba3a2",
-                                                                        channelName: handles.id,
-                                                                      ),
-                                                                      enabledPermission: [
-                                                                        Permission.camera,
-                                                                        Permission.microphone,
-                                                                      ],
-                                                                    ),
-                                                                    participants: selectedCaller.toList()
-                                                                  ));
-                                                                }
-                                                              }
-                                                            )
-                                                          ],
-                                                        ),
-                                                        SizedBox(height: MQuery.height(0.01, context)),
-                                                        Expanded(
-                                                          flex: 7,
-                                                          child: Container(
-                                                            child: ListView.builder(
-                                                              itemCount: handles.members.length,
-                                                              shrinkWrap: true,
-                                                              itemBuilder: (context, index){
-                                                                return FutureBuilder<UserModel>(
-                                                                  future: _userProvider.getUserByID(handles.members.keys.toList()[index]),
-                                                                  builder: (context, snapshot) {
-                                                                    return snapshot.hasData
-                                                                    ? ListTile(
-                                                                        onTap: (){
-                                                                          if(selectedCaller.toList().indexOf(snapshot.data!.id) >= 0){
-                                                                            setModalState(() {
-                                                                              selectedCaller.remove(snapshot.data!.id);
-                                                                            });
-                                                                          } else {
-                                                                            setModalState(() {
-                                                                              selectedCaller.add(snapshot.data!.id);
-                                                                            });
-                                                                          }
-                                                                        },
-                                                                        contentPadding: EdgeInsets.all(
-                                                                          MQuery.height(0.005, context),
-                                                                        ),
-                                                                        leading: CircleAvatar(
-                                                                          backgroundColor: Palette.primary,
-                                                                          radius: MQuery.height(0.025, context),
-                                                                          backgroundImage: snapshot.data!.profilePicture != ""
-                                                                          ? NetworkImage(snapshot.data!.profilePicture!) as ImageProvider
-                                                                          : AssetImage("assets/sample_profile.png"),
-                                                                        ),
-                                                                        title: Font.out(
-                                                                          snapshot.data!.name,
-                                                                          fontSize: 16,
-                                                                          textAlign: TextAlign.start
-                                                                        ),      
-                                                                        trailing: selectedCaller.toList().indexOf(snapshot.data!.id) >= 0
-                                                                        ? ZoomIn(
-                                                                            duration: Duration(milliseconds: 100),
-                                                                            child: Positioned(
-                                                                              child: CircleAvatar(
-                                                                                radius: 10,
-                                                                                child: Icon(Icons.check, size: 12, color: Colors.white),
-                                                                                backgroundColor: Palette.secondary
-                                                                              ),
-                                                                            ),
-                                                                          )
-                                                                        : SizedBox(),
-                                                                      )
-                                                                    : SizedBox();
-                                                                  }
-                                                                );
-                                                              },
-                                                            ),
-                                                          ),
-                                                      ),
-                                                    ],
+                                  print(callChannel.participants.isNotEmpty);
+
+                                  return IconButton(
+                                    padding: EdgeInsets.zero,
+                                    tooltip: "Make a Group Call",
+                                    icon: AdaptiveIcon(
+                                      android: Icons.add_call,
+                                      iOS: CupertinoIcons.phone_solid,
+                                    ),
+                                    onPressed: (){
+                                      if(callChannel.participants.isNotEmpty && callChannel.intendedParticipants.indexOf(currentUser.id) >= 0){
+                                        _callProvider.joinCallChannel(handles.id);
+                                        Get.to(() => CallPage(
+                                          client: AgoraClient(
+                                            agoraConnectionData: AgoraConnectionData(
+                                              appId: "33a7608a9e714097bb913a6e7e6ba3a2",
+                                              channelName: handles.id,
+                                            ),
+                                            enabledPermission: [
+                                              Permission.camera,
+                                              Permission.microphone,
+                                            ],
+                                          ),
+                                          handlesID: handles.id,
+                                          userID: currentUser.id
+                                        ));
+                                      } else if (callChannel.participants.isNotEmpty && callChannel.intendedParticipants.indexOf(currentUser.id) <= 0) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Container(
+                                              height: MQuery.height(0.025, context),
+                                              child: Center(
+                                                child: Text(
+                                                  "This Handle call channel is currently used",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w400
                                                   )
                                                 )
-                                              ]
-                                            )
-                                          );},
+                                              ),
+                                            ),
+                                            backgroundColor: Palette.warning,
+                                            behavior: SnackBarBehavior.floating,
+                                          )
                                         );
-                                      } 
-                                    )
+                                      } else {
+                                        Get.bottomSheet(
+                                          BottomSheet(
+                                            enableDrag: true,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(20),
+                                                topRight: Radius.circular(20)
+                                              ) 
+                                            ),
+                                            onClosing: (){},
+                                            builder: (context){
+
+                                              Set<String> selectedCaller = Set();
+
+                                              return StatefulBuilder(
+                                                builder: (context, setModalState){
+                                                  return Container(
+                                                    height: MQuery.height(0.95, context),
+                                                    padding: EdgeInsets.all(
+                                                      MQuery.height(0.02, context)
+                                                    ),
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Expanded(
+                                                          flex: 2,
+                                                          child: Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                                            children: [          
+                                                              Row(
+                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                children: [
+                                                                  Font.out(
+                                                                    "Invite call's participants:",
+                                                                    fontSize: 16,
+                                                                    fontWeight: FontWeight.normal,
+                                                                    textAlign: TextAlign.start,
+                                                                    color: Palette.primary
+                                                                  ),
+                                                                  IconButton(
+                                                                    icon: AdaptiveIcon(
+                                                                      android: Icons.arrow_right_alt,
+                                                                      iOS: CupertinoIcons.chevron_right,
+                                                                      color: Palette.primary
+                                                                    ),
+                                                                    onPressed: (){
+                                                                      _callProvider.createCallChannel(handles.id, DateTime.now(), selectedCaller.toList());
+                                                                      Get.to(() => CallPage(
+                                                                        client: AgoraClient(
+                                                                          agoraConnectionData: AgoraConnectionData(
+                                                                            appId: "33a7608a9e714097bb913a6e7e6ba3a2",
+                                                                            channelName: handles.id,
+                                                                          ),
+                                                                          enabledPermission: [
+                                                                            Permission.camera,
+                                                                            Permission.microphone,
+                                                                          ],
+                                                                        ),
+                                                                        handlesID: handles.id,
+                                                                        userID: currentUser.id
+                                                                      ));
+                                                                    }
+                                                                  )
+                                                                ],
+                                                              ),
+                                                              SizedBox(height: MQuery.height(0.01, context)),
+                                                              Expanded(
+                                                                flex: 7,
+                                                                child: Container(
+                                                                  child: ListView.builder(
+                                                                    itemCount: handles.members.length,
+                                                                    shrinkWrap: true,
+                                                                    itemBuilder: (context, index){
+                                                                      return FutureBuilder<UserModel>(
+                                                                        future: _userProvider.getUserByID(handles.members.keys.toList()[index]),
+                                                                        builder: (context, snapshot) {
+                                                                          return snapshot.hasData
+                                                                          ? ListTile(
+                                                                              onTap: (){
+                                                                                if(selectedCaller.toList().indexOf(snapshot.data!.id) >= 0){
+                                                                                  setModalState(() {
+                                                                                    selectedCaller.remove(snapshot.data!.id);
+                                                                                  });
+                                                                                } else {
+                                                                                  setModalState(() {
+                                                                                    selectedCaller.add(snapshot.data!.id);
+                                                                                  });
+                                                                                }
+                                                                              },
+                                                                              contentPadding: EdgeInsets.all(
+                                                                                MQuery.height(0.005, context),
+                                                                              ),
+                                                                              leading: CircleAvatar(
+                                                                                backgroundColor: Palette.primary,
+                                                                                radius: MQuery.height(0.025, context),
+                                                                                backgroundImage: snapshot.data!.profilePicture != ""
+                                                                                ? NetworkImage(snapshot.data!.profilePicture!) as ImageProvider
+                                                                                : AssetImage("assets/sample_profile.png"),
+                                                                              ),
+                                                                              title: Font.out(
+                                                                                snapshot.data!.name,
+                                                                                fontSize: 16,
+                                                                                textAlign: TextAlign.start
+                                                                              ),      
+                                                                              trailing: selectedCaller.toList().indexOf(snapshot.data!.id) >= 0
+                                                                              ? ZoomIn(
+                                                                                  duration: Duration(milliseconds: 100),
+                                                                                  child: Positioned(
+                                                                                    child: CircleAvatar(
+                                                                                      radius: 10,
+                                                                                      child: Icon(Icons.check, size: 12, color: Colors.white),
+                                                                                      backgroundColor: Palette.secondary
+                                                                                    ),
+                                                                                  ),
+                                                                                )
+                                                                              : SizedBox(),
+                                                                            )
+                                                                          : SizedBox();
+                                                                        }
+                                                                      );
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                            ),
+                                                          ],
+                                                        )
+                                                      )
+                                                    ]
+                                                  )
+                                                );},
+                                              );
+                                            } 
+                                          )
+                                        );
+                                      }
+                                    }
                                   );
+                                },
+                                loading: () => SizedBox(),
+                                error: (err, obj){
+                                  print(err);
+                                  return SizedBox();
                                 }
                               ),
                               IconButton(

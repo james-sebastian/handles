@@ -1,13 +1,17 @@
 part of "../pages.dart";
 
-class CallPage extends StatelessWidget {
+class CallPage extends ConsumerWidget {
 
-  final List<String> participants;
   final AgoraClient client;
-  CallPage({ Key? key, required this.client, required this.participants}) : super(key: key);
+  final String handlesID;
+  final String userID;
+  CallPage({ Key? key, required this.client, required this.handlesID, required this.userID}) : super(key: key);
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context, ScopedReader watch){
+
+    final _userProvider = watch(userProvider);
+    final _callProvider = watch(callProvider);
 
     client.sessionController.toggleCamera();
 
@@ -19,17 +23,45 @@ class CallPage extends StatelessWidget {
       _stopWatchTimer.onExecute.add(StopWatchExecute.start);
     });
 
+    Future<List<UserModel>> participantNamesGetter() async {
+      List<UserModel> out = [];
+
+      watch(callChannelProvider(handlesID)).whenData((value){
+        value.intendedParticipants.forEach((element) {
+          _userProvider.getUserByID(element).then((value){
+            out.add(value);
+          });
+        });
+      });
+      return out;
+    }
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Palette.primary,
         leadingWidth: MQuery.width(0.05, context),
-        title: Text(
-          "In call (Jefferson, Maya, ...)",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400
-          ),
+        title: FutureBuilder<List<UserModel>>(
+          future: participantNamesGetter(),
+          builder: (context, snapshot) {
+
+            List<String> names = [];
+            if(snapshot.hasData){
+              snapshot.data!.forEach((element) {
+                names.add(element.name);
+              });
+            }
+
+            return snapshot.hasData
+            ? Text(
+                "In call (${names.toString().substring(1, names.toString().length - 1)})",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400
+                ),
+              )
+            : SizedBox();
+          }
         ),
         actions: [
           Padding(
@@ -60,27 +92,46 @@ class CallPage extends StatelessWidget {
             AgoraVideoViewer(
               client: this.client,
               layoutType: Layout.floating,
-              disabledVideoWidget: SizedBox(),
+              disabledVideoWidget: Container(
+                color: Palette.handlesBackground,
+                child: Center(
+                  child: Icon(Icons.videocam_off, size: 64)
+                )
+              ),
               showNumberOfUsers: true,
             ), 
             AgoraVideoButtons(
               client: this.client,
-              disconnectButtonChild: Container(
-                height: 60,
-                child: FittedBox(
-                  child: FloatingActionButton(
-                    elevation: 2,
-                    backgroundColor: Colors.red,
-                    child: Icon(
-                      Icons.call_end
+              disconnectButtonChild: watch(callChannelProvider(handlesID)).when(
+                data: (channel){
+
+                  print(channel.participants.toString() + " anc");
+
+                  return Container(
+                    height: 60,
+                    child: FittedBox(
+                      child: FloatingActionButton(
+                        elevation: 2,
+                        backgroundColor: Colors.red,
+                        child: Icon(
+                          Icons.call_end
+                        ),
+                        onPressed: (){
+                          if(channel.participants.first == this.userID){
+                            _callProvider.terminateCallChannel(this.handlesID, DateTime.now());
+                          }
+                          client.sessionController.endCall();
+                          Get.back();
+                        },
+                      ),
                     ),
-                    onPressed: (){
-                      client.sessionController.endCall();
-                      Get.back();
-                    },
-                  ),
-                ),
-              ),
+                  );
+                },
+                loading: () => SizedBox(),
+                error: (err, obj){
+                  print(obj.toString() + " abc");
+                }
+              )
             ),
           ],
         ),
