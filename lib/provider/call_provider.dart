@@ -15,3 +15,11 @@ final callChannelProvider = StreamProvider.family<CallModel, String>(
     storage: ref.watch(firebaseStorageProvider)
   ).getCallChannel(handlesID)
 );
+
+final filteredCallProvider = StreamProvider<List<CallModel>>(
+  (ref)  => CallServices(
+    auth: ref.watch(firebaseAuthProvider),
+    firestore: ref.watch(firebaseFirestoreProvider),
+    storage: ref.watch(firebaseStorageProvider)
+  ).getFilteredCallChannel()
+);

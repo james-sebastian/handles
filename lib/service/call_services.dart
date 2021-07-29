@@ -24,6 +24,28 @@ class CallServices{
     });
   }
 
+  Stream<List<CallModel>> getFilteredCallChannel(){
+    return firestore
+    .collection('call_logs')
+    .where('intendedParticipants', arrayContains: auth.currentUser!.uid)
+    .snapshots()
+    .map((event){
+      List<CallModel> out = [];
+      event.docs.forEach((doc) {
+        out.add(
+          CallModel(
+            intendedParticipants: (doc['intendedParticipants'] as List<dynamic>).cast<String>(),
+            participants: (doc['participants'] as List<dynamic>).cast<String>(),
+            startTime: DateTime.parse(doc['startTime']),
+            endTime: DateTime.parse(doc['endTime']),
+            handlesUID: doc['handlesUID']
+          )
+        );
+      });
+      return out;
+    });
+  }
+
   Future<void> createCallChannel(String handlesUID, DateTime startTime, List<String> intendedParticipant) async {
     firestore
     .collection('call_channels')
@@ -60,18 +82,15 @@ class CallServices{
     .doc(handlesUID)
     .get()
     .then((value){
-
-      print(value);
-
       firestore
       .collection('call_logs')
       .doc()
       .set({
-        //if intendedParticipant != participants => declined
-        'intendedParticipant': value["intendedParticipants"],
+        'intendedParticipants': value["intendedParticipants"],
         'participants': value["participants"],
         'startTime': value["startTime"],
-        'endTime': endTime.toString()
+        'endTime': endTime.toString(),
+        'handlesUID': handlesUID
       }).then((value){
         firestore
         .collection('call_channels')

@@ -1,19 +1,17 @@
 part of "../pages.dart";
 
 class CallPage extends ConsumerWidget {
-
   final AgoraClient client;
   final String handlesID;
   final String userID;
-  CallPage({ Key? key, required this.client, required this.handlesID, required this.userID}) : super(key: key);
+  final bool isJoining;
+  CallPage({ Key? key, required this.client, required this.handlesID, required this.userID,  required this.isJoining}) : super(key: key);
 
   @override
   Widget build(BuildContext context, ScopedReader watch){
 
     final _userProvider = watch(userProvider);
     final _callProvider = watch(callProvider);
-
-    client.sessionController.toggleCamera();
 
     final _stopWatchTimer = StopWatchTimer(
       mode: StopWatchMode.countUp,
@@ -36,11 +34,23 @@ class CallPage extends ConsumerWidget {
       return out;
     }
 
+    if(isJoining){
+      print("join");
+      client.sessionController.joinVideoChannel();
+    } else {
+      print("create");
+      client.sessionController.initializeEngine(agoraConnectionData: AgoraConnectionData(
+        appId: "33a7608a9e714097bb913a6e7e6ba3a2",
+        channelName: this.handlesID,
+      ));
+    }
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Palette.primary,
-        leadingWidth: MQuery.width(0.05, context),
+        leadingWidth: MQuery.width(0, context),
+        leading: SizedBox(),
         title: FutureBuilder<List<UserModel>>(
           future: participantNamesGetter(),
           builder: (context, snapshot) {

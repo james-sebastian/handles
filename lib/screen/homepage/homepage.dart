@@ -39,8 +39,6 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
       });
     }
 
-    print(searchKey);
-
     // Future<bool?> askNotificationPermission() async {
     //   final bool? result = await FlutterLocalNotificationsPlugin().resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()?.requestPermissions(
     //     alert: true,
@@ -969,99 +967,132 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
 
                     user.handlesList!.isEmpty
                     ? EmptyHandles(isHandlesPage: false)
-                    : ListView.builder(
-                      itemCount: 3,
-                      itemBuilder: (context, index){
-                        return Column(
-                          children: [
-                            ListTile(
-                              onLongPress: (){
-                                setState(() {
-                                  isHandlesSelected = true;
-                                  selectedHandles.add(user.handlesList![index + 1]);
-                                });
-                              },
-                              onTap: (){
-                                if(isHandlesSelected){
-                                  if(selectedHandles.toList().indexOf(user.handlesList![index + 1]) < 0){
-                                    setState(() {
-                                      selectedHandles.add(user.handlesList![index + 1]);
-                                    });
-                                  } else {
-                                    setState(() {
-                                      selectedHandles.remove(user.handlesList![index + 1]);
-                                    });
-                                  }
-                                } else {
-                                  Get.to(() => DetailedCallPage(), transition: Transition.cupertino);
-                                }
-                              },
-                              contentPadding: EdgeInsets.fromLTRB(
-                                MQuery.width(0.02, context),
-                                index >= 1 ? 0 : MQuery.height(0.01, context),
-                                MQuery.width(0.01, context),
-                                0,
-                              ),
-                              leading: Stack(
-                                alignment: Alignment.bottomRight,
+                    : watch(filteredCallProvider).when(
+                        data: (callLogs){
+
+                          print(callLogs);
+
+                          return ListView.builder(
+                            itemCount: callLogs.length,
+                            itemBuilder: (context, index){
+                              return Column(
                                 children: [
-                                  CircleAvatar(
-                                    backgroundColor: Palette.primary,
-                                    radius: MQuery.height(0.025, context),
+                                  StreamBuilder<HandlesModel>(
+                                    stream: _handlesProvider.handlesModelGetter(callLogs[index].handlesUID!),
+                                    builder: (context, snapshot) {
+                                      return snapshot.hasData
+                                      ? ListTile(
+                                          onLongPress: (){
+                                            // setState(() {
+                                            //   isHandlesSelected = true;
+                                            //   selectedHandles.add(user.handlesList![index + 1]);
+                                            // });
+                                          },
+                                          onTap: (){
+                                            if(isHandlesSelected){
+                                              // if(selectedHandles.toList().indexOf(user.handlesList![index + 1]) < 0){
+                                              //   setState(() {
+                                              //     selectedHandles.add(user.handlesList![index + 1]);
+                                              //   });
+                                              // } else {
+                                              //   setState(() {
+                                              //     selectedHandles.remove(user.handlesList![index + 1]);
+                                              //   });
+                                              // }
+                                            } else {
+                                              Get.to(() => DetailedCallPage(
+                                                callModel: callLogs[index],
+                                                handlesModel: snapshot.data!,
+                                              ), transition: Transition.cupertino);
+                                            }
+                                          },
+                                          contentPadding: EdgeInsets.fromLTRB(
+                                            MQuery.width(0.02, context),
+                                            index >= 1 ? 0 : MQuery.height(0.01, context),
+                                            MQuery.width(0.01, context),
+                                            0,
+                                          ),
+                                          leading: Stack(
+                                            alignment: Alignment.bottomRight,
+                                            children: [
+                                              CircleAvatar(
+                                                backgroundColor: Palette.primary,
+                                                radius: MQuery.height(0.025, context),
+                                                backgroundImage: NetworkImage(snapshot.data!.cover)
+                                              ),
+                                            ],
+                                          ),
+                                          title: Font.out(
+                                            snapshot.data!.name,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                            textAlign: TextAlign.start
+                                          ),
+                                          subtitle: StreamBuilder<UserModel>(
+                                            stream: _userProvider.getCurrentUser,
+                                            builder: (context, snapshot) {
+                                              return snapshot.hasData
+                                              ? Row(
+                                                  children: [
+                                                    callLogs[index].participants.first == snapshot.data!.id
+                                                    ? AdaptiveIcon(
+                                                        android: Icons.call_made,
+                                                        iOS: CupertinoIcons.phone_fill_arrow_down_left,
+                                                        size: 14,
+                                                        color: Palette.secondary,
+                                                      )
+                                                    : callLogs[index].participants.first != snapshot.data!.id && callLogs[index].participants.indexOf(snapshot.data!.id) >= 0
+                                                      ? AdaptiveIcon(
+                                                          android: Icons.call_received,
+                                                          iOS: CupertinoIcons.phone_fill_arrow_up_right,
+                                                          size: 14,
+                                                          color: Palette.primary,
+                                                        )
+                                                      : AdaptiveIcon(
+                                                          android: Icons.call_missed,
+                                                          iOS: CupertinoIcons.phone_fill_arrow_up_right,
+                                                          size: 14,
+                                                          color: Palette.warning,
+                                                        ),
+                                                    SizedBox(width: MQuery.width(0.0075, context)),
+                                                    Font.out(
+                                                      "${DateFormat.yMd().format(callLogs[index].startTime!)}, ${DateFormat.Hm().format(callLogs[index].startTime!)}",
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w400,
+                                                      textAlign: TextAlign.start,
+                                                      color: Colors.black.withOpacity(0.75)
+                                                    ),
+                                                  ],
+                                                )
+                                              : SizedBox();
+                                            }
+                                          ),
+                                          trailing: IconButton(
+                                            onPressed: (){},
+                                            icon: AdaptiveIcon(
+                                              android: Icons.call,
+                                              iOS: CupertinoIcons.phone_fill,
+                                              color: Palette.primary,
+                                            ),
+                                          )
+                                        )
+                                      : SizedBox();
+                                    }
                                   ),
-                                  selectedHandles.toList().indexOf(user.handlesList![index + 1]) >= 0
-                                  ? ZoomIn(
-                                      duration: Duration(milliseconds: 100),
-                                      child: Positioned(
-                                        child: CircleAvatar(
-                                          backgroundColor: Palette.secondary,
-                                          radius: 10,
-                                          child: Icon(Icons.check, size: 12, color: Colors.white),
-                                        ),
-                                      ),
-                                    )
-                                  : SizedBox()
+                                  Divider(),
                                 ],
-                              ),
-                              title: Font.out(
-                                "Handles DevTeam",
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                textAlign: TextAlign.start
-                              ),
-                              subtitle: Row(
-                                children: [
-                                  //TODO: PHONE STATUS LOGIC
-                                  AdaptiveIcon(
-                                    android: Icons.call_made,
-                                    iOS: CupertinoIcons.phone_fill_arrow_down_left,
-                                    size: 14,
-                                    color: Palette.secondary,
-                                  ),
-                                  SizedBox(width: MQuery.width(0.0075, context)),
-                                  Font.out(
-                                    "June 16, 7:43 AM",
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    textAlign: TextAlign.start,
-                                    color: Colors.black.withOpacity(0.75)
-                                  ),
-                                ],
-                              ),
-                              trailing: IconButton(
-                                onPressed: (){},
-                                icon: AdaptiveIcon(
-                                  android: Icons.call,
-                                  iOS: CupertinoIcons.phone_fill,
-                                  color: Palette.primary,
-                                ),
-                              )
-                            ),
-                            Divider(),
-                          ],
-                        );
-                      }
-                    ),
+                              );
+                            }
+                          );
+                        },
+                        loading: (){
+                          return SizedBox();
+                        },
+                        error: (error, object){
+                          print(error);
+                          return SizedBox();
+                        }
+                    )
                   ],
                 );
               },

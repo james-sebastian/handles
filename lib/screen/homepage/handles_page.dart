@@ -480,7 +480,7 @@ class _HandlesPageState extends State<HandlesPage> {
                                     onPressed: (){
                                       if(callChannel.participants.isNotEmpty && callChannel.intendedParticipants.indexOf(currentUser.id) >= 0){
                                         _callProvider.joinCallChannel(handles.id);
-                                        Get.to(() => CallPage(
+                                        Get.offAll(() => CallPage(
                                           client: AgoraClient(
                                             agoraConnectionData: AgoraConnectionData(
                                               appId: "33a7608a9e714097bb913a6e7e6ba3a2",
@@ -492,7 +492,8 @@ class _HandlesPageState extends State<HandlesPage> {
                                             ],
                                           ),
                                           handlesID: handles.id,
-                                          userID: currentUser.id
+                                          userID: currentUser.id,
+                                          isJoining: true
                                         ));
                                       } else if (callChannel.participants.isNotEmpty && callChannel.intendedParticipants.indexOf(currentUser.id) <= 0) {
                                         ScaffoldMessenger.of(context).showSnackBar(
@@ -562,7 +563,7 @@ class _HandlesPageState extends State<HandlesPage> {
                                                                     ),
                                                                     onPressed: (){
                                                                       _callProvider.createCallChannel(handles.id, DateTime.now(), selectedCaller.toList());
-                                                                      Get.to(() => CallPage(
+                                                                      Get.off(() => CallPage(
                                                                         client: AgoraClient(
                                                                           agoraConnectionData: AgoraConnectionData(
                                                                             appId: "33a7608a9e714097bb913a6e7e6ba3a2",
@@ -574,7 +575,8 @@ class _HandlesPageState extends State<HandlesPage> {
                                                                           ],
                                                                         ),
                                                                         handlesID: handles.id,
-                                                                        userID: currentUser.id
+                                                                        userID: currentUser.id,
+                                                                        isJoining: false,
                                                                       ));
                                                                     }
                                                                   )
