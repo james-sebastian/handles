@@ -12,11 +12,11 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: dev
-      resolved-ref: "162cda9b5365aa3f51dcc51ec8c9af815f3230df"
+      ref: black-screen-fix
+      resolved-ref: "61ecc29318556b6f5e191fbde13418bdab5a0a5e"
       url: "git://github.com/AgoraIO-Community/Flutter-UIKit.git"
     source: git
-    version: "0.0.3"
+    version: "0.0.2"
   animate_do:
     dependency: "direct main"
     description:
@@ -725,6 +725,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "5.0.0"
+  purchases_flutter:
+    dependency: "direct main"
+    description:
+      name: purchases_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.4.1"
   quiver:
     dependency: transitive
     description:

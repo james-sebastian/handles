@@ -1,5 +1,5 @@
 name: handles
-description: A simple group chat business chat.
+description: A chat app specialized for business purposes.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -25,8 +25,8 @@ dependencies:
     sdk: flutter
   agora_uikit:
     git:
-      url: git://github.com/AgoraIO-Community/Flutter-UIKit.git
-      ref: dev
+      url: git://github.com/AgoraIO-Community/Flutter-UIKit.git 
+      ref: black-screen-fix
   animate_do: ^2.0.0
   audio_video_progress_bar: ^0.4.0
   chewie: ^1.2.2
@@ -63,6 +63,7 @@ dependencies:
   permission_handler: ^8.1.2
   pinch_zoom: ^0.1.0
   pinput: ^1.2.0
+  purchases_flutter: ^3.4.1
   riverpod: ^0.14.0+3
   scrollable_positioned_list: ^0.2.0-nullsafety.0
   shared_preferences: ^2.0.6

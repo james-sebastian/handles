@@ -7,25 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:303210379996:android:3a162f1d55f6305dc41219",
+        "mobilesdk_app_id": "1:303210379996:android:a4fb25200f6d8274c41219",
         "android_client_info": {
-          "package_name": "com.example.handles"
+          "package_name": "com.houseace.handles"
         }
       },
       "oauth_client": [
         {
-          "client_id": "303210379996-a76gnkb5udon0pit4uruggm2u27bav0u.apps.googleusercontent.com",
+          "client_id": "303210379996-a9u07hajr8i8rngt7kfm9nk4trtdue2c.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.handles",
-            "certificate_hash": "b498206ef76c0b13d56e69b2da083dad13bf32f2"
-          }
-        },
-        {
-          "client_id": "303210379996-hofebhc8b85q5q4qcrmsh1c8c78hinn0.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.handles",
+            "package_name": "com.houseace.handles",
             "certificate_hash": "96c0fdf4a13e0306727f47974fe5613d86ff42aa"
           }
         },
@@ -50,7 +42,7 @@
               "client_id": "303210379996-lohicoat80p5rrjuk9k0vnureq4ha0me.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.handles"
+                "bundle_id": "com.houseace.handles"
               }
             }
           ]
