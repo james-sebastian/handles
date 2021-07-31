@@ -11,12 +11,10 @@ packages:
   agora_uikit:
     dependency: "direct main"
     description:
-      path: "."
-      ref: black-screen-fix
-      resolved-ref: "61ecc29318556b6f5e191fbde13418bdab5a0a5e"
-      url: "git://github.com/AgoraIO-Community/Flutter-UIKit.git"
-    source: git
-    version: "0.0.2"
+      name: agora_uikit
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.3"
   animate_do:
     dependency: "direct main"
     description:

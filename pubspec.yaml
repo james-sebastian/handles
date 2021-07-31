@@ -23,10 +23,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  agora_uikit:
-    git:
-      url: git://github.com/AgoraIO-Community/Flutter-UIKit.git 
-      ref: black-screen-fix
+  agora_uikit: ^0.0.3
   animate_do: ^2.0.0
   audio_video_progress_bar: ^0.4.0
   chewie: ^1.2.2

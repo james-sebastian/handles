@@ -5,13 +5,13 @@ class CallPage extends StatefulWidget {
   final String handlesID;
   final String userID;
   final bool isJoining;
-  CallPage({ Key? key, required this.client, required this.handlesID, required this.userID,  required this.isJoining}) : super(key: key);
-
+  final bool isLoading;
+  CallPage({ Key? key, required this.client, required this.handlesID, required this.userID, required this.isLoading, required this.isJoining}) : super(key: key);
   @override
   _CallPageState createState() => _CallPageState();
 }
 
-class _CallPageState extends State<CallPage> {
+class _CallPageState extends State<CallPage> {  
   @override
   Widget build(BuildContext context){
     return Consumer(
@@ -24,7 +24,9 @@ class _CallPageState extends State<CallPage> {
         );
 
         WidgetsBinding.instance!.addPostFrameCallback((_){
-          _stopWatchTimer.onExecute.add(StopWatchExecute.start);
+          if(widget.isLoading == false){
+            _stopWatchTimer.onExecute.add(StopWatchExecute.start);
+          }
         });
 
         Future<List<UserModel>> participantNamesGetter() async {
@@ -38,6 +40,31 @@ class _CallPageState extends State<CallPage> {
           });
           return out;
         }
+
+        Future.delayed(1.seconds, (){
+          if(widget.isLoading){
+            Navigator.pop(context);
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context){
+                return CallPage(
+                client: AgoraClient(
+                  agoraConnectionData: AgoraConnectionData(
+                    appId: "33a7608a9e714097bb913a6e7e6ba3a2",
+                    channelName: widget.handlesID
+                  ),
+                  enabledPermission: [
+                    Permission.camera,
+                    Permission.microphone,
+                  ],
+                ),
+                handlesID: widget.handlesID,
+                userID: widget.userID,
+                isJoining: true,
+                isLoading: false
+              );
+            }));
+          }
+        });
 
         return Scaffold(
           appBar: AppBar(
@@ -123,7 +150,7 @@ class _CallPageState extends State<CallPage> {
                                 _callProvider.terminateCallChannel(this.widget.handlesID, DateTime.now());
                               }
                               widget.client.sessionController.endCall();
-                              Get.back();
+                              Get.off(() => HandlesPage(handlesID: widget.handlesID));
                             },
                           ),
                         ),
@@ -133,6 +160,13 @@ class _CallPageState extends State<CallPage> {
                     error: (err, obj){}
                   )
                 ),
+                widget.isLoading
+                ? Positioned.fill(
+                    child: Container(
+                      color: Palette.handlesBackground
+                    )
+                  )
+                : SizedBox()
               ],
             ),
           ),
