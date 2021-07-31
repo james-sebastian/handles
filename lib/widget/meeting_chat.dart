@@ -31,6 +31,7 @@ class MeetingChat extends StatefulWidget {
 class _MeetingChatState extends State<MeetingChat> {
   @override
   Widget build(BuildContext context) {
+
     Future<Favicon.Icon?> getFavicon(String url) async {
       try {
         return Favicon.Favicon.getBest(this.widget.meetingModel.meetingURL);
@@ -39,8 +40,27 @@ class _MeetingChatState extends State<MeetingChat> {
       }
     }
 
+    Future<void> activateNotification() async {
+      FlutterAppBadger.updateBadgeCount(1);
+      print("FIRED!!!");
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+            id: Random().nextInt(1000),
+            channelKey: 'scheduled',
+            title: widget.meetingModel.meetingName,
+            body: '${widget.meetingModel.meetingName} is going to start in 5 minutes. Click here to join it!',
+            notificationLayout: NotificationLayout.Default,
+            payload: {
+              "link": widget.meetingModel.meetingURL
+            }
+          ),
+        schedule: NotificationCalendar.fromDate(date: widget.meetingModel.meetingStartTime.subtract(5.minutes))
+      );
+    }
+
     return Consumer(
       builder: (ctx, watch, child) {
+
         final _userProvider = watch(userProvider);
 
         return widget.sender == widget.userID
@@ -147,10 +167,9 @@ class _MeetingChatState extends State<MeetingChat> {
                                                         color: Colors.white)),
                                                 Text(
                                                     widget
-                                                                .meetingModel
-                                                                .description
-                                                                .length >=
-                                                            30
+                                                      .meetingModel
+                                                      .description
+                                                      .length >= 30
                                                         ? widget.meetingModel
                                                                 .description
                                                                 .substring(
@@ -170,17 +189,22 @@ class _MeetingChatState extends State<MeetingChat> {
                                     ],
                                   ),
                                   SizedBox(
-                                      height: MQuery.height(0.01, context)),
-                                  widget.meetingModel.meetingStartTime
-                                          .isAfter(DateTime.now())
-                                      ? //TODO: REMINDER LOGIC HERE
-                                      Button(
-                                          height: MQuery.height(0.045, context),
-                                          width: double.infinity,
-                                          color: Palette.secondary,
-                                          method: () {},
-                                          textColor: Colors.white,
-                                          title: "Reminder Active",
+                                    height: MQuery.height(0.01, context)),
+                                    widget.meetingModel.meetingStartTime.isAfter(DateTime.now())
+                                      ? Builder(
+                                          builder: (context) {
+
+                                            activateNotification();
+
+                                            return Button(
+                                              height: MQuery.height(0.045, context),
+                                              width: double.infinity,
+                                              color: Palette.secondary,
+                                              method: () {},
+                                              textColor: Colors.white,
+                                              title: "Reminder Active",
+                                            );
+                                          }
                                         )
                                       : widget.meetingModel.meetingStartTime
                                                   .isBefore(DateTime.now()) &&
@@ -427,46 +451,45 @@ class _MeetingChatState extends State<MeetingChat> {
                                       ],
                                     ),
                                     SizedBox(
-                                        height: MQuery.height(0.01, context)),
-                                    widget.meetingModel.meetingStartTime
-                                            .isAfter(DateTime.now())
-                                        ? //TODO: REMINDER LOGIC HERE
-                                        Button(
-                                            height:
-                                                MQuery.height(0.045, context),
-                                            width: double.infinity,
-                                            color: Colors.white,
-                                            borderColor: Palette.secondary,
-                                            method: () {},
-                                            textColor: Palette.secondary,
-                                            title: "Reminder Active",
-                                          )
-                                        : widget.meetingModel.meetingStartTime
-                                                    .isBefore(DateTime.now()) &&
-                                                widget
-                                                    .meetingModel.meetingEndTime
-                                                    .isAfter(DateTime.now())
-                                            ? Button(
-                                                height: MQuery.height(
-                                                    0.045, context),
+                                      height: MQuery.height(0.01, context)),
+                                      widget.meetingModel.meetingStartTime.isAfter(DateTime.now())
+                                        ? Builder(
+                                          builder: (context) {
+                                            activateNotification();
+                                            return Button(
+                                                height:
+                                                    MQuery.height(0.045, context),
                                                 width: double.infinity,
-                                                color: Palette.primary,
-                                                method: () async {
-                                                  await launch(widget
-                                                      .meetingModel.meetingURL);
-                                                },
-                                                textColor: Colors.white,
-                                                title: "Join Meeting",
-                                              )
-                                            : Button(
-                                                height: MQuery.height(
-                                                    0.045, context),
-                                                width: double.infinity,
-                                                color: Palette.secondary,
+                                                color: Colors.white,
+                                                borderColor: Palette.secondary,
                                                 method: () {},
-                                                textColor: Colors.white,
-                                                title: "Completed",
-                                              ),
+                                                textColor: Palette.secondary,
+                                                title: "Reminder Active",
+                                              );
+                                            }
+                                          )
+                                        : widget.meetingModel.meetingStartTime.isBefore(DateTime.now()) && widget.meetingModel.meetingEndTime.isAfter(DateTime.now())
+                                          ? Button(
+                                              height: MQuery.height(
+                                                  0.045, context),
+                                              width: double.infinity,
+                                              color: Palette.primary,
+                                              method: () async {
+                                                await launch(widget
+                                                    .meetingModel.meetingURL);
+                                              },
+                                              textColor: Colors.white,
+                                              title: "Join Meeting",
+                                            )
+                                          : Button(
+                                              height: MQuery.height(
+                                                  0.045, context),
+                                              width: double.infinity,
+                                              color: Palette.secondary,
+                                              method: () {},
+                                              textColor: Colors.white,
+                                              title: "Completed",
+                                            ),
                                     SizedBox(
                                         height: MQuery.height(0.01, context)),
                                     Row(

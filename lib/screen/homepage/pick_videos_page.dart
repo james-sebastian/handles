@@ -143,7 +143,7 @@ class _PickVideosPageState extends State<PickVideosPage> {
                   );
                 } else {
                   print(selectedEntities);
-                  Get.to(() => PreviewVideosPage(
+                  Get.off(() => PreviewVideosPage(
                     replyTo: widget.replyTo,
                     handlesID: widget.handlesID,
                     selectedEntities: selectedEntities,

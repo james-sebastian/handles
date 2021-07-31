@@ -125,7 +125,7 @@ class _PickImagesPageState extends State<PickImagesPage> {
                     )
                   );
                 } else {
-                  Get.to(() => PreviewImagesPage(
+                  Get.off(() => PreviewImagesPage(
                     replyTo: widget.replyTo,
                     handlesID: widget.handlesID,
                     selectedEntities: selectedEntities,

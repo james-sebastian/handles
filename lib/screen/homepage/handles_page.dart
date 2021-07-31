@@ -116,6 +116,10 @@ class _HandlesPageState extends State<HandlesPage> {
           return userModel;
         }
 
+        Future.delayed(2.seconds, (){
+          AwesomeNotifications().dismissAllNotifications();
+        });
+
         return _singleHandlesProvider.when(
           data: (handles){
             return _currentUserProvider.when(

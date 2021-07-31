@@ -85,7 +85,7 @@ class _MeetingDetailedPageState extends State<MeetingDetailedPage> {
                         iOS: CupertinoIcons.pencil,
                       ),
                       onPressed: (){
-                        Get.to(() => MeetingCreator(
+                        Get.off(() => MeetingCreator(
                           handlesID: widget.handlesID,
                           meetingModel: widget.meetingModel
                         ));

@@ -21,6 +21,13 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
   @override
   void initState() { 
     super.initState();
+
+    AwesomeNotifications().isNotificationAllowed().then((isAllowed) async {
+      if (!isAllowed) {
+        await AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
+
     _tabController = TabController(vsync: this, length: 2);
   }
 
@@ -38,16 +45,6 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
         isHandlesSelected = false;
       });
     }
-
-    // Future<bool?> askNotificationPermission() async {
-    //   final bool? result = await FlutterLocalNotificationsPlugin().resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()?.requestPermissions(
-    //     alert: true,
-    //     badge: true,
-    //     sound: true,
-    //   );
-      
-    //   return result;
-    // }
 
     return Consumer(
       builder: (context, watch, _){

@@ -36,6 +36,24 @@ class _PreviewVideosPageState extends State<PreviewVideosPage> {
       return chewieController;
     }
 
+    Future<void> showIndeterminateProgressNotification(int id) async {
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          id: id,
+          channelKey: 'progress_bar',
+          title: 'Sending ${assetMedia.title}',
+          body: '',
+          payload: {
+            'file': '${assetMedia.title}',
+            'path': '${assetMedia.relativePath}'
+          },
+          notificationLayout: NotificationLayout.ProgressBar,
+          progress: null,
+          locked: true
+        )
+      );
+    }
+
     return Consumer(
       builder: (ctx, watch,child) {
 
@@ -75,6 +93,11 @@ class _PreviewVideosPageState extends State<PreviewVideosPage> {
                       color: Colors.white
                     ),
                     onPressed: (){
+
+                      showIndeterminateProgressNotification(
+                        Random().nextInt(1000)
+                      );
+
                       widget.selectedEntities.forEach((element) {
                         element.file.then((file){
                           _chatProvider.uploadVideoURL(file!.path, snapshot.data!.name).then((mediaURL){
@@ -100,7 +123,7 @@ class _PreviewVideosPageState extends State<PreviewVideosPage> {
                         });
                       });
         
-                      Get.offAll(() => Homepage(), transition: Transition.cupertino);
+                      Get.off(() => HandlesPage(handlesID: widget.handlesID), transition: Transition.cupertino);
                     },
                   )
                 ]

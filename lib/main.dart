@@ -3,14 +3,93 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:handles/config/config.dart';
 import 'package:handles/provider/providers.dart';
 import 'package:handles/screen/pages.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  AwesomeNotifications().initialize(
+    'resource://mipmap/ic_launcher',
+    [
+      NotificationChannel(
+          channelKey: 'basic_channel',
+          channelName: 'Basic notifications',
+          channelDescription: 'Notification channel for basic tests',
+          defaultColor: Colors.white,
+          ledColor: Colors.white),
+      NotificationChannel(
+          channelKey: 'badge_channel',
+          channelName: 'Badge indicator notifications',
+          channelDescription: 'Notification channel to activate badge indicator',
+          channelShowBadge: true,
+          defaultColor: Colors.white,
+          ledColor: Colors.yellow),
+      NotificationChannel(
+          channelKey: 'ringtone_channel',
+          channelName: 'Ringtone Channel',
+          channelDescription: 'Channel with default ringtone',
+          defaultColor: Colors.white,
+          ledColor: Colors.white,
+          defaultRingtoneType: DefaultRingtoneType.Ringtone),
+      NotificationChannel(
+          channelKey: 'updated_channel',
+          channelName: 'Channel to update',
+          channelDescription: 'Notifications with not updated channel',
+          defaultColor: Colors.white,
+          ledColor: Colors.white),
+      NotificationChannel(
+          channelKey: 'big_picture',
+          channelName: 'Big pictures',
+          channelDescription: 'Notifications with big and beautiful images',
+          defaultColor: Colors.white,
+          ledColor: Colors.white,
+          vibrationPattern: lowVibrationPattern),
+      NotificationChannel(
+          channelKey: 'scheduled',
+          channelName: 'Scheduled notifications',
+          channelDescription: 'Notifications with schedule functionality',
+          defaultColor: Colors.white,
+          ledColor: Colors.white,
+          vibrationPattern: lowVibrationPattern,
+          importance: NotificationImportance.High,
+          defaultRingtoneType: DefaultRingtoneType.Alarm),
+      NotificationChannel(
+          icon: 'resource://mipmap/ic_launcher',
+          channelKey: 'progress_bar',
+          channelName: 'Progress bar notifications',
+          channelDescription: 'Notifications with a progress bar layout',
+          defaultColor: Palette.primary,
+          ledColor: Palette.primary,
+          vibrationPattern: lowVibrationPattern,
+          onlyAlertOnce: true),
+      NotificationChannel(
+          channelKey: 'grouped',
+          channelName: 'Grouped notifications',
+          channelDescription: 'Notifications with group functionality',
+          groupKey: 'grouped',
+          groupSort: GroupSort.Desc,
+          groupAlertBehavior: GroupAlertBehavior.Children,
+          defaultColor: Palette.primary,
+          ledColor: Palette.primary,
+          vibrationPattern: lowVibrationPattern,
+          importance: NotificationImportance.High)
+    ],
+    debug: true
+  );
+
+  AwesomeNotifications().actionStream.listen((receivedNotification) async {
+    if(receivedNotification.payload != null){
+      if(receivedNotification.payload!['link'] != ""){
+        await launch(receivedNotification.payload!['link']!);
+      }
+    }
+  });
+
   runApp(
     ProviderScope(
       child: MyApp()
@@ -43,53 +122,6 @@ class Authenticator extends ConsumerWidget {
   Widget build(BuildContext context, ScopedReader watch) {
 
     final authStateChanges = watch(authStateChangesProvider);
-
-    Future<dynamic> onDidReceiveLocalNotification(int id, String? title, String? body, String? payload) async {
-      // display a dialog with the notification details, tap ok to go to another page
-      showDialog(
-        context: context,
-        builder: (BuildContext context) => CupertinoAlertDialog(
-          title: Text(title!),
-          content: Text(body!),
-          actions: [
-            CupertinoDialogAction(
-              isDefaultAction: true,
-              child: Text('Ok'),
-              onPressed: () async {
-                Navigator.of(context, rootNavigator: true).pop();
-              },
-            )
-          ],
-        ),
-      );
-    }
-
-    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    final IOSInitializationSettings initializationSettingsIOS = IOSInitializationSettings(
-      requestSoundPermission: true,
-      requestBadgePermission: true,
-      requestAlertPermission: true,
-      onDidReceiveLocalNotification: onDidReceiveLocalNotification
-    );
-
-    final InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS
-    );
-
-    FlutterLocalNotificationsPlugin().initialize(
-      initializationSettings,
-      onSelectNotification: (String? payload) async {
-        if (payload != null) {
-          debugPrint('notification payload: $payload');
-        }
-        // await Navigator.push(
-        //   context,
-        //   MaterialPageRoute<void>(builder: (context) => SecondScreen(payload)),
-        // );
-      }
-    );
 
     return authStateChanges.when(
       data: (user){

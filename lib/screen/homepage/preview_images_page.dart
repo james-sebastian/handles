@@ -15,6 +15,7 @@ class PreviewImagesPage extends StatefulWidget {
 class _PreviewImagesPageState extends State<PreviewImagesPage> {
 
   late AssetEntity assetMedia;
+  int globalID = 0;
   TextEditingController chatController = TextEditingController();
 
   @override
@@ -30,6 +31,24 @@ class _PreviewImagesPageState extends State<PreviewImagesPage> {
 
         final _handlesProvider = watch(handlesProvider);
         final _chatProvider = watch(chatProvider);
+
+        Future<void> showIndeterminateProgressNotification(int id) async {
+          await AwesomeNotifications().createNotification(
+            content: NotificationContent(
+              id: id,
+              channelKey: 'progress_bar',
+              title: 'Sending ${assetMedia.title}',
+              body: '',
+              payload: {
+                'file': '${assetMedia.title}',
+                'path': '${assetMedia.relativePath}'
+              },
+              notificationLayout: NotificationLayout.ProgressBar,
+              progress: null,
+              locked: true
+            )
+          );
+        }
 
         return StreamBuilder<HandlesModel>(
           stream: _handlesProvider.handlesModelGetter(widget.handlesID),
@@ -64,12 +83,14 @@ class _PreviewImagesPageState extends State<PreviewImagesPage> {
                       color: Colors.white
                     ),
                     onPressed: (){
+                    
+                      showIndeterminateProgressNotification(
+                        Random().nextInt(1000)
+                      );
+
                       widget.selectedEntities.forEach((element) {
                         element.file.then((file){
                           _chatProvider.uploadImageURL(file!.path, snapshot.data!.name).then((mediaURL){
-
-                            print(mediaURL);
-
                             _chatProvider.sendImageChat(
                               widget.handlesID,
                               ChatModel(
@@ -89,7 +110,7 @@ class _PreviewImagesPageState extends State<PreviewImagesPage> {
                         });
                       });
 
-                      Get.offAll(() => Homepage(), transition: Transition.cupertino);
+                      Get.off(() => HandlesPage(handlesID: widget.handlesID), transition: Transition.cupertino);
                     },
                   )
                 ]
