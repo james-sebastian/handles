@@ -184,7 +184,77 @@ class AuthenticationService with ChangeNotifier{
       timeout: const Duration(minutes: 2),
       verificationCompleted: (credential) async {
 
-         //TODO: DELETE FIRESTORE RECORD && REMOVE UID FROM HANDLES
+        firestore
+        .collection('users')
+        .doc(auth.currentUser!.uid)
+        .get().then((value){
+          List<String> handlesList = (value['handlesList'] as List<dynamic>).cast<String>();
+
+          handlesList.forEach((handlesID) async {
+
+            await firestore
+            .collection('handles')
+            .doc(handlesID)
+            .get().then((handle){
+              List<String> handleMemberList = (handle['members'] as List<dynamic>).cast<String>();
+              handleMemberList.remove(auth.currentUser!.uid);
+              firestore
+              .collection('handles')
+              .doc(handlesID)
+              .update({
+                "members": handleMemberList
+              });
+            });
+
+            await firestore
+            .collection('meet_chat')
+            .where('attendees', arrayContains: auth.currentUser!.uid)
+            .get().then((meetChats){
+                meetChats.docs.forEach((meet) {
+                  List<String> attendeesList = (meet['attendees'] as List<dynamic>).cast<String>();
+                  attendeesList.remove(auth.currentUser!.uid);
+                  firestore
+                  .collection('meet_chat')
+                  .doc(meet.id)
+                  .update({
+                    "attendees": attendeesList
+                  });
+                });
+            });
+
+            await firestore
+            .collection('call_logs')
+            .where('intendedParticipants', arrayContains: auth.currentUser!.uid)
+            .get().then((callLogs){
+                callLogs.docs.forEach((log) {
+                  List<String> logIntParticipants = (log['intendedParticipants'] as List<dynamic>).cast<String>();
+                  logIntParticipants.remove(auth.currentUser!.uid);
+                  firestore
+                  .collection('call_logs')
+                  .doc(log.id)
+                  .update({
+                    "intendedParticipants": logIntParticipants
+                  });
+                });
+            });
+
+            await firestore
+            .collection('call_logs')
+            .where('participants', arrayContains: auth.currentUser!.uid)
+            .get().then((callLogs){
+                callLogs.docs.forEach((log) {
+                  List<String> callLogsParticipants = (log['participants'] as List<dynamic>).cast<String>();
+                  callLogsParticipants.remove(auth.currentUser!.uid);
+                  firestore
+                  .collection('call_logs')
+                  .doc(log.id)
+                  .update({
+                    "participants": callLogsParticipants
+                  });
+                });
+            });
+          });
+        });
 
         await auth.currentUser!.reauthenticateWithCredential(credential);
         await auth.currentUser!.delete();
@@ -204,8 +274,77 @@ class AuthenticationService with ChangeNotifier{
   }
 
   Future<void> deleteUserPhoneCredential(String code, String pin) async {
+    firestore
+    .collection('users')
+    .doc(auth.currentUser!.uid)
+    .get().then((value){
+      List<String> handlesList = (value['handlesList'] as List<dynamic>).cast<String>();
 
-    //TODO: DELETE FIRESTORE RECORD && REMOVE UID FROM HANDLES
+      handlesList.forEach((handlesID) async {
+
+        await firestore
+        .collection('handles')
+        .doc(handlesID)
+        .get().then((handle){
+          List<String> handleMemberList = (handle['members'] as List<dynamic>).cast<String>();
+          handleMemberList.remove(auth.currentUser!.uid);
+          firestore
+          .collection('handles')
+          .doc(handlesID)
+          .update({
+            "members": handleMemberList
+          });
+        });
+
+        await firestore
+        .collection('meet_chat')
+        .where('attendees', arrayContains: auth.currentUser!.uid)
+        .get().then((meetChats){
+            meetChats.docs.forEach((meet) {
+              List<String> attendeesList = (meet['attendees'] as List<dynamic>).cast<String>();
+              attendeesList.remove(auth.currentUser!.uid);
+              firestore
+              .collection('meet_chat')
+              .doc(meet.id)
+              .update({
+                "attendees": attendeesList
+              });
+            });
+        });
+
+        await firestore
+        .collection('call_logs')
+        .where('intendedParticipants', arrayContains: auth.currentUser!.uid)
+        .get().then((callLogs){
+            callLogs.docs.forEach((log) {
+              List<String> logIntParticipants = (log['intendedParticipants'] as List<dynamic>).cast<String>();
+              logIntParticipants.remove(auth.currentUser!.uid);
+              firestore
+              .collection('call_logs')
+              .doc(log.id)
+              .update({
+                "intendedParticipants": logIntParticipants
+              });
+            });
+        });
+
+        await firestore
+        .collection('call_logs')
+        .where('participants', arrayContains: auth.currentUser!.uid)
+        .get().then((callLogs){
+            callLogs.docs.forEach((log) {
+              List<String> callLogsParticipants = (log['participants'] as List<dynamic>).cast<String>();
+              callLogsParticipants.remove(auth.currentUser!.uid);
+              firestore
+              .collection('call_logs')
+              .doc(log.id)
+              .update({
+                "participants": callLogsParticipants
+              });
+            });
+        });
+      });
+    });
 
     final PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: code, smsCode: pin);
     await auth.currentUser!.reauthenticateWithCredential(credential);

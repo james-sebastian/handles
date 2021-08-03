@@ -52,6 +52,8 @@ dependencies:
   get: ^4.1.4
   http: ^0.13.3
   image_picker: ^0.8.0+4
+  in_app_purchase: ^1.0.6
+  in_app_purchase_android: ^0.1.4+3
   intl: ^0.17.0
   just_audio: ^0.8.0
   open_file: ^3.2.1

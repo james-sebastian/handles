@@ -291,95 +291,7 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                         ],
                       ),
                     )
-                  : FadeIn(
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: AdaptiveIcon(
-                              android: Icons.delete,
-                              iOS: CupertinoIcons.trash,
-                            ),
-                            onPressed: (){
-                              showDialog(
-                                context: context,
-                                builder: (context){
-                                  return Platform.isAndroid
-                                  ? AlertDialog(
-                                      title: Text(
-                                        "Are you want to delete your call logs?",
-                                      ),
-                                      content: Text(
-                                        "This action is irreversible"
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          child: Text("CANCEL"),
-                                          style: TextButton.styleFrom(
-                                            textStyle: TextStyle(
-                                              color: Palette.warning,
-                                              fontWeight: FontWeight.w500
-                                            )
-                                          ),
-                                          onPressed: (){
-                                            Get.back();
-                                          },
-                                        ),
-                                        TextButton(
-                                          child: Text("DELETE"),
-                                          style: TextButton.styleFrom(
-                                            textStyle: TextStyle(
-                                              color: Palette.primary,
-                                              fontWeight: FontWeight.w500
-                                            )
-                                          ),
-                                          onPressed: (){
-                                            //TODO: DELETION LOGIC...
-                                            Get.back();
-                                          },
-                                        )
-                                      ],
-                                    )
-                                  : CupertinoAlertDialog(
-                                      title: Text(
-                                        "Are you want to delete your call logs?",
-                                      ),
-                                      content: Text(
-                                        "This action is irreversible"
-                                      ),
-                                      actions: [
-                                        TextButton(
-                                          child: Text("CANCEL"),
-                                          style: TextButton.styleFrom(
-                                            textStyle: TextStyle(
-                                              color: Palette.warning,
-                                              fontWeight: FontWeight.w500
-                                            )
-                                          ),
-                                          onPressed: (){
-                                            Get.back();
-                                          },
-                                        ),
-                                        TextButton(
-                                          child: Text("DELETE"),
-                                          style: TextButton.styleFrom(
-                                            textStyle: TextStyle(
-                                              color: Palette.primary,
-                                              fontWeight: FontWeight.w500
-                                            )
-                                          ),
-                                          onPressed: (){
-                                            Get.back();
-                                          },
-                                        )
-                                      ],
-                                    );
-                                }
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    )
+                  : SizedBox()
                 : isSearchActive
                   ? FadeIn(
                       child: Row(
@@ -706,9 +618,6 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
 
                                       return _singleHandlesProvider.when(
                                         data: (handles){
-
-                                          print(handles);
-
                                           return handles.archivedBy!.indexOf(user.id) >= 0
                                           ? SizedBox()
                                           : StreamBuilder<List<ChatModel>>(
@@ -966,9 +875,6 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                     ? EmptyHandles(isHandlesPage: false)
                     : watch(filteredCallProvider).when(
                         data: (callLogs){
-
-                          print(callLogs);
-
                           return ListView.builder(
                             itemCount: callLogs.length,
                             itemBuilder: (context, index){
@@ -979,23 +885,8 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                                     builder: (context, snapshot) {
                                       return snapshot.hasData
                                       ? ListTile(
-                                          onLongPress: (){
-                                            // setState(() {
-                                            //   isHandlesSelected = true;
-                                            //   selectedHandles.add(user.handlesList![index + 1]);
-                                            // });
-                                          },
                                           onTap: (){
                                             if(isHandlesSelected){
-                                              // if(selectedHandles.toList().indexOf(user.handlesList![index + 1]) < 0){
-                                              //   setState(() {
-                                              //     selectedHandles.add(user.handlesList![index + 1]);
-                                              //   });
-                                              // } else {
-                                              //   setState(() {
-                                              //     selectedHandles.remove(user.handlesList![index + 1]);
-                                              //   });
-                                              // }
                                             } else {
                                               Get.to(() => DetailedCallPage(
                                                 callModel: callLogs[index],
@@ -1065,7 +956,9 @@ class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin
                                             }
                                           ),
                                           trailing: IconButton(
-                                            onPressed: (){},
+                                            onPressed: (){
+                                              Get.to(() => HandlesPage(handlesID: snapshot.data!.id));
+                                            },
                                             icon: AdaptiveIcon(
                                               android: Icons.call,
                                               iOS: CupertinoIcons.phone_fill,

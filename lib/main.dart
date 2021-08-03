@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get/get.dart';
@@ -8,10 +9,15 @@ import 'package:handles/provider/providers.dart';
 import 'package:handles/screen/pages.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  if (defaultTargetPlatform == TargetPlatform.android) {
+    InAppPurchaseAndroidPlatformAddition.enablePendingPurchases();
+  }
 
   AwesomeNotifications().initialize(
     'resource://mipmap/ic_launcher',

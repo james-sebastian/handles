@@ -319,8 +319,7 @@ class _MeetingDetailedPageState extends State<MeetingDetailedPage> {
                           MQuery.height(0.075, context),
                         ),
                         child: widget.meetingModel.meetingStartTime.isAfter(DateTime.now())
-                        ? //TODO: REMINDER LOGIC HERE
-                          Button(
+                        ? Button(
                             width: double.infinity - MQuery.width(0.075, context),
                             color: Colors.white,
                             borderColor: Palette.secondary,
