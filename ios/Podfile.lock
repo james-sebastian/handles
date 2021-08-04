@@ -212,7 +212,15 @@ PODS:
     - abseil/base/base_internal
     - abseil/base/config
     - abseil/meta/type_traits
+  - agora_rtc_engine (4.0.6):
+    - AgoraRtcEngine_iOS (= 3.4.6)
+    - Flutter
+  - agora_uikit (0.0.1):
+    - Flutter
+  - AgoraRtcEngine_iOS (3.4.6)
   - audio_session (0.0.1):
+    - Flutter
+  - awesome_notifications (0.0.2):
     - Flutter
   - BoringSSL-GRPC (0.0.7):
     - BoringSSL-GRPC/Implementation (= 0.0.7)
@@ -225,6 +233,8 @@ PODS:
     - firebase_core
     - Flutter
   - contacts_service (0.2.2):
+    - Flutter
+  - country_codes (0.0.1):
     - Flutter
   - DKImagePickerController/Core (4.3.2):
     - DKImagePickerController/ImageDataManager
@@ -298,7 +308,7 @@ PODS:
     - FirebaseCoreDiagnostics (~> 8.0)
     - GoogleUtilities/Environment (~> 7.4)
     - GoogleUtilities/Logger (~> 7.4)
-  - FirebaseCoreDiagnostics (8.4.0):
+  - FirebaseCoreDiagnostics (8.5.0):
     - GoogleDataTransport (~> 9.0)
     - GoogleUtilities/Environment (~> 7.4)
     - GoogleUtilities/Logger (~> 7.4)
@@ -315,7 +325,7 @@ PODS:
     - "gRPC-C++ (~> 1.28.0)"
     - leveldb-library (~> 1.22)
     - nanopb (~> 2.30908.0)
-  - FirebaseInstallations (8.4.0):
+  - FirebaseInstallations (8.5.0):
     - FirebaseCore (~> 8.0)
     - GoogleUtilities/Environment (~> 7.4)
     - GoogleUtilities/UserDefaults (~> 7.4)
@@ -332,8 +342,6 @@ PODS:
     - GTMSessionFetcher/Core (~> 1.5)
   - Flutter (1.0.0)
   - flutter_app_badger (0.0.1):
-    - Flutter
-  - flutter_local_notifications (0.0.1):
     - Flutter
   - flutter_sound (8.2.0):
     - Flutter
@@ -390,6 +398,8 @@ PODS:
   - GTMSessionFetcher/Core (1.6.1)
   - image_picker (0.0.1):
     - Flutter
+  - in_app_purchase_ios (0.0.1):
+    - Flutter
   - just_audio (0.0.1):
     - Flutter
   - leveldb-library (1.22.1)
@@ -418,6 +428,14 @@ PODS:
     - Flutter
     - FlutterMacOS
   - PromisesObjC (2.0.0)
+  - Purchases (3.12.2):
+    - PurchasesCoreSwift (= 3.12.2)
+  - purchases_flutter (3.4.1):
+    - Flutter
+    - PurchasesHybridCommon (= 1.8.1)
+  - PurchasesCoreSwift (3.12.2)
+  - PurchasesHybridCommon (1.8.1):
+    - Purchases (= 3.12.2)
   - SDWebImage (5.11.1):
     - SDWebImage/Core (= 5.11.1)
   - SDWebImage/Core (5.11.1)
@@ -439,9 +457,13 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - agora_rtc_engine (from `.symlinks/plugins/agora_rtc_engine/ios`)
+  - agora_uikit (from `.symlinks/plugins/agora_uikit/ios`)
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
+  - awesome_notifications (from `.symlinks/plugins/awesome_notifications/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - contacts_service (from `.symlinks/plugins/contacts_service/ios`)
+  - country_codes (from `.symlinks/plugins/country_codes/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
@@ -449,15 +471,16 @@ DEPENDENCIES:
   - firebase_storage (from `.symlinks/plugins/firebase_storage/ios`)
   - Flutter (from `Flutter`)
   - flutter_app_badger (from `.symlinks/plugins/flutter_app_badger/ios`)
-  - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_sound (from `.symlinks/plugins/flutter_sound/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
+  - in_app_purchase_ios (from `.symlinks/plugins/in_app_purchase_ios/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/ios`)
   - open_file (from `.symlinks/plugins/open_file/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
   - photo_manager (from `.symlinks/plugins/photo_manager/ios`)
+  - purchases_flutter (from `.symlinks/plugins/purchases_flutter/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
   - video_compress (from `.symlinks/plugins/video_compress/ios`)
@@ -468,6 +491,7 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - abseil
+    - AgoraRtcEngine_iOS
     - BoringSSL-GRPC
     - DKImagePickerController
     - DKPhotoGallery
@@ -489,18 +513,29 @@ SPEC REPOS:
     - mobile-ffmpeg-full
     - nanopb
     - PromisesObjC
+    - Purchases
+    - PurchasesCoreSwift
+    - PurchasesHybridCommon
     - SDWebImage
     - SwiftyGif
     - tau_core
     - Toast
 
 EXTERNAL SOURCES:
+  agora_rtc_engine:
+    :path: ".symlinks/plugins/agora_rtc_engine/ios"
+  agora_uikit:
+    :path: ".symlinks/plugins/agora_uikit/ios"
   audio_session:
     :path: ".symlinks/plugins/audio_session/ios"
+  awesome_notifications:
+    :path: ".symlinks/plugins/awesome_notifications/ios"
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
   contacts_service:
     :path: ".symlinks/plugins/contacts_service/ios"
+  country_codes:
+    :path: ".symlinks/plugins/country_codes/ios"
   file_picker:
     :path: ".symlinks/plugins/file_picker/ios"
   firebase_auth:
@@ -515,14 +550,14 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_app_badger:
     :path: ".symlinks/plugins/flutter_app_badger/ios"
-  flutter_local_notifications:
-    :path: ".symlinks/plugins/flutter_local_notifications/ios"
   flutter_sound:
     :path: ".symlinks/plugins/flutter_sound/ios"
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
   image_picker:
     :path: ".symlinks/plugins/image_picker/ios"
+  in_app_purchase_ios:
+    :path: ".symlinks/plugins/in_app_purchase_ios/ios"
   just_audio:
     :path: ".symlinks/plugins/just_audio/ios"
   open_file:
@@ -533,6 +568,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/permission_handler/ios"
   photo_manager:
     :path: ".symlinks/plugins/photo_manager/ios"
+  purchases_flutter:
+    :path: ".symlinks/plugins/purchases_flutter/ios"
   shared_preferences:
     :path: ".symlinks/plugins/shared_preferences/ios"
   url_launcher:
@@ -548,10 +585,15 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
+  agora_rtc_engine: d3178bd63d453a2d0111bd45475f17ce1fcc754d
+  agora_uikit: ca47b21e2af19474ddd8ec153670c2dc8cf3a9e8
+  AgoraRtcEngine_iOS: 8aa4a8e46bd81963607857b1d46703b93e4de156
   audio_session: 4f3e461722055d21515cf3261b64c973c062f345
+  awesome_notifications: 74462bc8e68b11f8235d78422266886759e9da61
   BoringSSL-GRPC: 8edf627ee524575e2f8d19d56f068b448eea3879
   cloud_firestore: d6c77e2b33f00576fed2b070fec1be58d7e5f276
   contacts_service: 849e1f84281804c8bfbec1b4c3eedcb23c5d3eca
+  country_codes: b0900f46ad686281d5dab438e354e44ad10f5941
   DKImagePickerController: b5eb7f7a388e4643264105d648d01f727110fc3d
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
   file_picker: 3e6c3790de664ccf9b882732d9db5eaf6b8d4eb1
@@ -562,14 +604,13 @@ SPEC CHECKSUMS:
   firebase_storage: 93642c2a5d403bd218134a2bfe61e311a6f446bc
   FirebaseAuth: fd12c82de44e7ad3b821610c387b8251f03aa0f9
   FirebaseCore: a6dba751680d7033b9d3831e1cfc95ead0605118
-  FirebaseCoreDiagnostics: cad03be1904b975f845e632f2720c3337da27faf
+  FirebaseCoreDiagnostics: 7bf55d386f9fc690d971b70a582142321a390eb8
   FirebaseFirestore: f4f42828c6d82f6945575611c23dd343e0e7d0aa
-  FirebaseInstallations: 1585729afc787877763208c2088ed84221161f77
+  FirebaseInstallations: f2bc590b291d25fb40a9a05b8281c02a881b5117
   FirebaseMessaging: 42252b79b860482021483748669ec32e22196462
   FirebaseStorage: ff380720c204593d98c3e5482e62ccfbb522f0c5
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
   flutter_app_badger: 65de4d6f0c34a891df49e6cfb8a1c0496426fa68
-  flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
   flutter_sound: 9abd356ff1aac77f0cad17152c59ae320226bbe7
   fluttertoast: 6122fa75143e992b1d3470f61000f591a798cc58
   GoogleDataTransport: 85fd18ff3019bb85d3f2c551d04c481dedf71fc9
@@ -578,6 +619,7 @@ SPEC CHECKSUMS:
   gRPC-Core: 4afa11bfbedf7cdecd04de535a9e046893404ed5
   GTMSessionFetcher: 36689134877faeb055b27dfa4ccc9ceaa42e029e
   image_picker: e06f7a68f000bd36f552c1847e33cda96ed31f1f
+  in_app_purchase_ios: 18c65275991b8a28b2a47634a7797fb23d5d773e
   just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
   leveldb-library: 50c7b45cbd7bf543c81a468fe557a16ae3db8729
   libwebp: e90b9c01d99205d03b6bb8f2c8c415e5a4ef66f0
@@ -588,6 +630,10 @@ SPEC CHECKSUMS:
   permission_handler: ccb20a9fad0ee9b1314a52b70b76b473c5f8dab0
   photo_manager: 84fa94fbeb82e607333ea9a13c43b58e0903a463
   PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
+  Purchases: 3e20881892483ab6ca17cb86a89af4c6d1731562
+  purchases_flutter: e4ffd92c27d310827fa04432196200264a339d60
+  PurchasesCoreSwift: e614645840af49d465dee1918011f784365d79a6
+  PurchasesHybridCommon: a6ec3e74e4f274b9c7437c25e5dcc564a87a04ad
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
   SwiftyGif: 5d4af95df24caf1c570dbbcb32a3b8a0763bc6d7
