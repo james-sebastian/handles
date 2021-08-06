@@ -45,15 +45,15 @@ class _MeetingChatState extends State<MeetingChat> {
       print("FIRED!!!");
       await AwesomeNotifications().createNotification(
         content: NotificationContent(
-            id: Random().nextInt(1000),
-            channelKey: 'scheduled',
-            title: widget.meetingModel.meetingName,
-            body: '${widget.meetingModel.meetingName} is going to start in 5 minutes. Click here to join it!',
-            notificationLayout: NotificationLayout.Default,
-            payload: {
-              "link": widget.meetingModel.meetingURL
-            }
-          ),
+          id: Random().nextInt(1000),
+          channelKey: 'scheduled',
+          title: widget.meetingModel.meetingName,
+          body: '${widget.meetingModel.meetingName} is going to start in 5 minutes. Click here to join it!',
+          notificationLayout: NotificationLayout.Default,
+          payload: {
+            "link": widget.meetingModel.meetingURL
+          }
+        ),
         schedule: NotificationCalendar.fromDate(date: widget.meetingModel.meetingStartTime.subtract(5.minutes))
       );
     }

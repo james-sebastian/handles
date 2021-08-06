@@ -88,10 +88,6 @@ class _MeetingCreatorState extends State<MeetingCreator> {
       }
     }
 
-    print(baseDate);
-    print(endTime);
-    print(attendeesList.toList());
-
     return Consumer(
       builder: (ctx, watch,child) {
 

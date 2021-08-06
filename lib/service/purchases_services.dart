@@ -4,24 +4,20 @@ class PurchasesServices with ChangeNotifier{
   static const _apiKey = 'GJwnSERogYKUiCaRvukwcnWaQTCsIHSN';
 
   Future<void> init() async {
-    // await Purchases.setDebugLogsEnabled(true);
+    await Purchases.setDebugLogsEnabled(true);
     await Purchases.setup(_apiKey);
   }
 
   Future<Offering?> fetchOffers() async {
     try {
-      const Set<String> _kIds = <String>{'product1', 'product2'};
-      final ProductDetailsResponse response = await InAppPurchase.instance.queryProductDetails(_kIds);
-
-      print(response);
-
-      if (response.notFoundIDs.isNotEmpty) {
-        // Handle the error.
+      Offerings offerings = await Purchases.getOfferings();
+      if (offerings.current != null && offerings.current!.monthly != null) {
+        print(offerings.current);
       }
-      List<ProductDetails> products = response.productDetails;
-      print(products);
+
+      print("null");
     } on PlatformException catch (e) {
-      print(e);
+      print("error");
     }
   }
 }

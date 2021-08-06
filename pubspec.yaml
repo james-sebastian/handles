@@ -89,6 +89,9 @@ flutter_native_splash:
 
 flutter_icons:
   image_path: assets/handles_logo.png
+  image_path_ios: assets/handles_logo_ios.png
+  adaptive_icon_background: "#ffffff"
+  remove_alpha_ios: true
   android: true
   ios: true
 
