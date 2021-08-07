@@ -1,4 +1,8 @@
 {
+  "identifier" : "F8335942",
+  "nonRenewingSubscriptions" : [
+
+  ],
   "products" : [
 
   ],
@@ -6,10 +10,40 @@
 
   },
   "subscriptionGroups" : [
+    {
+      "id" : "65FE0BFE",
+      "localizations" : [
 
+      ],
+      "name" : "subscription_group",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "displayPrice" : "29.99",
+          "familyShareable" : true,
+          "groupNumber" : 1,
+          "internalID" : "64005AFC",
+          "introductoryOffer" : null,
+          "localizations" : [
+            {
+              "description" : "",
+              "displayName" : "",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "mw_300_1y_1w0",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "monthly free trial",
+          "subscriptionGroupID" : "65FE0BFE",
+          "type" : "RecurringSubscription"
+        }
+      ]
+    }
   ],
   "version" : {
     "major" : 1,
-    "minor" : 0
+    "minor" : 1
   }
 }
