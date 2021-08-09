@@ -1,4 +1,4 @@
-package com.houseace.handles
+package com.handles.app
 
 import io.flutter.embedding.android.FlutterActivity
 

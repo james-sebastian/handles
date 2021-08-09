@@ -7,17 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:303210379996:android:a4fb25200f6d8274c41219",
+        "mobilesdk_app_id": "1:303210379996:android:37fcbd3ba43ee7c4c41219",
         "android_client_info": {
-          "package_name": "com.houseace.handles"
+          "package_name": "com.handles.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "303210379996-a9u07hajr8i8rngt7kfm9nk4trtdue2c.apps.googleusercontent.com",
+          "client_id": "303210379996-13612589bp5gnbad2msf87oseklihuna.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.houseace.handles",
+            "package_name": "com.handles.app",
             "certificate_hash": "96c0fdf4a13e0306727f47974fe5613d86ff42aa"
           }
         },
@@ -39,7 +39,7 @@
               "client_type": 3
             },
             {
-              "client_id": "303210379996-lohicoat80p5rrjuk9k0vnureq4ha0me.apps.googleusercontent.com",
+              "client_id": "303210379996-19bklj77atdvu6f64c0hg29b14p717bu.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
                 "bundle_id": "com.houseace.handles"
