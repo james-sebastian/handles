@@ -15,11 +15,52 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
 
         final _purchasesProvider = watch(purchasesProvider);
 
-        _purchasesProvider.init().then((_){
-          _purchasesProvider.fetchOffers().then((value){
-            print(value);
-          });
-        });
+        void displayProducts() async {
+          await _purchasesProvider.init();
+
+          PurchaserInfo purchaserInfo = await Purchases.getPurchaserInfo();
+
+          if (purchaserInfo.entitlements.all['pro'] != null && purchaserInfo.entitlements.all['pro']!.isActive == true) {
+
+          } else {
+            late Offerings offerings;
+            
+            try {
+              offerings = await Purchases.getOfferings();
+            } on PlatformException catch (e) {
+              await showDialog(
+                context: context,
+                builder: (BuildContext context) => ShowDialogToDismiss(
+                  title: "Error", content: e.message ?? "", buttonText: 'OK')
+              );
+            }
+
+            // ignore: unnecessary_null_comparison
+            if (offerings == null || offerings.current == null) {
+              print("Offerings $offerings");
+            } else {
+              // current offering is available, show paywall
+              await showModalBottomSheet(
+                useRootNavigator: true,
+                isDismissible: true,
+                isScrollControlled: true,
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+                ),
+                context: context,
+                builder: (BuildContext context) {
+                  return StatefulBuilder(
+                    builder: (BuildContext context, StateSetter setModalState) {
+                      print(offerings.current);
+                      return SizedBox();
+                    }
+                  );
+                },
+              );
+            }
+          }
+        }
 
         return Scaffold(
           appBar: AppBar(
@@ -187,195 +228,206 @@ class _SubscriptionPageState extends State<SubscriptionPage> {
                           Divider(height: 0),
                           SizedBox(height: MQuery.height(0.02, context)),
                           Divider(height: 0),
-                          Container(
-                              padding:
-                                  EdgeInsets.all(MQuery.height(0.02, context)),
-                              child: Column(
-                                children: [
-                                  Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text("Premium",
-                                                textAlign: TextAlign.start,
-                                                style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.w600,
-                                                    color:
-                                                        Palette.secondaryText)),
-                                            SizedBox(
-                                                width:
-                                                    MQuery.width(0.01, context)),
-                                            Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: MQuery.height(
-                                                        0.01, context),
-                                                    vertical: MQuery.height(
-                                                        0.0075, context)),
-                                                decoration: BoxDecoration(
-                                                    color: Palette.tertiary,
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(5))),
-                                                child: Center(
-                                                  child: Text("PRO",
-                                                      style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.w700)),
-                                                )),
-                                            SizedBox(
-                                                width:
-                                                    MQuery.width(0.01, context)),
-                                            Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: MQuery.height(
-                                                        0.01, context),
-                                                    vertical: MQuery.height(
-                                                        0.0075, context)),
-                                                decoration: BoxDecoration(
-                                                    color: Palette.primary,
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(5))),
-                                                child: Center(
-                                                  child: Text("BEST",
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.w500)),
-                                                )),
-                                          ],
-                                        ),
-                                        Text(
-                                            //TODO: INTL LOCAL CURRENCY HERE
-                                            "\$19.99/mo",
-                                            textAlign: TextAlign.start,
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w600,
-                                                color: Palette.secondaryText)),
-                                      ]),
-                                  SizedBox(height: MQuery.height(0.02, context)),
-                                  Row(children: [
-                                    AdaptiveIcon(
-                                        android:
-                                            Icons.check_circle_outline_rounded,
-                                        iOS: CupertinoIcons.checkmark_alt_circle,
-                                        color: HexColor("00BFA5")),
-                                    SizedBox(width: MQuery.width(0.02, context)),
-                                    Text("Unlimited Handles creation",
-                                        style: TextStyle(
-                                            color: HexColor("00BFA5"),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400)),
-                                  ]),
-                                  SizedBox(height: MQuery.height(0.015, context)),
-                                  Row(children: [
-                                    AdaptiveIcon(
-                                        android:
-                                            Icons.check_circle_outline_rounded,
-                                        iOS: CupertinoIcons.checkmark_alt_circle,
-                                        color: HexColor("00BFA5")),
-                                    SizedBox(width: MQuery.width(0.02, context)),
-                                    Text(
-                                        "Add company informations on your profile",
-                                        style: TextStyle(
-                                            color: HexColor("00BFA5"),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400)),
-                                  ])
-                                ],
-                              )),
+                          GestureDetector(
+                            onTap: (){
+                              displayProducts();
+                            },
+                            child: Container(
+                                padding:
+                                    EdgeInsets.all(MQuery.height(0.02, context)),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text("Premium",
+                                                  textAlign: TextAlign.start,
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight: FontWeight.w600,
+                                                      color:
+                                                          Palette.secondaryText)),
+                                              SizedBox(
+                                                  width:
+                                                      MQuery.width(0.01, context)),
+                                              Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: MQuery.height(
+                                                          0.01, context),
+                                                      vertical: MQuery.height(
+                                                          0.0075, context)),
+                                                  decoration: BoxDecoration(
+                                                      color: Palette.tertiary,
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(5))),
+                                                  child: Center(
+                                                    child: Text("PRO",
+                                                        style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight.w700)),
+                                                  )),
+                                              SizedBox(
+                                                  width:
+                                                      MQuery.width(0.01, context)),
+                                              Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: MQuery.height(
+                                                          0.01, context),
+                                                      vertical: MQuery.height(
+                                                          0.0075, context)),
+                                                  decoration: BoxDecoration(
+                                                      color: Palette.primary,
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(5))),
+                                                  child: Center(
+                                                    child: Text("BEST",
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight.w500)),
+                                                  )),
+                                            ],
+                                          ),
+                                          Text(
+                                              //TODO: INTL LOCAL CURRENCY HERE
+                                              "\$19.99/mo",
+                                              textAlign: TextAlign.start,
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Palette.secondaryText)),
+                                        ]),
+                                    SizedBox(height: MQuery.height(0.02, context)),
+                                    Row(children: [
+                                      AdaptiveIcon(
+                                          android:
+                                              Icons.check_circle_outline_rounded,
+                                          iOS: CupertinoIcons.checkmark_alt_circle,
+                                          color: HexColor("00BFA5")),
+                                      SizedBox(width: MQuery.width(0.02, context)),
+                                      Text("Unlimited Handles creation",
+                                          style: TextStyle(
+                                              color: HexColor("00BFA5"),
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400)),
+                                    ]),
+                                    SizedBox(height: MQuery.height(0.015, context)),
+                                    Row(children: [
+                                      AdaptiveIcon(
+                                          android:
+                                              Icons.check_circle_outline_rounded,
+                                          iOS: CupertinoIcons.checkmark_alt_circle,
+                                          color: HexColor("00BFA5")),
+                                      SizedBox(width: MQuery.width(0.02, context)),
+                                      Text(
+                                          "Add company informations on your profile",
+                                          style: TextStyle(
+                                              color: HexColor("00BFA5"),
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400)),
+                                    ])
+                                  ],
+                                )),
+                          ),
                           Divider(height: 0),
                           SizedBox(height: MQuery.height(0.02, context)),
                           Divider(height: 0),
-                          Container(
-                              padding:
-                                  EdgeInsets.all(MQuery.height(0.02, context)),
-                              child: Column(
-                                children: [
-                                  Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text("Starter",
-                                                textAlign: TextAlign.start,
-                                                style: TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.w600,
-                                                    color:
-                                                        Palette.secondaryText)),
-                                            SizedBox(
-                                                width:
-                                                    MQuery.width(0.01, context)),
-                                            Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: MQuery.height(
-                                                        0.01, context),
-                                                    vertical: MQuery.height(
-                                                        0.0075, context)),
-                                                decoration: BoxDecoration(
-                                                    color: Palette.tertiary,
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(5))),
-                                                child: Center(
-                                                  child: Text("PRO",
-                                                      style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.w700)),
-                                                )),
-                                          ],
-                                        ),
-                                        Text(
-                                            //TODO: INTL LOCAL CURRENCY HERE
-                                            "\$9.99/mo",
-                                            textAlign: TextAlign.start,
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.w600,
-                                                color: Palette.secondaryText)),
-                                      ]),
-                                  SizedBox(height: MQuery.height(0.02, context)),
-                                  Row(children: [
-                                    AdaptiveIcon(
-                                        android:
-                                            Icons.check_circle_outline_rounded,
-                                        iOS: CupertinoIcons.checkmark_alt_circle,
-                                        color: HexColor("00BFA5")),
-                                    SizedBox(width: MQuery.width(0.02, context)),
-                                    Text("Up to 5 Handles creation",
-                                        style: TextStyle(
-                                            color: HexColor("00BFA5"),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400)),
-                                  ]),
-                                  SizedBox(height: MQuery.height(0.015, context)),
-                                  Row(children: [
-                                    AdaptiveIcon(
-                                        android:
-                                            Icons.check_circle_outline_rounded,
-                                        iOS: CupertinoIcons.checkmark_alt_circle,
-                                        color: HexColor("00BFA5")),
-                                    SizedBox(width: MQuery.width(0.02, context)),
-                                    Text(
-                                        "Add company informations on your profile",
-                                        style: TextStyle(
-                                            color: HexColor("00BFA5"),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400)),
-                                  ]),
-                                ],
-                              )),
+                          GestureDetector(
+                            onTap: (){
+                              print("bbbb");
+                              displayProducts();
+                            },
+                            child: Container(
+                                padding:
+                                    EdgeInsets.all(MQuery.height(0.02, context)),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text("Starter",
+                                                  textAlign: TextAlign.start,
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight: FontWeight.w600,
+                                                      color:
+                                                          Palette.secondaryText)),
+                                              SizedBox(
+                                                  width:
+                                                      MQuery.width(0.01, context)),
+                                              Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: MQuery.height(
+                                                          0.01, context),
+                                                      vertical: MQuery.height(
+                                                          0.0075, context)),
+                                                  decoration: BoxDecoration(
+                                                      color: Palette.tertiary,
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(5))),
+                                                  child: Center(
+                                                    child: Text("PRO",
+                                                        style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontSize: 12,
+                                                            fontWeight:
+                                                                FontWeight.w700)),
+                                                  )),
+                                            ],
+                                          ),
+                                          Text(
+                                              //TODO: INTL LOCAL CURRENCY HERE
+                                              "\$9.99/mo",
+                                              textAlign: TextAlign.start,
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Palette.secondaryText)),
+                                        ]),
+                                    SizedBox(height: MQuery.height(0.02, context)),
+                                    Row(children: [
+                                      AdaptiveIcon(
+                                          android:
+                                              Icons.check_circle_outline_rounded,
+                                          iOS: CupertinoIcons.checkmark_alt_circle,
+                                          color: HexColor("00BFA5")),
+                                      SizedBox(width: MQuery.width(0.02, context)),
+                                      Text("Up to 5 Handles creation",
+                                          style: TextStyle(
+                                              color: HexColor("00BFA5"),
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400)),
+                                    ]),
+                                    SizedBox(height: MQuery.height(0.015, context)),
+                                    Row(children: [
+                                      AdaptiveIcon(
+                                          android:
+                                              Icons.check_circle_outline_rounded,
+                                          iOS: CupertinoIcons.checkmark_alt_circle,
+                                          color: HexColor("00BFA5")),
+                                      SizedBox(width: MQuery.width(0.02, context)),
+                                      Text(
+                                          "Add company informations on your profile",
+                                          style: TextStyle(
+                                              color: HexColor("00BFA5"),
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w400)),
+                                    ]),
+                                  ],
+                                )),
+                          ),
                           Divider(height: 0),
                           Container(
                             padding: EdgeInsets.all(MQuery.height(0.02, context)),

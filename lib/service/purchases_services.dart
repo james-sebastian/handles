@@ -8,16 +8,7 @@ class PurchasesServices with ChangeNotifier{
     await Purchases.setup(_apiKey);
   }
 
-  Future<Offering?> fetchOffers() async {
-    try {
-      Offerings offerings = await Purchases.getOfferings();
-      if (offerings.current != null && offerings.current!.monthly != null) {
-        print(offerings.current);
-      }
-
-      print("null");
-    } on PlatformException catch (e) {
-      print("error");
-    }
+  void fetchOffers() async {
+    
   }
 }
