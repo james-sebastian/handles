@@ -76,14 +76,14 @@ class _HandlesCreatorPageState extends State<HandlesCreatorPage> {
                   CupertinoActionSheetAction(
                     child: const Text('Pick from Camera'),
                     onPressed: () {
-                      _imgFromGallery();
+                      _imgFromCamera();
                       Navigator.of(context).pop();
                     },
                   ),
                   CupertinoActionSheetAction(
                     child: const Text('Pick from Gallery'),
                     onPressed: () {
-                      _imgFromCamera();
+                      _imgFromGallery();
                       Navigator.of(context).pop();
                     },
                   )

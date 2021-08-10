@@ -80,14 +80,14 @@ class _HandlesCoverPageState extends State<HandlesCoverPage> {
                       CupertinoActionSheetAction(
                         child: const Text('Pick from Camera'),
                         onPressed: () {
-                          _imgFromGallery();
+                          _imgFromCamera();
                           Navigator.of(context).pop();
                         },
                       ),
                       CupertinoActionSheetAction(
                         child: const Text('Pick from Gallery'),
                         onPressed: () {
-                          _imgFromCamera();
+                          _imgFromGallery();
                           Navigator.of(context).pop();
                         },
                       )

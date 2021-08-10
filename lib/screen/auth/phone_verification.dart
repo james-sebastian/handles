@@ -13,6 +13,15 @@ class PhoneVerificationPage extends StatefulWidget {
 }
 class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
   final TextEditingController _pinPutController = TextEditingController();
+  bool _hasInvokedAuthService = false;
+
+  @override
+  void didUpdateWidget(PhoneVerificationPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.verificationStatus != widget.verificationStatus) {
+      _hasInvokedAuthService = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,18 +29,26 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
       final _authenticationProvider = watch(authenticationProvider);
       final _verificationCode = watch(authenticationProvider).verificationCode;
 
-      if (widget.verificationStatus == PhoneVerificationType.update) {
+      if (!_hasInvokedAuthService &&
+          widget.verificationStatus == PhoneVerificationType.update) {
+        print('Invoke updateUserVerifyPhone call...');
+        _hasInvokedAuthService = true;
         WidgetsBinding.instance?.addPostFrameCallback((_) {
           _authenticationProvider
               .updateUserPhoneVerification(widget.phoneNumber);
         });
-      } else if (widget.verificationStatus == PhoneVerificationType.creation) {
+      } else if (!_hasInvokedAuthService &&
+          widget.verificationStatus == PhoneVerificationType.creation) {
+        print('Invoke verifyPhone call...');
+        _hasInvokedAuthService = true;
         WidgetsBinding.instance?.addPostFrameCallback((_) {
           _authenticationProvider.verifyPhone(
             phoneNumber: widget.phoneNumber,
           );
         });
-      } else {
+      } else if (!_hasInvokedAuthService) {
+        print('Invoke deleteUserVerification call...');
+        _hasInvokedAuthService = true;
         WidgetsBinding.instance?.addPostFrameCallback((_) {
           _authenticationProvider.deleteUserVerification(widget.phoneNumber);
         });
@@ -120,15 +137,18 @@ class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
                   if (_pinPutController.text != "") {
                     if (widget.verificationStatus ==
                         PhoneVerificationType.update) {
+                      _hasInvokedAuthService = true;
                       _authenticationProvider.updateUserPhoneCredential(
                           _verificationCode,
                           _pinPutController.text,
                           widget.phoneNumber);
                     } else if (widget.verificationStatus ==
                         PhoneVerificationType.creation) {
+                      _hasInvokedAuthService = true;
                       _authenticationProvider.signInWithVerificationCode(
                           _verificationCode, _pinPutController.text);
                     } else {
+                      _hasInvokedAuthService = true;
                       _authenticationProvider.deleteUserPhoneCredential(
                           _verificationCode, _pinPutController.text);
                     }

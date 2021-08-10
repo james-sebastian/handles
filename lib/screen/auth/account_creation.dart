@@ -23,8 +23,9 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
     }
 
     _imgFromGallery() async {
-      XFile? image = await ImagePicker()
-          .pickImage(source: ImageSource.gallery, imageQuality: 50);
+      final imagePicker = ImagePicker();
+      XFile? image = await imagePicker.pickImage(
+          source: ImageSource.gallery, imageQuality: 50);
       setState(() {
         _image = image;
       });
@@ -66,14 +67,14 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
                   CupertinoActionSheetAction(
                     child: const Text('Pick from Camera'),
                     onPressed: () {
-                      _imgFromGallery();
+                      _imgFromCamera();
                       Navigator.of(context).pop();
                     },
                   ),
                   CupertinoActionSheetAction(
                     child: const Text('Pick from Gallery'),
-                    onPressed: () {
-                      _imgFromCamera();
+                    onPressed: () async {
+                      await _imgFromGallery();
                       Navigator.of(context).pop();
                     },
                   )
