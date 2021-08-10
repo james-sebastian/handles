@@ -2,6 +2,7 @@ part of "../pages.dart";
 
 enum PhoneVerificationType { creation, update, deletion }
 
+=======
 class PhoneVerificationPage extends StatefulWidget {
   final PhoneVerificationType verificationStatus;
   final String phoneNumber;
@@ -12,7 +13,6 @@ class PhoneVerificationPage extends StatefulWidget {
   @override
   _PhoneVerificationPageState createState() => _PhoneVerificationPageState();
 }
-
 class _PhoneVerificationPageState extends State<PhoneVerificationPage> {
   final TextEditingController _pinPutController = TextEditingController();
   bool _hasInvokedAuthService = false;
